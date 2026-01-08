@@ -1,0 +1,4 @@
+#!/bin/bash
+# Auto-generated chat launcher for this INTRO directory
+cd "/home/rasmus/Desktop/projekts/projects/cirkelline-kv1ntos/INTRO"
+/home/rasmus/Desktop/ELLE.md/AGENTS.md/.venv/bin/python /home/rasmus/Desktop/ELLE.md/AGENTS.md/agents/intro_chat_agent.py "/home/rasmus/Desktop/projekts/projects/cirkelline-kv1ntos/INTRO"
