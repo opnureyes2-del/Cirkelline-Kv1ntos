@@ -1,0 +1,32 @@
+{
+  "name": "kv1nt",
+  "version": "1.0.0",
+  "type": "system",
+  "status": "stable",
+  "created": "2025-12-13",
+  "author": "Claude + Rasmus",
+  "description": "Proaktivt anbefalingssystem med workflow recommendations",
+  "capabilities": ["proactive_recommendations", "pattern_analysis", "workflow_suggestions", "priority_management"],
+  "dependencies": {
+    "cirkelline-system": ">=1.3.0"
+  },
+  "components": [
+    {"name": "recommendations", "file": "components/kv1nt_recommendations.py"},
+    {"name": "dashboard_api", "file": "components/kv1nt_dashboard.py"}
+  ],
+  "endpoints": [
+    "/api/kv1nt/health",
+    "/api/kv1nt/recommendations",
+    "/api/kv1nt/analysis",
+    "/api/kv1nt/rules/status",
+    "/api/kv1nt/rules/trigger",
+    "/api/kv1nt/patterns",
+    "/api/kv1nt/dashboard"
+  ],
+  "source": "cirkelline/ckc/kv1nt_recommendations.py",
+  "tests": {
+    "unit": "tests/test_kv1nt.py",
+    "coverage": "82%"
+  },
+  "frozen": true
+}

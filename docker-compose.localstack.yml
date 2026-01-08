@@ -1,0 +1,95 @@
+version: '3.8'
+
+# =============================================================================
+# CKC MASTERMIND - LocalStack AWS Simulation
+# =============================================================================
+# Formål: Lokal simulering af AWS services til test og validering
+# Brug: docker-compose -f docker-compose.localstack.yml up -d
+# =============================================================================
+
+services:
+  localstack:
+    image: localstack/localstack-pro:latest
+    container_name: cirkelline-localstack
+    ports:
+      - "4566:4566"           # LocalStack Gateway (alle services)
+      - "4510-4559:4510-4559" # External service ports range
+    environment:
+      # LocalStack Pro Auth Token
+      - LOCALSTACK_AUTH_TOKEN=ls-riMiNeVe-bIQu-7994-3115-WaPOdaWibc0b
+
+      # AWS Services til at emulere (PRO: alle 110+ services tilgængelige)
+      - SERVICES=s3,sqs,sns,dynamodb,lambda,cloudwatch,iam,secretsmanager,logs,events,apigateway,ec2,rds,cognito,ses,acm
+
+      # Debug mode
+      - DEBUG=1
+
+      # Skip data persistence to avoid mount issues
+      - PERSISTENCE=0
+      - SKIP_INFRA_DOWNLOADS=1
+
+      # Lambda konfiguration
+      - LAMBDA_EXECUTOR=docker
+      - LAMBDA_REMOTE_DOCKER=false
+      - LAMBDA_REMOVE_CONTAINERS=true
+
+      # Docker socket for Lambda
+      - DOCKER_HOST=unix:///var/run/docker.sock
+
+      # Region (matcher AWS production)
+      - DEFAULT_REGION=eu-north-1
+
+      # Edge port
+      - EDGE_PORT=4566
+
+    volumes:
+      # Docker socket for Lambda execution
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+    networks:
+      - cirkelline-aws-sim
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  localstack_data:
+    driver: local
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  cirkelline-aws-sim:
+    driver: bridge
+    name: cirkelline-aws-simulation
+
+# =============================================================================
+# USAGE:
+# =============================================================================
+#
+# Start:
+#   docker-compose -f docker-compose.localstack.yml up -d
+#
+# Stop:
+#   docker-compose -f docker-compose.localstack.yml down
+#
+# View logs:
+#   docker-compose -f docker-compose.localstack.yml logs -f
+#
+# Health check:
+#   curl http://localhost:4566/_localstack/health
+#
+# AWS CLI med LocalStack:
+#   aws --endpoint-url=http://localhost:4566 s3 ls
+#   aws --endpoint-url=http://localhost:4566 sqs list-queues
+#   aws --endpoint-url=http://localhost:4566 dynamodb list-tables
+#
+# =============================================================================

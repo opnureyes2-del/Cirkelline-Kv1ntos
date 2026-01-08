@@ -1,0 +1,25 @@
+{
+  "name": "web3-kommandant",
+  "version": "1.0.0",
+  "type": "kommandant",
+  "status": "stable",
+  "created": "2025-12-13",
+  "author": "Claude + Rasmus",
+  "description": "Web3, blockchain og cryptocurrency kommandant",
+  "capabilities": ["blockchain_analysis", "smart_contract_audit", "defi_monitoring", "nft_tracking", "wallet_analysis"],
+  "dependencies": {
+    "cirkelline-system": ">=1.3.0",
+    "agno": ">=2.3.4",
+    "web3": ">=6.0.0"
+  },
+  "egenskaber": [
+    {"name": "blockchain_historiker", "file": "egenskaber/blockchain_historiker.py"},
+    {"name": "defi_bibliotekar", "file": "egenskaber/defi_bibliotekar.py"}
+  ],
+  "source": "cirkelline/kommandanter/implementations/web3_kommandanter.py",
+  "tests": {
+    "unit": "tests/test_web3.py",
+    "coverage": "80%"
+  },
+  "frozen": true
+}

@@ -1,0 +1,24 @@
+{
+  "name": "law-team",
+  "version": "1.0.0",
+  "type": "team",
+  "status": "stable",
+  "created": "2025-12-13",
+  "author": "Claude + Rasmus",
+  "description": "Legal research og analyse team",
+  "capabilities": ["legal_research", "case_analysis", "compliance_check", "regulation_tracking"],
+  "dependencies": {
+    "cirkelline-system": ">=1.3.0",
+    "agno": ">=2.3.4"
+  },
+  "agents": [
+    {"name": "legal_researcher", "file": "agents/legal_researcher.py", "role": "Finds legal sources"},
+    {"name": "legal_analyst", "file": "agents/legal_analyst.py", "role": "Provides legal analysis"}
+  ],
+  "source": "cirkelline/agents/law_team.py",
+  "tests": {
+    "unit": "tests/test_law.py",
+    "coverage": "85%"
+  },
+  "frozen": true
+}

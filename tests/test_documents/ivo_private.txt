@@ -1,0 +1,9 @@
+This is Ivo's private contract document.
+
+Confidential Information:
+- Salary: €120,000/year
+- Benefits: Stock options, company car
+- Vacation days: 30 days/year
+- Start date: January 2024
+
+This document should ONLY be visible to Ivo.

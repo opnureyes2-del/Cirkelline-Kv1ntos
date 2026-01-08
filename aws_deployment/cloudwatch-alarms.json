@@ -1,0 +1,186 @@
+{
+  "Description": "CloudWatch Alarms for Cirkelline System",
+  "Version": "v1.3.5",
+  "Region": "eu-north-1",
+  "SNSTopicName": "cirkelline-alerts",
+
+  "Alarms": {
+    "ECS": [
+      {
+        "AlarmName": "cirkelline-ecs-cpu-high",
+        "Description": "ECS CPU utilization > 80%",
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/ECS",
+        "Statistic": "Average",
+        "Period": 300,
+        "EvaluationPeriods": 2,
+        "Threshold": 80,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {"Name": "ClusterName", "Value": "cirkelline-system-cluster"},
+          {"Name": "ServiceName", "Value": "cirkelline-system-backend-service"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "notBreaching"
+      },
+      {
+        "AlarmName": "cirkelline-ecs-memory-high",
+        "Description": "ECS Memory utilization > 80%",
+        "MetricName": "MemoryUtilization",
+        "Namespace": "AWS/ECS",
+        "Statistic": "Average",
+        "Period": 300,
+        "EvaluationPeriods": 2,
+        "Threshold": 80,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {"Name": "ClusterName", "Value": "cirkelline-system-cluster"},
+          {"Name": "ServiceName", "Value": "cirkelline-system-backend-service"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "notBreaching"
+      },
+      {
+        "AlarmName": "cirkelline-ecs-task-count-low",
+        "Description": "ECS running task count < desired",
+        "MetricName": "RunningTaskCount",
+        "Namespace": "ECS/ContainerInsights",
+        "Statistic": "Average",
+        "Period": 60,
+        "EvaluationPeriods": 3,
+        "Threshold": 1,
+        "ComparisonOperator": "LessThanThreshold",
+        "Dimensions": [
+          {"Name": "ClusterName", "Value": "cirkelline-system-cluster"},
+          {"Name": "ServiceName", "Value": "cirkelline-system-backend-service"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "breaching"
+      }
+    ],
+
+    "ALB": [
+      {
+        "AlarmName": "cirkelline-alb-5xx-errors",
+        "Description": "ALB 5XX errors > 10 in 5 minutes",
+        "MetricName": "HTTPCode_Target_5XX_Count",
+        "Namespace": "AWS/ApplicationELB",
+        "Statistic": "Sum",
+        "Period": 300,
+        "EvaluationPeriods": 1,
+        "Threshold": 10,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {"Name": "LoadBalancer", "Value": "app/cirkelline-system-alb/xxxxx"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "notBreaching"
+      },
+      {
+        "AlarmName": "cirkelline-alb-latency-high",
+        "Description": "ALB target response time > 2s",
+        "MetricName": "TargetResponseTime",
+        "Namespace": "AWS/ApplicationELB",
+        "Statistic": "Average",
+        "Period": 300,
+        "EvaluationPeriods": 2,
+        "Threshold": 2,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {"Name": "LoadBalancer", "Value": "app/cirkelline-system-alb/xxxxx"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "notBreaching"
+      },
+      {
+        "AlarmName": "cirkelline-alb-unhealthy-hosts",
+        "Description": "Unhealthy host count > 0",
+        "MetricName": "UnHealthyHostCount",
+        "Namespace": "AWS/ApplicationELB",
+        "Statistic": "Maximum",
+        "Period": 60,
+        "EvaluationPeriods": 2,
+        "Threshold": 0,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {"Name": "LoadBalancer", "Value": "app/cirkelline-system-alb/xxxxx"},
+          {"Name": "TargetGroup", "Value": "targetgroup/cirkelline-backend/xxxxx"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "notBreaching"
+      },
+      {
+        "AlarmName": "cirkelline-alb-request-count-anomaly",
+        "Description": "Unusual request count (potential DDoS)",
+        "MetricName": "RequestCount",
+        "Namespace": "AWS/ApplicationELB",
+        "Statistic": "Sum",
+        "Period": 300,
+        "EvaluationPeriods": 2,
+        "Threshold": 10000,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {"Name": "LoadBalancer", "Value": "app/cirkelline-system-alb/xxxxx"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "notBreaching"
+      }
+    ],
+
+    "RDS": [
+      {
+        "AlarmName": "cirkelline-rds-cpu-high",
+        "Description": "RDS CPU > 80%",
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/RDS",
+        "Statistic": "Average",
+        "Period": 300,
+        "EvaluationPeriods": 2,
+        "Threshold": 80,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {"Name": "DBInstanceIdentifier", "Value": "cirkelline-system-db"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "notBreaching"
+      },
+      {
+        "AlarmName": "cirkelline-rds-connections-high",
+        "Description": "RDS connections > 80",
+        "MetricName": "DatabaseConnections",
+        "Namespace": "AWS/RDS",
+        "Statistic": "Average",
+        "Period": 300,
+        "EvaluationPeriods": 2,
+        "Threshold": 80,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {"Name": "DBInstanceIdentifier", "Value": "cirkelline-system-db"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "notBreaching"
+      },
+      {
+        "AlarmName": "cirkelline-rds-storage-low",
+        "Description": "RDS free storage < 5GB",
+        "MetricName": "FreeStorageSpace",
+        "Namespace": "AWS/RDS",
+        "Statistic": "Average",
+        "Period": 300,
+        "EvaluationPeriods": 1,
+        "Threshold": 5368709120,
+        "ComparisonOperator": "LessThanThreshold",
+        "Dimensions": [
+          {"Name": "DBInstanceIdentifier", "Value": "cirkelline-system-db"}
+        ],
+        "AlarmActions": ["arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts"],
+        "TreatMissingData": "notBreaching"
+      }
+    ]
+  },
+
+  "AWSCommands": {
+    "CreateSNSTopic": "aws sns create-topic --name cirkelline-alerts --region eu-north-1",
+    "SubscribeEmail": "aws sns subscribe --topic-arn arn:aws:sns:eu-north-1:710504360116:cirkelline-alerts --protocol email --notification-endpoint admin@cirkelline.com --region eu-north-1"
+  }
+}

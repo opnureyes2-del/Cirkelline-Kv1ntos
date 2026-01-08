@@ -1,0 +1,112 @@
+{
+  "common": {
+    "loading": "Indlæser...",
+    "error": "Der opstod en fejl",
+    "success": "Handling gennemført",
+    "cancel": "Annuller",
+    "save": "Gem",
+    "delete": "Slet",
+    "edit": "Rediger",
+    "create": "Opret",
+    "close": "Luk",
+    "confirm": "Bekræft",
+    "back": "Tilbage",
+    "next": "Næste",
+    "search": "Søg",
+    "filter": "Filtrer",
+    "refresh": "Opdater",
+    "download": "Download",
+    "upload": "Upload",
+    "yes": "Ja",
+    "no": "Nej",
+    "ok": "OK",
+    "submit": "Send"
+  },
+  "auth": {
+    "login": "Log ind",
+    "logout": "Log ud",
+    "signup": "Opret konto",
+    "email": "E-mail",
+    "password": "Adgangskode",
+    "forgotPassword": "Glemt adgangskode?",
+    "resetPassword": "Nulstil adgangskode",
+    "rememberMe": "Husk mig",
+    "loginSuccess": "Du er nu logget ind",
+    "logoutSuccess": "Du er nu logget ud",
+    "invalidCredentials": "Ugyldig e-mail eller adgangskode",
+    "sessionExpired": "Din session er udløbet. Log venligst ind igen."
+  },
+  "errors": {
+    "unauthorized": "Du har ikke adgang til denne ressource",
+    "forbidden": "Adgang nægtet",
+    "notFound": "Siden blev ikke fundet",
+    "serverError": "Serverfejl. Prøv igen senere.",
+    "networkError": "Netværksfejl. Tjek din forbindelse.",
+    "timeout": "Forespørgslen tog for lang tid. Prøv igen.",
+    "validation": {
+      "required": "{field} er påkrævet",
+      "email": "Ugyldig e-mailadresse",
+      "minLength": "{field} skal være mindst {min} tegn",
+      "maxLength": "{field} må højst være {max} tegn"
+    }
+  },
+  "navigation": {
+    "home": "Hjem",
+    "dashboard": "Dashboard",
+    "settings": "Indstillinger",
+    "profile": "Profil",
+    "admin": "Administration",
+    "help": "Hjælp"
+  },
+  "user": {
+    "profile": "Profil",
+    "account": "Konto",
+    "preferences": "Præferencer",
+    "notifications": "Notifikationer",
+    "security": "Sikkerhed",
+    "language": "Sprog",
+    "theme": "Tema",
+    "darkMode": "Mørk tilstand",
+    "lightMode": "Lys tilstand"
+  },
+  "chat": {
+    "newChat": "Ny samtale",
+    "sendMessage": "Send besked",
+    "typeMessage": "Skriv en besked...",
+    "thinking": "Tænker...",
+    "generating": "Genererer...",
+    "copied": "Kopieret!",
+    "regenerate": "Generér igen",
+    "stopGenerating": "Stop generering",
+    "clearHistory": "Ryd historik",
+    "exportChat": "Eksporter samtale"
+  },
+  "documents": {
+    "upload": "Upload dokument",
+    "download": "Download",
+    "delete": "Slet dokument",
+    "rename": "Omdøb",
+    "preview": "Forhåndsvis",
+    "noDocuments": "Ingen dokumenter fundet",
+    "uploadSuccess": "Dokument uploadet",
+    "uploadError": "Fejl ved upload af dokument",
+    "deleteConfirm": "Er du sikker på, at du vil slette dette dokument?",
+    "processing": "Behandler dokument..."
+  },
+  "agents": {
+    "selectAgent": "Vælg agent",
+    "activeAgent": "Aktiv agent",
+    "thinking": "Agent tænker...",
+    "specialist": "Specialist",
+    "orchestrator": "Orkestrator",
+    "researcher": "Forsker"
+  },
+  "sessions": {
+    "newSession": "Ny session",
+    "loadSession": "Indlæs session",
+    "saveSession": "Gem session",
+    "deleteSession": "Slet session",
+    "sessionHistory": "Sessionshistorik",
+    "noSessions": "Ingen sessioner fundet"
+  }
+}

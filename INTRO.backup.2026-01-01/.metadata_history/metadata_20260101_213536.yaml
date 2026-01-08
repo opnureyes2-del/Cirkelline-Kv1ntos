@@ -1,0 +1,48 @@
+timestamp: '2026-01-01T21:35:36.745415'
+metadata:
+  folder_id: P-002-cirkelline-kv1ntos
+  folder_prefix: P
+  folder_number: 2
+  folder_name: cirkelline-kv1ntos
+  client_name: Cirkelline Kv1ntos
+  client_type: Internal Tool
+  industry: Agent Development
+  network: Cirkelline
+  project_type: AI Agent Framework
+  project_status: Active
+  project_stage: Development
+  created_date: '2024-11-15'
+  owner: Rasmus
+  priority: High
+  budget_category: Internal
+  renewal_date: null
+  contract_value: null
+  tech_stack:
+  - Python
+  - FastAPI
+  - TypeScript
+  - Docker
+  database: PostgreSQL
+  services: []
+  cirkelline_id: null
+  github_repo: null
+  documentation_url: null
+  dependencies: []
+  dependents: []
+  tags:
+  - status:active
+  - stage:development
+  - network:cirkelline
+  - industry:agent-development
+  - priority:high
+  - tech:python
+  - tech:fastapi
+  - tech:docker
+  - tech:typescript
+  metadata_version: '1.0'
+  last_updated: '2026-01-01T21:35:36.743669'
+  last_updated_by: system
+  metrics: null
+changed_by: system
+changes:
+  action: created

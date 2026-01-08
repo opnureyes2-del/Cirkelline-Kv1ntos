@@ -1,0 +1,98 @@
+# CKC Infrastructure - Docker Compose
+# Version: 1.0.0 | Date: 2025-12-10
+#
+# Dette er CKC's dedikerede infrastruktur:
+# - ckc-postgres: Primær database for agent hukommelse og læringsdata
+# - ckc-rabbitmq: Message queue for robust kommunikation
+# - ckc-redis: Cache og volatile pub/sub
+#
+# Start: docker compose -f docker-compose.ckc.yml up -d
+# Stop:  docker compose -f docker-compose.ckc.yml down
+
+version: '3.8'
+
+services:
+  # ==========================================================
+  # CKC PostgreSQL Database
+  # Port 5533 (ikke 5432 for at undgå konflikt med andre DBs)
+  # ==========================================================
+  ckc-postgres:
+    image: pgvector/pgvector:pg17
+    container_name: ckc-postgres
+    environment:
+      POSTGRES_USER: ckc
+      POSTGRES_PASSWORD: ${CKC_DB_PASSWORD:-ckc_secure_password_2025}
+      POSTGRES_DB: ckc_brain
+    ports:
+      - "5533:5432"
+    volumes:
+      - ckc_postgres_data:/var/lib/postgresql/data
+      - ./migrations/ckc:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ckc -d ckc_brain"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ckc-network
+
+  # ==========================================================
+  # RabbitMQ Message Queue
+  # AMQP: 5672 | Management UI: 15672
+  # ==========================================================
+  ckc-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ckc-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ckc
+      RABBITMQ_DEFAULT_PASS: ${CKC_MQ_PASSWORD:-ckc_mq_password_2025}
+      RABBITMQ_DEFAULT_VHOST: ckc
+    ports:
+      - "5672:5672"    # AMQP protocol
+      - "15672:15672"  # Management UI
+    volumes:
+      - ckc_rabbitmq_data:/var/lib/rabbitmq
+      - ./config/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ckc-network
+
+  # ==========================================================
+  # Redis Cache & Pub/Sub
+  # Port 6379 (standard)
+  # ==========================================================
+  ckc-redis:
+    image: redis:7-alpine
+    container_name: ckc-redis
+    command: redis-server --appendonly yes --requirepass ${CKC_REDIS_PASSWORD:-ckc_redis_password_2025}
+    ports:
+      - "6380:6379"  # Use 6380 to avoid conflict with existing Redis
+    volumes:
+      - ckc_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${CKC_REDIS_PASSWORD:-ckc_redis_password_2025}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ckc-network
+
+volumes:
+  ckc_postgres_data:
+    name: ckc_postgres_data
+  ckc_rabbitmq_data:
+    name: ckc_rabbitmq_data
+  ckc_redis_data:
+    name: ckc_redis_data
+
+networks:
+  ckc-network:
+    name: ckc-network
+    driver: bridge

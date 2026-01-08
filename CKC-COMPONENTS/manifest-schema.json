@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CKC Component Manifest",
+  "type": "object",
+  "required": ["name", "version", "type", "status", "created"],
+  "properties": {
+    "name": {"type": "string", "description": "Component name (kebab-case)"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "type": {"enum": ["kommandant", "team", "system", "agent"]},
+    "status": {"enum": ["development", "testing", "stable", "frozen", "deprecated"]},
+    "created": {"type": "string", "format": "date"},
+    "updated": {"type": "string", "format": "date"},
+    "author": {"type": "string"},
+    "description": {"type": "string"},
+    "capabilities": {"type": "array", "items": {"type": "string"}},
+    "dependencies": {"type": "object"},
+    "egenskaber": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "file": {"type": "string"}
+        }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "properties": {
+        "unit": {"type": "string"},
+        "coverage": {"type": "string"}
+      }
+    },
+    "checksum": {"type": "string"},
+    "frozen": {"type": "boolean", "default": false}
+  }
+}

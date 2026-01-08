@@ -1,0 +1,101 @@
+# CIRKELLINE PROMETHEUS ALERTS
+# ============================
+# Version: v1.3.5
+# Date: 2025-12-17
+
+groups:
+  # ============================================================
+  # BACKEND ALERTS
+  # ============================================================
+  - name: cirkelline-backend
+    rules:
+      - alert: BackendDown
+        expr: up{job="cirkelline-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Cirkelline Backend is down"
+          description: "Backend at {{ $labels.instance }} has been down for more than 1 minute."
+
+      - alert: HighRequestLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="cirkelline-backend"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request latency on {{ $labels.instance }}"
+          description: "95th percentile latency is {{ $value }}s"
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{job="cirkelline-backend",status=~"5.."}[5m]) / rate(http_requests_total{job="cirkelline-backend"}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate on Cirkelline Backend"
+          description: "Error rate is {{ $value | humanizePercentage }}"
+
+  # ============================================================
+  # SYSTEM ALERTS
+  # ============================================================
+  - name: system-alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}%"
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value }}%"
+
+      - alert: DiskSpaceLow
+        expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk usage is {{ $value }}%"
+
+  # ============================================================
+  # CONTAINER ALERTS
+  # ============================================================
+  - name: container-alerts
+    rules:
+      - alert: ContainerHighCPU
+        expr: rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} has high CPU usage"
+          description: "CPU usage is {{ $value }}%"
+
+      - alert: ContainerHighMemory
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} has high memory usage"
+          description: "Memory usage is {{ $value }}%"
+
+      - alert: ContainerRestarted
+        expr: increase(container_restart_count{name!=""}[1h]) > 3
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} restarted multiple times"
+          description: "Restarted {{ $value }} times in last hour"

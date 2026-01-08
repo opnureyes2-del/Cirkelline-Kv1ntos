@@ -1,0 +1,99 @@
+[package]
+name = "cirkelline-local-agent"
+version = "0.1.0"
+description = "Cirkelline Local Agent - Lokal AI-accelereret desktop app"
+authors = ["Cirkelline Team"]
+license = "MIT"
+repository = "https://github.com/cirkelline/cla"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+# Tauri Core
+tauri = { version = "2.0", features = ["devtools"] }
+tauri-plugin-shell = "2.0"
+tauri-plugin-fs = "2.0"
+tauri-plugin-dialog = "2.0"
+tauri-plugin-notification = "2.0"
+tauri-plugin-http = { version = "2.0", default-features = false, features = ["rustls-tls"] }
+tauri-plugin-store = "2.0"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Async Runtime
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+futures-util = "0.3"
+
+# Numerical computing
+ndarray = "0.16"
+
+# ONNX Runtime for AI inference
+ort = { version = "2.0.0-rc.10", features = ["load-dynamic"] }
+
+# Tokenizer for text processing
+tokenizers = { version = "0.21", default-features = false, features = ["onig"] }
+
+# Audio processing for Whisper
+hound = "3.5"
+rubato = "0.14"
+
+# System monitoring
+sysinfo = "0.30"
+
+# Database
+rusqlite = { version = "0.30", features = ["bundled"] }
+
+# HTTP Client for CKC communication (rustls for TLS, no OpenSSL dependency)
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls", "stream"] }
+
+# Regex and lazy statics
+regex = "1.10"
+once_cell = "1.19"
+
+# Platform-specific data directories
+dirs = "5.0"
+
+# gRPC client (optional, for high-performance sync)
+tonic = { version = "0.10", optional = true }
+
+# Logging
+log = "0.4"
+env_logger = "0.10"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# UUID generation
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Hashing for integrity checks
+sha2 = "0.10"
+base64 = "0.21"
+hex = "0.4"
+
+# Encryption
+aes-gcm = "0.10"
+argon2 = "0.5"
+rand = "0.8"
+
+[features]
+default = []
+grpc = ["dep:tonic"]
+cuda = []
+webgpu = []
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "z"
+strip = true

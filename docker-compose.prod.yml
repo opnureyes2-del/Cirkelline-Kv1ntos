@@ -1,0 +1,71 @@
+# Cirkelline Kv1ntos - Production
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: kv1ntos-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: cirkelline
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: cirkelline
+    volumes:
+      - kv1ntos_postgres_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cirkelline"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    container_name: kv1ntos-redis-prod
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - kv1ntos_redis_prod:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kv1ntos-backend-prod
+    restart: always
+    ports:
+      - "8777:7777"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://cirkelline:${POSTGRES_PASSWORD}@postgres:5432/cirkelline
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:7777/config')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - internal
+
+  # TODO: Frontend service (cirkelline-ui) pending Dockerfile creation
+
+volumes:
+  kv1ntos_postgres_prod:
+  kv1ntos_redis_prod:
+
+networks:
+  internal:

@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cirkelline-config
+  namespace: cirkelline
+  labels:
+    app: cirkelline-backend
+data:
+  # Application
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+
+  # Server
+  HOST: "0.0.0.0"
+  PORT: "7777"
+
+  # AGNO
+  AGNO_MONITOR: "true"
+  AGNO_DEBUG: "false"
+
+  # CORS
+  CORS_ORIGINS: "https://cirkelline.com,https://www.cirkelline.com"
+
+  # Rate Limiting
+  RATE_LIMIT_WINDOW: "60"
+
+  # Redis (connection string in secrets)
+  REDIS_DB: "0"
+  REDIS_MAX_CONNECTIONS: "50"
+
+  # Database Pool
+  DB_POOL_SIZE: "10"
+  DB_MAX_OVERFLOW: "20"
+  DB_POOL_TIMEOUT: "30"
+  DB_POOL_RECYCLE: "3600"

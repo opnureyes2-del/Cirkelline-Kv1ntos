@@ -1,0 +1,24 @@
+{
+  "name": "mastermind",
+  "version": "1.0.0",
+  "type": "system",
+  "status": "stable",
+  "created": "2025-12-13",
+  "author": "Claude + Rasmus",
+  "description": "Central orchestrator system med SuperAdminControl og KV1NT integration",
+  "capabilities": ["task_orchestration", "agent_coordination", "workflow_management", "priority_scheduling"],
+  "dependencies": {
+    "cirkelline-system": ">=1.3.0"
+  },
+  "components": [
+    {"name": "super_admin_control", "file": "components/super_admin_control.py"},
+    {"name": "kv1nt_terminal_partner", "file": "components/kv1nt_terminal_partner.py"},
+    {"name": "workflow_engine", "file": "components/workflow_engine.py"}
+  ],
+  "source": "cirkelline/ckc/mastermind/",
+  "tests": {
+    "unit": "tests/test_mastermind.py",
+    "coverage": "88%"
+  },
+  "frozen": true
+}

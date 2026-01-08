@@ -1,0 +1,52 @@
+{
+  "timestamp": "2025-12-18T03:33:01.497644",
+  "duration_seconds": 0.016884,
+  "steps_completed": 5,
+  "steps_total": 5,
+  "memory_audit": {
+    "action": "memory_audit",
+    "status": "success",
+    "entries_scanned": 0,
+    "duplicates_found": 0,
+    "memory_mb_before": 23.6015625,
+    "memory_mb_after": 23.6015625,
+    "gc_collected": [
+      12,
+      0,
+      0
+    ]
+  },
+  "cleanup": {
+    "action": "system_cleanup",
+    "status": "success",
+    "files_deleted": 0,
+    "bytes_freed": 0,
+    "paths_cleaned": [],
+    "mb_freed": 0.0
+  },
+  "log_rotation": {
+    "action": "log_rotation",
+    "status": "success",
+    "logs_rotated": 0,
+    "logs_archived": 0,
+    "logs_deleted": 0,
+    "bytes_compressed": 0,
+    "mb_compressed": 0.0
+  },
+  "cache_clear": {
+    "action": "cache_invalidation",
+    "status": "success",
+    "redis_cleared": false,
+    "file_cache_cleared": 0,
+    "memory_collected": true
+  },
+  "index_optimization": {
+    "action": "index_optimization",
+    "status": "skipped",
+    "vacuum_run": false,
+    "analyze_run": false,
+    "tables_optimized": []
+  },
+  "errors": [],
+  "success": true
+}

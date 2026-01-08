@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cirkelline
+  labels:
+    app.kubernetes.io/name: cirkelline
+    app.kubernetes.io/part-of: cirkelline-system

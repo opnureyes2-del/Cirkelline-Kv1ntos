@@ -1,0 +1,163 @@
+{
+  "metadata": {
+    "system": "Cirkelline Human-Centric Validation (HCV)",
+    "version": "1.0.0",
+    "description": "Tracking fil for Human-Centric Validation checkpoints",
+    "last_updated": null
+  },
+  "phases": {
+    "5": {
+      "status": "PENDING",
+      "required": true,
+      "checkpoints": [
+        {
+          "id": "HCV-5.1",
+          "name": "Web3 Scanner Intuitivitet",
+          "description": "Validering af scanner-output relevans og brugervenlighed",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        },
+        {
+          "id": "HCV-5.2",
+          "name": "Analysis Output Kvalitet",
+          "description": "Vurdering af decompilation og analyse-rapporter for forståelighed",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        },
+        {
+          "id": "HCV-5.3",
+          "name": "Governance Insights",
+          "description": "Evaluering af DAO-analyse for strategisk værdi og klarhed",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        },
+        {
+          "id": "HCV-5.4",
+          "name": "Social Integration UX",
+          "description": "Test af social media adapter brugerflade og OAuth flow",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        },
+        {
+          "id": "HCV-5.5",
+          "name": "Local LLM Fallback Experience",
+          "description": "Validering af offline-oplevelse og respons-kvalitet",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        }
+      ],
+      "overall_feedback": null,
+      "approved_by": null,
+      "approved_at": null
+    },
+    "6": {
+      "status": "PENDING",
+      "required": true,
+      "checkpoints": [
+        {
+          "id": "HCV-6.1",
+          "name": "Marketplace Navigation",
+          "description": "Validering af marketplace brugervenlighed og flow",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        },
+        {
+          "id": "HCV-6.2",
+          "name": "Payment Integration UX",
+          "description": "Test af betalingsflow for sikkerhed og intuitivitet",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        },
+        {
+          "id": "HCV-6.3",
+          "name": "Marketing Website Æstetik",
+          "description": "Vurdering af landingside for brand-alignment og konvertering",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        }
+      ],
+      "overall_feedback": null,
+      "approved_by": null,
+      "approved_at": null
+    },
+    "7": {
+      "status": "PENDING",
+      "required": true,
+      "checkpoints": [
+        {
+          "id": "HCV-7.1",
+          "name": "AI Learning Personalisering",
+          "description": "Validering af adaptiv læring og brugerspecifik tilpasning",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        },
+        {
+          "id": "HCV-7.2",
+          "name": "Agent Kreativitet",
+          "description": "Vurdering af AI-genereret indhold for originalitet og værdi",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        },
+        {
+          "id": "HCV-7.3",
+          "name": "Video/Annonce Output",
+          "description": "Evaluering af genererede videoer og annoncetekster",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        }
+      ],
+      "overall_feedback": null,
+      "approved_by": null,
+      "approved_at": null
+    },
+    "8": {
+      "status": "PENDING",
+      "required": true,
+      "checkpoints": [
+        {
+          "id": "HCV-8.1",
+          "name": "Security Transparency",
+          "description": "Validering af sikkerhedsrapporter for forståelighed",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        },
+        {
+          "id": "HCV-8.2",
+          "name": "Compliance Dashboard",
+          "description": "Vurdering af compliance-oversigt for brugervenlighed",
+          "status": "PENDING",
+          "validated_by": null,
+          "validated_at": null,
+          "feedback": null
+        }
+      ],
+      "overall_feedback": null,
+      "approved_by": null,
+      "approved_at": null
+    }
+  }
+}

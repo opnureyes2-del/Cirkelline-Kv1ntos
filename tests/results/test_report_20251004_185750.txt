@@ -1,0 +1,60 @@
+
+================================================================================
+CIRKELLINE TEST REPORT
+Generated: 2025-10-04 18:57:50
+================================================================================
+
+📊 SUMMARY:
+  Total Tests: 8
+  ✅ Passed: 4
+  ❌ Failed: 4
+  Success Rate: 50.0%
+
+📋 DETAILED RESULTS:
+
+✅ PASS | Server Health Check
+  Duration: 0.00s
+  Response Length: 0 chars
+  Notes: Server is healthy
+
+✅ PASS | Configuration Endpoint
+  Duration: 0.04s
+  Response Length: 0 chars
+  Notes: 4 agents, 3 teams
+
+✅ PASS | Agents List Endpoint
+  Duration: 0.04s
+  Response Length: 0 chars
+  Notes: Found agents: Audio Specialist, Video Specialist, Image Specialist, Document Specialist
+
+✅ PASS | Teams List Endpoint
+  Duration: 0.06s
+  Response Length: 0 chars
+  Notes: Found teams: Cirkelline, Research Team, Law Team
+
+❌ FAIL | Cirkelline Text Query
+  Duration: 0.04s
+  Response Length: 0 chars
+  Error: Status code: 422
+
+❌ FAIL | Cirkelline Pass-Through Behavior
+  Duration: 0.04s
+  Response Length: 0 chars
+  Error: Status code: 422
+
+❌ FAIL | Research Team Direct Access
+  Duration: 0.04s
+  Response Length: 0 chars
+  Error: Status code: 422
+
+❌ FAIL | Law Team Direct Access
+  Duration: 0.04s
+  Response Length: 0 chars
+  Error: Status code: 422
+
+💡 RECOMMENDATIONS:
+  ⚠️  4 test(s) failed. Review failures before deployment.
+  🚨 CRITICAL FAILURES:
+     • Cirkelline Pass-Through Behavior: Status code: 422
+
+================================================================================

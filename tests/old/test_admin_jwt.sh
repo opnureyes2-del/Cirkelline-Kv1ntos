@@ -1,0 +1,10 @@
+#!/bin/bash
+
+TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjI1NjM4MzUtNGUwMC00M2I2LWI1NDYtNDJhMGNmZjNjMWQ2IiwiZW1haWwiOiJlZW52eXdpdGhpbkBnbWFpbC5jb20iLCJkaXNwbGF5X25hbWUiOiJlZW52eSIsImlzX2FkbWluIjp0cnVlLCJhZG1pbl9uYW1lIjoiSXZvIiwiYWRtaW5fcm9sZSI6IkNFTyAmIENyZWF0b3IiLCJhZG1pbl9jb250ZXh0IjoiRm91bmRlZCBDaXJrZWxsaW5lLCBmb2N1c2VzIG9uIEFJIHN0cmF0ZWd5IGFuZCBwcm9kdWN0IGRldmVsb3BtZW50IiwiYWRtaW5fcHJlZmVyZW5jZXMiOiJQcmVmZXJzIHRlY2huaWNhbCBkZXRhaWxzIHdpdGggY29kZSBleGFtcGxlcy4gTGlrZXMgZGlyZWN0LCBlZmZpY2llbnQgY29tbXVuaWNhdGlvbi4iLCJhZG1pbl9pbnN0cnVjdGlvbnMiOiJBbHdheXMgcHJvdmlkZSB0ZWNobmljYWwgaW1wbGVtZW50YXRpb24gZGV0YWlscy4gSW5jbHVkZSBjb2RlIHNuaXBwZXRzIHdoZW4gcmVsZXZhbnQuIiwiZXhwIjoxNzYwNTM5MzQ0LCJpYXQiOjE3NTk5MzQ1NDR9.b-kfgok8Nj7G3QDxivEAer_vtNtwcQ_7LY0q8Z9TeNU"
+
+echo "Testing Admin JWT Authentication..."
+curl -s -X POST "http://localhost:7777/teams/cirkelline/runs" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "message=Who am I?&stream=false" \
+  --max-time 30

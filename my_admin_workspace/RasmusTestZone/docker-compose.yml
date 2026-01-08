@@ -1,0 +1,117 @@
+# /home/rasmus/Desktop/projects/cirkelline-system/my_admin_workspace/RasmusTestZone/docker-compose.yml
+# ==============================================================================================
+# RASMUS TESTZONE - Lokal test-konfiguration for CKC systemet
+# Denne fil refererer til kode i ecosystems/ckc-core/
+#
+# Brug: docker compose up -d
+# ==============================================================================================
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # DATABASE: PostgreSQL 15 med pgvector
+  # ============================================================================
+  ckc-postgres:
+    image: postgres:15-alpine
+    container_name: ckc-postgres-testzone
+    environment:
+      POSTGRES_DB: ckc_db
+      POSTGRES_USER: ckc_user
+      POSTGRES_PASSWORD: ckc_password
+    ports:
+      - "127.0.0.1:5533:5432"
+    volumes:
+      - ckc_data_testzone:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ckc_user -d ckc_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ckc-network
+
+  # ============================================================================
+  # AWS LOCALSTACK: Lokal AWS simulering (S3, SQS, Lambda, DynamoDB)
+  # ============================================================================
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack-testzone
+    ports:
+      - "4566:4566"
+      - "4510-4559:4510-4559"
+    environment:
+      - SERVICES=s3,sqs,lambda,dynamodb
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - localstack_data_testzone:/tmp/localstack
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:4566/_localstack/health | grep -q running || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ckc-network
+
+  # ============================================================================
+  # TEST REDIS: Caching til tests
+  # ============================================================================
+  test-redis:
+    image: redis:7-alpine
+    container_name: ckc-test-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6381:6379"
+    volumes:
+      - test_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - ckc-network
+    profiles:
+      - full
+
+  # ============================================================================
+  # TEST RABBITMQ: Messaging til tests
+  # ============================================================================
+  test-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ckc-test-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: test
+      RABBITMQ_DEFAULT_PASS: test123
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ckc-network
+    profiles:
+      - full
+
+# ============================================================================
+# VOLUMES: Persistent data storage
+# ============================================================================
+volumes:
+  ckc_data_testzone:
+    name: ckc_testzone_postgres_data
+  localstack_data_testzone:
+    name: ckc_testzone_localstack_data
+  test_redis_data:
+    name: ckc_testzone_redis_data
+
+# ============================================================================
+# NETWORKS: Isoleret netværk for testzone
+# ============================================================================
+networks:
+  ckc-network:
+    name: ckc-testzone-network
+    driver: bridge

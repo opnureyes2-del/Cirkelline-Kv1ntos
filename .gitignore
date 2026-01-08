@@ -1,0 +1,100 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# Node
+node_modules/
+.next/
+.turbo/
+dist/
+build/
+
+# CKC Ecosystems (large versioned copies)
+ecosystems/
+
+# CLA (Cirkelline Local Agent - build artifacts)
+# =============================================
+# Mappesystem:
+# /home/rasmus/Desktop/projekts/projects/cirkelline-system/cla/
+#   ├── src-tauri/
+#   │   ├── src/               <- Rust source (TRACKED)
+#   │   │   ├── accessibility/ <- Voice control module (TRACKED)
+#   │   │   ├── commander/     <- Commander unit (TRACKED)
+#   │   │   ├── commands/      <- Tauri commands (TRACKED)
+#   │   │   └── ...
+#   │   └── target/            <- Build output (IGNORED)
+#   ├── node_modules/          <- Dependencies (IGNORED)
+#   └── dist/                  <- Build output (IGNORED)
+cla/target/
+cla/node_modules/
+cla/dist/
+cla/.next/
+cla/src-tauri/target/
+# Include CLA source files via negation:
+!cla/src-tauri/src/
+!cla/src-tauri/Cargo.toml
+!cla/package.json
+
+# Admin workspace (tracked for DNA lineage)
+# my_admin_workspace/  ← NOW TRACKED
+
+# Archive - NOW TRACKED FOR DNA LINEAGE
+# Removed: archive/, docs(archive)/
+# All historical content is now preserved in git for agent DNA identification
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+.tox/
+*.cover
+
+# Logs
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Database
+*.db
+
+# Temp
+tmp/
+
+# Backups
+backups/old_logs/
+*.backup
+
+# AWS Secrets
+aws_deployment/db_*.txt
+aws_deployment/deployment_vars.env
+
+# Claude
+.claude/
+*.egg-info/
+
+# Large model files (download separately)
+cla/src-tauri/models/*.onnx
+cla/src-tauri/models/**/*.onnx
+
+# Archive with potential secrets
+DNA-ARKIV/

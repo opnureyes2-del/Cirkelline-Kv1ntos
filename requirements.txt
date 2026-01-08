@@ -1,0 +1,49 @@
+# Core AI (PINNED 2025-12-17 for stability)
+agno==2.3.13
+google-genai==1.55.0
+
+# Framework (PINNED 2025-12-17 for stability)
+fastapi==0.124.4
+uvicorn>=0.27.0
+python-dotenv
+sqlalchemy==2.0.45
+pgvector
+psycopg[binary]
+pypdf
+python-docx
+beautifulsoup4
+markdown
+duckduckgo-search
+ddgs
+exa_py
+tavily-python
+psutil
+# Security dependencies (PINNED 2025-12-17 for security)
+pyjwt==2.10.1
+bcrypt==5.0.0
+cryptography==46.0.3
+tzlocal==5.2
+# Google Auth (PINNED 2025-12-16)
+google-auth>=2.25.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+google-api-python-client>=2.100.0
+notion-client
+aiohttp
+asyncpg
+redis==7.1.0
+
+# FASE 6: Multi-Bibliotek & Marketplace dependencies
+pyyaml
+
+# Browser automation (optional - for Research Team)
+browser-use>=0.1.0
+langchain-google-genai>=2.0.0
+playwright>=1.40.0
+
+# Testing dependencies
+pytest
+pytest-asyncio
+pytest-cov
+httpx
+alembic==1.14.0

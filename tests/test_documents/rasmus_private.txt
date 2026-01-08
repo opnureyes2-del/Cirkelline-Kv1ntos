@@ -1,0 +1,14 @@
+This is Rasmus's private technical notes.
+
+Project Architecture Notes:
+- Database: PostgreSQL with pgvector extension
+- Backend: FastAPI with AgentOS framework
+- Frontend: Next.js with TypeScript
+- Deployment: AWS ECS Fargate
+
+Security considerations:
+- JWT-based authentication
+- Row-level security for documents
+- Admin-only access to system metrics
+
+This document should ONLY be visible to Rasmus.

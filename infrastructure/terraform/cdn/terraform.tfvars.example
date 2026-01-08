@@ -1,0 +1,22 @@
+# =============================================================================
+# CIRKELLINE CDN - TERRAFORM VARIABLES
+# =============================================================================
+# Copy this file to terraform.tfvars and fill in your values
+# DO NOT commit terraform.tfvars to version control
+# =============================================================================
+
+# AWS Region
+aws_region = "eu-north-1"
+
+# Environment
+environment = "production"
+
+# Domain configuration
+domain_name = "cirkelline.com"
+api_domain  = "api.cirkelline.com"
+
+# ALB DNS name (from EKS/ECS deployment)
+alb_dns_name = "your-alb-dns-name.eu-north-1.elb.amazonaws.com"
+
+# ACM Certificate ARN (must be in us-east-1 for CloudFront)
+acm_certificate_arn = "arn:aws:acm:us-east-1:YOUR_ACCOUNT_ID:certificate/YOUR_CERT_ID"

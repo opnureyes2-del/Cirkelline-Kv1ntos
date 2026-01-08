@@ -1,0 +1,828 @@
+/* Import Google Fonts - Inter for body, Alan Sans for headings */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ============================================
+     CIRKELLINE DESIGN SYSTEM V2.0
+     Design tokens for the new UI
+     ============================================ */
+
+  /* Light theme (default) */
+  :root {
+    /* Background Colors */
+    --bg-primary: #FFFFFF;           /* Main background - pure white */
+    --bg-secondary: #FFFFFF;         /* Secondary surfaces - white */
+    --bg-surface: #FFFFFF;           /* Cards, panels, elevated surfaces */
+    --bg-elevated: #FFFFFF;          /* Modals, dropdowns */
+
+    /* Text Colors */
+    --text-primary: #212124;         /* Main text - dark gray */
+    --text-secondary: #6B6B6B;       /* Secondary text - medium gray */
+    --text-tertiary: #9B9B9B;        /* Tertiary text - light gray */
+    --text-placeholder: #B0B0B0;     /* Placeholder text */
+
+    /* Border Colors */
+    --border-primary: #E4E4E2;       /* Main borders - custom light gray (NO BLUE!) */
+    --border-secondary: #E5E5E5;     /* Subtle borders */
+    --border-focus: #DD4814;         /* Focus states - orange accent */
+
+    /* Custom Cirkelline Colors */
+    --main-bg: #FFFFFF;              /* Main background */
+    --surface-bg: #FFFFFF;           /* Sidebar, topbar, chat input */
+    --border-color: #E4E4E2;         /* Border color - custom gray (NO BLUE!) */
+
+    /* Accent Colors - DYNAMIC (default purple) */
+    --accent-rgb: 142, 11, 131;      /* RGB values - default purple #8E0B83 */
+    --accent: rgb(var(--accent-rgb));
+    --accent-start: rgb(var(--accent-rgb));
+    --accent-end: rgb(var(--accent-rgb));
+    --accent-hover-start: rgb(var(--accent-rgb));
+    --accent-hover-end: rgb(var(--accent-rgb));
+    --accent-active-start: rgb(var(--accent-rgb));
+    --accent-active-end: rgb(var(--accent-rgb));
+    --accent-light: rgba(var(--accent-rgb), 0.1);
+    --accent-medium: rgba(var(--accent-rgb), 0.3);
+
+    /* Secondary Accent */
+    --accent-secondary: #F59E0B;     /* Amber for highlights */
+    --accent-secondary-hover: #D97706;
+
+    /* Contrast Colors (for text on accent backgrounds) */
+    --contrast-light: #E0E0E0;       /* Light text for dark backgrounds */
+    --contrast-dark: #212124;        /* Dark text for light backgrounds */
+    --contrast-light-rgb: 224, 224, 224;  /* RGB for Tailwind arbitrary values */
+    --contrast-dark-rgb: 33, 33, 36;      /* RGB for Tailwind arbitrary values */
+
+    /* Font Families (Inter for body, Alan Sans for headings) */
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-heading: 'Alan Sans', system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', monospace;
+
+    /* Semantic Colors */
+    --success: #10B981;
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --success-border: rgba(16, 185, 129, 0.2);
+    
+    --error: #EF4444;
+    --error-bg: rgba(239, 68, 68, 0.1);
+    --error-border: rgba(239, 68, 68, 0.2);
+    
+    --warning: #F59E0B;
+    --warning-bg: rgba(245, 158, 11, 0.1);
+    --warning-border: rgba(245, 158, 11, 0.2);
+    
+    --info: #3B82F6;
+    --info-bg: rgba(59, 130, 246, 0.1);
+    --info-border: rgba(59, 130, 246, 0.2);
+
+    /* Shadows - Disabled for minimal design */
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+
+    /* Animation Durations */
+    --duration-instant: 0ms;
+    --duration-fast: 150ms;
+    --duration-normal: 250ms;
+    --duration-slow: 400ms;
+    --duration-slower: 600ms;
+
+    /* Easing Curves */
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Legacy support */
+    --color-border-default: 208, 215, 222;
+    --scrollbar-width: 0.1rem;
+
+    /* App Container Background (slightly darker than main bg) */
+    --app-container-bg: #E8E8E6;
+  }
+
+  /* Dark theme */
+  .dark {
+    /* Background Colors */
+    --bg-primary: #212124;           /* Main background - dark gray */
+    --bg-secondary: #212124;         /* Secondary surfaces */
+    --bg-surface: #212124;           /* Cards, panels, elevated surfaces */
+    --bg-elevated: #212124;          /* Modals, dropdowns */
+
+    /* Text Colors */
+    --text-primary: #E0E0E0;         /* Main text - light gray */
+    --text-secondary: #A0A0A0;       /* Secondary text - medium gray */
+    --text-tertiary: #808080;        /* Tertiary text - darker gray */
+    --text-placeholder: #606060;     /* Placeholder text */
+
+    /* Border Colors */
+    --border-primary: #2A2A2A;       /* Main borders - custom dark gray (NO BLUE!) */
+    --border-secondary: #2F3034;     /* Subtle borders */
+    --border-focus: #DD4814;         /* Focus states - orange accent */
+
+    /* Custom Cirkelline Colors */
+    --main-bg: #212124;              /* Main background */
+    --surface-bg: #212124;           /* Sidebar, topbar, chat input */
+    --border-color: #2A2A2A;         /* Border color - custom dark gray (NO BLUE!) */
+
+    /* Accent Colors - DYNAMIC (inherits from :root) */
+    --accent: rgb(var(--accent-rgb));
+    --accent-start: rgb(var(--accent-rgb));
+    --accent-end: rgb(var(--accent-rgb));
+    --accent-hover-start: rgb(var(--accent-rgb));
+    --accent-hover-end: rgb(var(--accent-rgb));
+    --accent-active-start: rgb(var(--accent-rgb));
+    --accent-active-end: rgb(var(--accent-rgb));
+    --accent-light: rgba(var(--accent-rgb), 0.15);
+    --accent-medium: rgba(var(--accent-rgb), 0.4);
+
+    /* Secondary Accent */
+    --accent-secondary: #F59E0B;
+    --accent-secondary-hover: #D97706;
+
+    /* Semantic Colors */
+    --success: #10B981;
+    --success-bg: rgba(16, 185, 129, 0.15);
+    --success-border: rgba(16, 185, 129, 0.25);
+    
+    --error: #EF4444;
+    --error-bg: rgba(239, 68, 68, 0.15);
+    --error-border: rgba(239, 68, 68, 0.25);
+    
+    --warning: #F59E0B;
+    --warning-bg: rgba(245, 158, 11, 0.15);
+    --warning-border: rgba(245, 158, 11, 0.25);
+    
+    --info: #3B82F6;
+    --info-bg: rgba(59, 130, 246, 0.15);
+    --info-border: rgba(59, 130, 246, 0.25);
+
+    /* Shadows - Disabled for minimal design */
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+
+    /* Legacy support */
+    --color-border-default: 48, 54, 61;
+
+    /* App Container Background (slightly darker than main bg) */
+    --app-container-bg: #1d1d1e;
+  }
+
+  /* Apply to body */
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+  }
+
+  /* Placeholder styling */
+  ::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+  }
+
+  /* App Container Background Utilities */
+  .bg-app-container {
+    background-color: var(--app-container-bg);
+  }
+  .hover\:bg-app-container:hover {
+    background-color: var(--app-container-bg);
+  }
+
+  .dark ::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.5;
+  }
+
+  /* Headings use Alan Sans */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Alan Sans', system-ui, sans-serif;
+    font-weight: 600;
+  }
+
+  /* Code elements use monospace */
+  code, pre {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', monospace;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better focus indicators */
+  *:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Sharp SVG icons - prevents pixelation/blur on all icons */
+  svg {
+    shape-rendering: geometricPrecision !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+  }
+}
+
+@layer components {
+  /* Reusable component classes */
+  .surface {
+    background-color: var(--bg-surface);
+  }
+
+  .accent-text {
+    color: var(--accent);
+  }
+
+  .accent-bg {
+    background-color: var(--accent);
+  }
+
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-thumb {
+  --tw-border-opacity: 1;
+  background-color: #2A2A2A;
+  border-color: rgba(255, 255, 255, var(--tw-border-opacity));
+  border-radius: 9999px;
+  border-width: 1px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 9999px;
+}
+
+/* Custom Scrollbar for Sidebar */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #2A2A2A transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: #2A2A2A;
+  border-radius: 3px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #2A2A2A;
+}
+
+/* Chat Messages Scrollbar - targets StickToBottom's scrollRef div */
+.message-scroll-container > div:first-child {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 107, 107, 0.3) transparent;
+}
+
+.dark .message-scroll-container > div:first-child {
+  scrollbar-color: rgba(160, 160, 160, 0.3) transparent;
+}
+
+.message-scroll-container > div:first-child::-webkit-scrollbar {
+  width: 2px;
+}
+
+.message-scroll-container > div:first-child::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-scroll-container > div:first-child::-webkit-scrollbar-thumb {
+  background-color: rgb(107 107 107 / 0.3);
+  border-radius: 9999px;
+}
+
+.message-scroll-container > div:first-child::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(107 107 107 / 0.5);
+}
+
+.dark .message-scroll-container > div:first-child::-webkit-scrollbar-thumb {
+  background-color: rgb(160 160 160 / 0.3);
+}
+
+.dark .message-scroll-container > div:first-child::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(160 160 160 / 0.5);
+}
+
+/* Tasks Board Horizontal Scrollbar - matches sidebar style (tiny 2px) */
+.tasks-board-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 107, 107, 0.1) transparent;
+}
+
+.tasks-board-scroll::-webkit-scrollbar {
+  height: 2px;
+  width: 2px;
+}
+
+.tasks-board-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tasks-board-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 107, 107, 0.1);
+  border-radius: 9999px;
+}
+
+.tasks-board-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(107, 107, 107, 0.2);
+}
+
+.dark .tasks-board-scroll {
+  scrollbar-color: rgba(160, 160, 160, 0.1) transparent;
+}
+
+.dark .tasks-board-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(160, 160, 160, 0.1);
+}
+
+/* Email Panel Scrollbar - visible 6px */
+.email-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 107, 107, 0.1) transparent;
+}
+
+.email-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.email-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.email-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 107, 107, 0.1);
+  border-radius: 3px;
+}
+
+.email-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(107, 107, 107, 0.2);
+}
+
+.dark .email-scroll {
+  scrollbar-color: rgba(160, 160, 160, 0.1) transparent;
+}
+
+.dark .email-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(160, 160, 160, 0.1);
+}
+
+.dark .email-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(160, 160, 160, 0.2);
+}
+
+.dark .tasks-board-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(160, 160, 160, 0.2);
+}
+
+/* Unified App Container Scrollbar - matches sidebar style (tiny 2px) */
+.app-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 107, 107, 0.1) transparent;
+}
+
+.app-scroll::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+
+.app-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 107, 107, 0.1);
+  border-radius: 9999px;
+}
+
+.app-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(107, 107, 107, 0.2);
+}
+
+.dark .app-scroll {
+  scrollbar-color: rgba(160, 160, 160, 0.1) transparent;
+}
+
+.dark .app-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(160, 160, 160, 0.1);
+}
+
+.dark .app-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(160, 160, 160, 0.2);
+}
+
+/* Hide Scrollbar */
+.scrollbar-none {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Dropdown Animation */
+@keyframes dropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-dropdown {
+  animation: dropdown 0.15s ease-out;
+}
+
+/* Collapsible Section Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.2s ease-in forwards;
+}
+
+/* Smooth transition for section content */
+.section-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+/* Modal Animation */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal {
+  animation: modalIn 0.2s ease-out;
+}
+
+/* ============================================
+   NEW DESIGN SYSTEM V2.0 ANIMATIONS
+   ============================================ */
+
+/* Fade In */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-fast) var(--ease-out);
+}
+
+/* Slide Up */
+@keyframes slideUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUpIn var(--duration-normal) var(--ease-out);
+}
+
+/* Scale In */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--duration-normal) var(--ease-out);
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--accent-rgb), 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* Gradient Shimmer for buttons */
+@keyframes gradientShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-shimmer {
+  background-size: 200% 200%;
+  animation: gradientShimmer 3s ease-in-out infinite;
+}
+
+/* Bounce Dot (for typing indicator) */
+@keyframes bounceDot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-bounce-dot {
+  animation: bounceDot 0.8s ease-in-out infinite;
+}
+
+.animate-bounce-dot-1 {
+  animation: bounceDot 0.8s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.animate-bounce-dot-2 {
+  animation: bounceDot 0.8s ease-in-out infinite;
+  animation-delay: 0.15s;
+}
+
+.animate-bounce-dot-3 {
+  animation: bounceDot 0.8s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+/* Spin */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Pulse */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Glow */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--accent-rgb), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.8);
+  }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Slide From Left */
+@keyframes slideFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-from-left {
+  animation: slideFromLeft var(--duration-normal) var(--ease-out);
+}
+
+/* Slide From Right */
+@keyframes slideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-from-right {
+  animation: slideFromRight var(--duration-normal) var(--ease-out);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Gradient backgrounds */
+.bg-gradient-accent {
+  background: linear-gradient(135deg, var(--accent-start) 0%, var(--accent-end) 100%);
+}
+
+.bg-gradient-accent-hover {
+  background: linear-gradient(135deg, var(--accent-hover-start) 0%, var(--accent-hover-end) 100%);
+}
+
+.bg-gradient-accent-active {
+  background: linear-gradient(135deg, var(--accent-active-start) 0%, var(--accent-active-end) 100%);
+}
+
+/* Hover gradient shift */
+.hover-gradient-shift {
+  background-size: 200% 200%;
+  transition: background-position 0.5s var(--ease-in-out);
+}
+
+.hover-gradient-shift:hover {
+  background-position: 100% 50%;
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all var(--duration-normal) var(--ease-in-out);
+}
+
+.transition-fast {
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.transition-slow {
+  transition: all var(--duration-slow) var(--ease-in-out);
+}
+
+/* Transform utilities */
+.hover-lift {
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hover-scale {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   TOPBAR ICON BUTTONS - MATERIAL DESIGN
+   Android-style circular icons with elevation
+   ============================================ */
+
+/* Active icon button - filled with accent color, elevated with glow */
+.icon-btn-active {
+  box-shadow:
+    /* Drop shadow for elevation */
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    /* Outer glow with accent color */
+    0 0 8px rgba(var(--accent-rgb), 0.2),
+    /* Inner shadow for depth */
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode adjustments for active icon */
+.dark .icon-btn-active {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(var(--accent-rgb), 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Inactive icon button - solid background */
+.icon-btn-inactive {
+  transition: all 0.2s var(--ease-out);
+}

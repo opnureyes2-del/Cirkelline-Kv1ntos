@@ -1,0 +1,69 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: cirkelline-production
+
+namespace: cirkelline
+
+resources:
+  - ../../base
+
+commonLabels:
+  environment: production
+
+# Production-specific patches
+patches:
+  # Scale up replicas
+  - target:
+      kind: Deployment
+      name: cirkelline-backend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+
+  # Higher HPA limits for production
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: cirkelline-backend-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 50
+
+  # Increase resources for production
+  - target:
+      kind: Deployment
+      name: cirkelline-backend
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "1Gi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "2000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "4Gi"
+
+# Production ConfigMap patches
+configMapGenerator:
+  - name: cirkelline-config
+    behavior: merge
+    literals:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=WARNING
+      - DB_POOL_SIZE=20
+      - DB_MAX_OVERFLOW=40
+      - REDIS_MAX_CONNECTIONS=100
+
+images:
+  - name: 710504360116.dkr.ecr.eu-north-1.amazonaws.com/cirkelline-system-backend
+    newTag: v1.3.1

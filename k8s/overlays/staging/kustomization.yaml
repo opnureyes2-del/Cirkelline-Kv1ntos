@@ -1,0 +1,71 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: cirkelline-staging
+
+namespace: cirkelline-staging
+
+resources:
+  - ../../base
+
+commonLabels:
+  environment: staging
+
+nameSuffix: -staging
+
+# Staging-specific patches
+patches:
+  # Lower replicas for staging
+  - target:
+      kind: Deployment
+      name: cirkelline-backend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+
+  # Lower HPA limits for staging
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: cirkelline-backend-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 5
+
+  # Reduce resources for staging
+  - target:
+      kind: Deployment
+      name: cirkelline-backend
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "100m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "256Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "1Gi"
+
+# Staging ConfigMap patches
+configMapGenerator:
+  - name: cirkelline-config
+    behavior: merge
+    literals:
+      - ENVIRONMENT=staging
+      - LOG_LEVEL=DEBUG
+      - DB_POOL_SIZE=5
+      - DB_MAX_OVERFLOW=10
+      - REDIS_MAX_CONNECTIONS=20
+
+images:
+  - name: 710504360116.dkr.ecr.eu-north-1.amazonaws.com/cirkelline-system-backend
+    newTag: latest

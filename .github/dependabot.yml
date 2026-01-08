@@ -1,0 +1,130 @@
+# Dependabot configuration for Cirkelline System
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+
+version: 2
+updates:
+  # CKC Core Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/ecosystems/ckc-core"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+      - "ckc-core"
+    commit-message:
+      prefix: "deps(ckc-core)"
+    groups:
+      ai-ml:
+        patterns:
+          - "torch*"
+          - "transformers*"
+          - "sentence-transformers*"
+          - "onnxruntime*"
+      web-framework:
+        patterns:
+          - "fastapi*"
+          - "uvicorn*"
+          - "starlette*"
+          - "pydantic*"
+      aws:
+        patterns:
+          - "boto3*"
+          - "botocore*"
+          - "aioboto3*"
+      testing:
+        patterns:
+          - "pytest*"
+          - "httpx*"
+          - "respx*"
+
+  # CLA Frontend (npm/pnpm)
+  - package-ecosystem: "npm"
+    directory: "/cla"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "cla"
+    commit-message:
+      prefix: "deps(cla-frontend)"
+    groups:
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      tauri:
+        patterns:
+          - "@tauri-apps/*"
+      state-management:
+        patterns:
+          - "zustand*"
+          - "immer*"
+      ui:
+        patterns:
+          - "tailwindcss*"
+          - "lucide-react*"
+          - "clsx*"
+
+  # CLA Rust dependencies (Tauri backend)
+  - package-ecosystem: "cargo"
+    directory: "/cla/src-tauri"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "rust"
+      - "cla"
+    commit-message:
+      prefix: "deps(cla-rust)"
+    groups:
+      tauri:
+        patterns:
+          - "tauri*"
+      async:
+        patterns:
+          - "tokio*"
+          - "async-*"
+      ml:
+        patterns:
+          - "ort*"
+          - "onnxruntime*"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "deps(actions)"
+
+  # Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "deps(docker)"

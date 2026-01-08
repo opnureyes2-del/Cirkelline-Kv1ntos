@@ -1,0 +1,123 @@
+{
+  "family": "cirkelline-system-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "2048",
+  "memory": "4096",
+  "executionRoleArn": "arn:aws:iam::710504360116:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::710504360116:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "cirkelline-system-container",
+      "image": "710504360116.dkr.ecr.eu-north-1.amazonaws.com/cirkelline-system-backend:v1.3.7",
+      "cpu": 2048,
+      "memory": 4096,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 7777,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "environment": [
+        {
+          "name": "RUNTIME_ENV",
+          "value": "production"
+        },
+        {
+          "name": "WORKERS",
+          "value": "1"
+        },
+        {
+          "name": "PORT",
+          "value": "7777"
+        },
+        {
+          "name": "AGNO_MONITOR",
+          "value": "true"
+        },
+        {
+          "name": "AGNO_DEBUG",
+          "value": "false"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline-system/database-url-SIvYB9"
+        },
+        {
+          "name": "GOOGLE_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline-system/google-api-key-5Dx9M5"
+        },
+        {
+          "name": "JWT_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline-system/jwt-secret-key-PFCrRL"
+        },
+        {
+          "name": "EXA_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline-system/exa-api-key-ElKyEQ"
+        },
+        {
+          "name": "TAVILY_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline-system/tavily-api-key-fMO5AL"
+        },
+        {
+          "name": "GOOGLE_CLIENT_ID",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline/GOOGLE_CLIENT_ID-C9Co68"
+        },
+        {
+          "name": "GOOGLE_CLIENT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline/GOOGLE_CLIENT_SECRET-CVyN2M"
+        },
+        {
+          "name": "GOOGLE_TOKEN_ENCRYPTION_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline/GOOGLE_TOKEN_ENCRYPTION_KEY-OV7ok8"
+        },
+        {
+          "name": "GOOGLE_REDIRECT_URI",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline/GOOGLE_REDIRECT_URI-QoTeQg"
+        },
+        {
+          "name": "FRONTEND_URL",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline/FRONTEND_URL-qcKBGV"
+        },
+        {
+          "name": "NOTION_CLIENT_ID",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline/NOTION_CLIENT_ID-K5gi9f"
+        },
+        {
+          "name": "NOTION_CLIENT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline/NOTION_CLIENT_SECRET-WxG5KY"
+        },
+        {
+          "name": "NOTION_TOKEN_ENCRYPTION_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline/NOTION_TOKEN_ENCRYPTION_KEY-n1YuSR"
+        },
+        {
+          "name": "NOTION_REDIRECT_URI",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:710504360116:secret:cirkelline/NOTION_REDIRECT_URI-7161lk"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/cirkelline-system-backend",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:7777/config || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}

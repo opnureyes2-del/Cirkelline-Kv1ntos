@@ -1,0 +1,62 @@
+# Crowdin Configuration - Cirkelline System
+# Documentation: https://support.crowdin.com/configuration-file/
+#
+# This file configures automated localization for the Cirkelline system.
+# Languages: Danish (da), English (en), Swedish (sv), German (de), Arabic (ar)
+
+# Project credentials (use environment variables for security)
+project_id_env: "CROWDIN_PROJECT_ID"
+api_token_env: "CROWDIN_PERSONAL_TOKEN"
+
+# Preserve directory structure between Crowdin and GitHub
+preserve_hierarchy: true
+
+# Files configuration
+files:
+  # JSON translation files
+  - source: /locales/en/**/*.json
+    translation: /locales/%locale%/**/%original_file_name%
+
+    # Update behavior: mark updated strings as unapproved for review
+    update_option: update_as_unapproved
+
+    # Auto-detect file type (JSON)
+    type: auto
+
+    # Content segmentation for better Translation Memory matching
+    # Splits content into smaller segments for reuse
+    content_segmentation: 1
+
+    # Enable ICU MessageFormat detection for placeholders like {field}, {min}, {max}
+    icu_tag_detection: 1
+
+    # Escape settings (0 = don't escape)
+    escape_quotes: 0
+    escape_special_characters: 0
+
+    # Export settings
+    skip_untranslated_strings: false  # Include empty translations in export
+    skip_untranslated_files: false    # Export even if file not 100% translated
+    export_only_approved: false       # For main branch, set to true
+
+    # Translation strategy
+    translate_hidden: true
+
+    # Language mapping (customize file paths per language)
+    languages_mapping:
+      locale:
+        da: da  # Danish
+        en: en  # English (source)
+        sv: sv  # Swedish
+        de: de  # German
+        ar: ar  # Arabic (RTL)
+
+      # Android-specific codes (if needed)
+      android_code:
+        da: da
+        ar: ar-rSA  # Arabic (Saudi Arabia)
+
+      # iOS/macOS codes (if needed)
+      osx_code:
+        da: da
+        ar: ar-SA

@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cirkelline-backend
+  namespace: cirkelline
+  labels:
+    app: cirkelline-backend
+    app.kubernetes.io/name: cirkelline-backend
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: cirkelline-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cirkelline-backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: cirkelline-backend
+        app.kubernetes.io/name: cirkelline-backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "7777"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: cirkelline-backend
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: backend
+          image: 710504360116.dkr.ecr.eu-north-1.amazonaws.com/cirkelline-system-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 7777
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: cirkelline-config
+            - secretRef:
+                name: cirkelline-secrets
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 10"]
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: cirkelline-backend
+                topologyKey: kubernetes.io/hostname
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: cirkelline-backend
+      terminationGracePeriodSeconds: 30

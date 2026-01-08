@@ -1,0 +1,87 @@
+# Dependabot configuration for CLA
+# Keeps dependencies up to date automatically
+
+version: 2
+
+updates:
+  # Frontend (npm/pnpm)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "cirkelline/cla-team"
+    labels:
+      - "dependencies"
+      - "frontend"
+    commit-message:
+      prefix: "deps(frontend)"
+    groups:
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      tailwind:
+        patterns:
+          - "tailwind*"
+          - "postcss*"
+          - "autoprefixer"
+      vite:
+        patterns:
+          - "vite*"
+          - "@vitejs/*"
+      testing:
+        patterns:
+          - "vitest"
+          - "@testing-library/*"
+          - "@vitest/*"
+
+  # Backend (Rust/Cargo)
+  - package-ecosystem: "cargo"
+    directory: "/src-tauri"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "cirkelline/cla-team"
+    labels:
+      - "dependencies"
+      - "backend"
+      - "rust"
+    commit-message:
+      prefix: "deps(rust)"
+    groups:
+      tauri:
+        patterns:
+          - "tauri*"
+      crypto:
+        patterns:
+          - "aes-gcm*"
+          - "argon2"
+          - "sha2"
+          - "rand"
+      async:
+        patterns:
+          - "tokio*"
+          - "async-*"
+      serde:
+        patterns:
+          - "serde*"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "cirkelline/cla-team"
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "ci(deps)"

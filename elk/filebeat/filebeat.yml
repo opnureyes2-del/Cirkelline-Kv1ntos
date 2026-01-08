@@ -1,0 +1,105 @@
+# CIRKELLINE FILEBEAT CONFIG
+# ==========================
+# Ships logs to Elasticsearch/Logstash
+#
+# Version: v1.3.5
+# Date: 2025-12-17
+
+# ============================================================
+# FILEBEAT INPUTS
+# ============================================================
+
+filebeat.inputs:
+  # CKC Routine Logs
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/host/ckc/*.log
+    fields:
+      log_type: ckc_routine
+      application: cirkelline
+    fields_under_root: true
+    multiline:
+      pattern: '^\['
+      negate: true
+      match: after
+
+  # Docker Container Logs
+  - type: container
+    enabled: true
+    paths:
+      - /var/lib/docker/containers/*/*.log
+    processors:
+      - add_docker_metadata:
+          host: "unix:///var/run/docker.sock"
+
+  # System Logs
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/host/syslog
+      - /var/log/host/auth.log
+    fields:
+      log_type: system
+    fields_under_root: true
+
+# ============================================================
+# FILEBEAT MODULES
+# ============================================================
+
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+# ============================================================
+# PROCESSORS
+# ============================================================
+
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - decode_json_fields:
+      fields: ["message"]
+      target: ""
+      overwrite_keys: true
+      process_array: false
+      max_depth: 2
+
+# ============================================================
+# OUTPUT - ELASTICSEARCH
+# ============================================================
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  index: "cirkelline-filebeat-%{+yyyy.MM.dd}"
+
+# Alternative: Output to Logstash
+# output.logstash:
+#   hosts: ["logstash:5044"]
+
+# ============================================================
+# SETUP
+# ============================================================
+
+setup.template.name: "cirkelline-filebeat"
+setup.template.pattern: "cirkelline-filebeat-*"
+setup.template.settings:
+  index.number_of_shards: 1
+  index.number_of_replicas: 0
+
+setup.kibana:
+  host: "http://kibana:5601"
+
+# ============================================================
+# LOGGING
+# ============================================================
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0640

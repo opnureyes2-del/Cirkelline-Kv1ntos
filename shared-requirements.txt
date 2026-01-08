@@ -1,0 +1,40 @@
+# Cirkelline Ecosystem Shared Dependencies
+# ===========================================
+# Alle projekter i Cirkelline økosystemet SKAL synkronisere til disse versioner
+# for at sikre konsistens og kompatibilitet.
+#
+# Opdateret: 2025-12-13
+# Gælder for: CKC-Core, lib-admin, Cosmic Library
+
+# === CORE FRAMEWORK ===
+fastapi==0.115.4
+uvicorn[standard]==0.32.0
+pydantic==2.10.3
+pydantic-settings==2.6.1
+sqlalchemy==2.0.36
+
+# === SECURITY ===
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.0
+pyjwt==2.9.0
+cryptography==43.0.0
+
+# === HTTP & ASYNC ===
+httpx==0.28.1
+aiohttp==3.11.7
+asyncpg==0.30.0
+
+# === DATABASE ===
+psycopg[binary]==3.2.3
+pgvector==0.3.6
+alembic==1.14.0
+
+# === TESTING ===
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+
+# === UTILITIES ===
+python-dotenv==1.0.1
+python-multipart==0.0.12

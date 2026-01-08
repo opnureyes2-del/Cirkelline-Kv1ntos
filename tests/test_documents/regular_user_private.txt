@@ -1,0 +1,16 @@
+This is the regular user's private vacation planning document.
+
+Vacation Plans for Summer 2025:
+- Destination: Barcelona, Spain
+- Dates: July 15-30, 2025
+- Budget: €3,000
+- Accommodations: AirBnB in Gothic Quarter
+- Activities: Sagrada Familia, Park Güell, beach time
+
+Packing list:
+- Sunscreen
+- Camera
+- Travel adapter
+- Comfortable walking shoes
+
+This document should ONLY be visible to the regular user (user_id: 6f174494-1055-474c-8d6f-73afb6610745).

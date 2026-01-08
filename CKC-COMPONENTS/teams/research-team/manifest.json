@@ -1,0 +1,28 @@
+{
+  "name": "research-team",
+  "version": "1.0.0",
+  "type": "team",
+  "status": "stable",
+  "created": "2025-12-13",
+  "author": "Claude + Rasmus",
+  "description": "Multi-source research team med DuckDuckGo, Exa og Tavily agenter",
+  "capabilities": ["web_search", "semantic_search", "news_search", "academic_search", "comprehensive_research"],
+  "dependencies": {
+    "cirkelline-system": ">=1.3.0",
+    "agno": ">=2.3.4",
+    "duckduckgo-search": ">=4.0.0",
+    "exa-py": ">=1.0.0",
+    "tavily-python": ">=0.3.0"
+  },
+  "agents": [
+    {"name": "duckduckgo_researcher", "file": "agents/duckduckgo_researcher.py", "role": "News and current events"},
+    {"name": "exa_researcher", "file": "agents/exa_researcher.py", "role": "Semantic and conceptual search"},
+    {"name": "tavily_researcher", "file": "agents/tavily_researcher.py", "role": "Comprehensive web research"}
+  ],
+  "source": "cirkelline/agents/research_team.py",
+  "tests": {
+    "unit": "tests/test_research.py",
+    "coverage": "90%"
+  },
+  "frozen": true
+}

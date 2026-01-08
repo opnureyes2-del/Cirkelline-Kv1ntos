@@ -1,0 +1,38 @@
+agent:
+  name: "Kv1ntos Sekretær"
+  type: "directory_assistant"
+  description: "Hjælper med Kv1ntos projekt"
+
+permissions:
+  - read_files
+  - git_operations
+  - run_scripts
+  - run_tests
+
+kommandoer:
+  - bibliotekar
+
+shortcuts:
+  - name: "status"
+    command: "git status"
+    description: "Git status"
+
+  - name: "todo"
+    command: "find . -name '*TODO*' -type f"
+    description: "Find TODO filer"
+
+  - name: "intro"
+    command: "cat INTRO/README.md 2>/dev/null || echo 'Ingen INTRO README'"
+    description: "Vis INTRO README"
+
+  - name: "test"
+    command: ".venv/bin/pytest tests/ -v 2>/dev/null || echo 'Ingen tests eller venv'"
+    description: "Kør tests"
+
+context:
+  project: "cirkelline-kv1ntos"
+  databases:
+    - "ckc_brain (port 5533)"
+
+  key_paths:
+    - "INTRO/ - Project documentation"

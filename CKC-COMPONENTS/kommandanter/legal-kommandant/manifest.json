@@ -1,0 +1,25 @@
+{
+  "name": "legal-kommandant",
+  "version": "1.0.0",
+  "type": "kommandant",
+  "status": "stable",
+  "created": "2025-12-13",
+  "author": "Claude + Rasmus",
+  "description": "Legal research and compliance kommandant med historiker og bibliotekar egenskaber",
+  "capabilities": ["legal_research", "compliance_check", "gdpr_audit", "law_tracking", "case_analysis"],
+  "dependencies": {
+    "cirkelline-system": ">=1.3.0",
+    "agno": ">=2.3.4"
+  },
+  "egenskaber": [
+    {"name": "historiker", "file": "egenskaber/historiker.py", "description": "Tracker lovgivning, retsafgørelser, compliance"},
+    {"name": "bibliotekar", "file": "egenskaber/bibliotekar.py", "description": "Søger og klassificerer juridisk indhold"}
+  ],
+  "source": "cirkelline/kommandanter/implementations/legal_kommandanter.py",
+  "lines": 760,
+  "tests": {
+    "unit": "tests/test_legal.py",
+    "coverage": "85%"
+  },
+  "frozen": true
+}

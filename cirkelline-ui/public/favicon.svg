@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <style>
+    /* Light theme: dark icon */
+    circle, line {
+      stroke: #212124;
+    }
+
+    /* Dark theme: light icon */
+    @media (prefers-color-scheme: dark) {
+      circle, line {
+        stroke: #e5e7eb;
+      }
+    }
+  </style>
+
+  <!-- CircleOff icon optimized for small sizes -->
+  <circle cx="24" cy="24" r="18" stroke-width="3" fill="none"/>
+  <line x1="9" y1="9" x2="39" y2="39" stroke-width="3" stroke-linecap="round"/>
+</svg>

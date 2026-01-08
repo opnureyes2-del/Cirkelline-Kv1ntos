@@ -1,0 +1,219 @@
+{
+  "rabbit_version": "3.13.0",
+  "users": [
+    {
+      "name": "ckc",
+      "password_hash": "ckc_mq_password_2025",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ["administrator"]
+    }
+  ],
+  "vhosts": [
+    {"name": "ckc"}
+  ],
+  "permissions": [
+    {
+      "user": "ckc",
+      "vhost": "ckc",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "ckc.tasks",
+      "vhost": "ckc",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "ckc.events",
+      "vhost": "ckc",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "ckc.ilcp",
+      "vhost": "ckc",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "ckc.feedback",
+      "vhost": "ckc",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "ckc.dlx",
+      "vhost": "ckc",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "tasks.tool_explorer",
+      "vhost": "ckc",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "ckc.dlx"
+      }
+    },
+    {
+      "name": "tasks.creative_synthesizer",
+      "vhost": "ckc",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "ckc.dlx"
+      }
+    },
+    {
+      "name": "tasks.knowledge_architect",
+      "vhost": "ckc",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "ckc.dlx"
+      }
+    },
+    {
+      "name": "tasks.virtual_world_builder",
+      "vhost": "ckc",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "ckc.dlx"
+      }
+    },
+    {
+      "name": "tasks.quality_assurance",
+      "vhost": "ckc",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "ckc.dlx"
+      }
+    },
+    {
+      "name": "events.dashboard",
+      "vhost": "ckc",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "events.audit",
+      "vhost": "ckc",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "feedback.kommandant",
+      "vhost": "ckc",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "dlq.all",
+      "vhost": "ckc",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "ckc.tasks",
+      "vhost": "ckc",
+      "destination": "tasks.tool_explorer",
+      "destination_type": "queue",
+      "routing_key": "tool_explorer",
+      "arguments": {}
+    },
+    {
+      "source": "ckc.tasks",
+      "vhost": "ckc",
+      "destination": "tasks.creative_synthesizer",
+      "destination_type": "queue",
+      "routing_key": "creative_synthesizer",
+      "arguments": {}
+    },
+    {
+      "source": "ckc.tasks",
+      "vhost": "ckc",
+      "destination": "tasks.knowledge_architect",
+      "destination_type": "queue",
+      "routing_key": "knowledge_architect",
+      "arguments": {}
+    },
+    {
+      "source": "ckc.tasks",
+      "vhost": "ckc",
+      "destination": "tasks.virtual_world_builder",
+      "destination_type": "queue",
+      "routing_key": "virtual_world_builder",
+      "arguments": {}
+    },
+    {
+      "source": "ckc.tasks",
+      "vhost": "ckc",
+      "destination": "tasks.quality_assurance",
+      "destination_type": "queue",
+      "routing_key": "quality_assurance",
+      "arguments": {}
+    },
+    {
+      "source": "ckc.events",
+      "vhost": "ckc",
+      "destination": "events.dashboard",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "ckc.events",
+      "vhost": "ckc",
+      "destination": "events.audit",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "ckc.feedback",
+      "vhost": "ckc",
+      "destination": "feedback.kommandant",
+      "destination_type": "queue",
+      "routing_key": "kommandant",
+      "arguments": {}
+    },
+    {
+      "source": "ckc.dlx",
+      "vhost": "ckc",
+      "destination": "dlq.all",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    }
+  ]
+}
