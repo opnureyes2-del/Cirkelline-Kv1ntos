@@ -689,7 +689,7 @@ dependencies = [
  "tauri-plugin-notification",
  "tauri-plugin-shell",
  "tauri-plugin-store",
- "thiserror 1.0.69",
+ "thiserror 2.0.17",
  "tokenizers",
  "tokio",
  "tonic",
