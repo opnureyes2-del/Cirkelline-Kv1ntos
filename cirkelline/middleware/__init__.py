@@ -6,6 +6,9 @@ FastAPI middleware components for:
 - Session management
 - RBAC tier enforcement
 - Compliance audit trails
+- CKC Gateway Authentication (P2-INT-2)
+
+UPDATED: 2026-01-09 - Added Gateway Auth Middleware
 """
 
 from cirkelline.middleware.middleware import (
@@ -19,6 +22,12 @@ from cirkelline.middleware.middleware import (
     RBACGatewayMiddleware,
     AuditTrailMiddleware,
     RateLimitMiddleware,
+)
+
+# CKC Gateway Authentication Middleware (P2-INT-2)
+from cirkelline.middleware.gateway_middleware import (
+    GatewayAuthMiddleware,
+    StrictGatewayAuthMiddleware,
 )
 
 from cirkelline.middleware.rbac import (
@@ -73,6 +82,10 @@ __all__ = [
     'RBACGatewayMiddleware',
     'AuditTrailMiddleware',
     'RateLimitMiddleware',
+
+    # Gateway Auth Middleware (P2-INT-2)
+    'GatewayAuthMiddleware',
+    'StrictGatewayAuthMiddleware',
 
     # RBAC - Permissions
     'Permission',
