@@ -98,3 +98,4 @@ cla/src-tauri/models/**/*.onnx
 
 # Archive with potential secrets
 DNA-ARKIV/
+.agent-core
