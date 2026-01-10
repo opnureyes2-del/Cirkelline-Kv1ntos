@@ -815,6 +815,200 @@ async def create_hitl_request(
     return request
 
 
+# ========== MODEL SWITCHING ENDPOINTS (CKC-24) ==========
+# Added 2026-01-09 by Kv1nt - Unblocks cirkelline-kv1ntos release
+
+class ModelSwitchRequest(BaseModel):
+    """Request to switch AI model."""
+    provider: str = Field(..., description="Target model provider (gemini, claude, gpt4, llama, mistral)")
+    reason: Optional[str] = Field(None, description="Reason for switch")
+    initiated_by: str = Field("user", description="Who initiated: user, system, super_admin")
+
+
+class ModelStatusResponse(BaseModel):
+    """Status of a single AI model."""
+    provider: str
+    status: str
+    is_active: bool
+    health_score: float
+    capabilities: List[str]
+    gdpr_compliant: bool
+    cost_per_1k_input: float = 0.0
+    cost_per_1k_output: float = 0.0
+    rate_limit_rpm: int = 60
+
+
+class ModelSwitchResponse(BaseModel):
+    """Response after model switch."""
+    success: bool
+    previous_model: Optional[str]
+    current_model: str
+    switch_time_ms: float
+    reason: Optional[str]
+
+
+class ModelSwitchHistory(BaseModel):
+    """History entry for model switch."""
+    event_id: str
+    from_model: Optional[str]
+    to_model: str
+    reason: str
+    timestamp: datetime
+    duration_ms: float
+    success: bool
+    initiated_by: str
+
+
+# Model switching state (in-memory for now)
+_model_state = {
+    "current_model": "gemini",
+    "switch_history": [],
+    "models": {
+        "gemini": {"status": "active", "health_score": 1.0, "gdpr_compliant": False},
+        "claude": {"status": "available", "health_score": 1.0, "gdpr_compliant": True},
+        "gpt4": {"status": "available", "health_score": 1.0, "gdpr_compliant": False},
+        "llama": {"status": "available", "health_score": 0.9, "gdpr_compliant": True},
+        "mistral": {"status": "available", "health_score": 0.95, "gdpr_compliant": True},
+    }
+}
+
+
+@router.get("/models", response_model=List[ModelStatusResponse])
+async def list_models():
+    """List all available AI models with their status."""
+    models = []
+    for provider, data in _model_state["models"].items():
+        models.append(ModelStatusResponse(
+            provider=provider,
+            status=data["status"],
+            is_active=(provider == _model_state["current_model"]),
+            health_score=data["health_score"],
+            capabilities=["chat", "reasoning", "code"] if provider != "llama" else ["chat", "reasoning"],
+            gdpr_compliant=data["gdpr_compliant"],
+            cost_per_1k_input=0.075 if provider == "gemini" else 0.01,
+            cost_per_1k_output=0.30 if provider == "gemini" else 0.03,
+            rate_limit_rpm=1500 if provider == "gemini" else 60
+        ))
+    return models
+
+
+@router.get("/models/current", response_model=ModelStatusResponse)
+async def get_current_model():
+    """Get the currently active AI model."""
+    provider = _model_state["current_model"]
+    data = _model_state["models"][provider]
+    return ModelStatusResponse(
+        provider=provider,
+        status="active",
+        is_active=True,
+        health_score=data["health_score"],
+        capabilities=["chat", "reasoning", "code"],
+        gdpr_compliant=data["gdpr_compliant"],
+        cost_per_1k_input=0.075,
+        cost_per_1k_output=0.30,
+        rate_limit_rpm=1500
+    )
+
+
+@router.post("/models/switch", response_model=ModelSwitchResponse)
+async def switch_model(request: ModelSwitchRequest):
+    """Switch to a different AI model (hot-swap)."""
+    import uuid
+    import time
+
+    start_time = time.time()
+    previous = _model_state["current_model"]
+    target = request.provider.lower()
+
+    # Validate target model
+    if target not in _model_state["models"]:
+        raise HTTPException(status_code=400, detail=f"Unknown model: {target}")
+
+    if target == previous:
+        return ModelSwitchResponse(
+            success=True,
+            previous_model=previous,
+            current_model=target,
+            switch_time_ms=0.0,
+            reason="Already using this model"
+        )
+
+    # Perform switch
+    _model_state["models"][previous]["status"] = "available"
+    _model_state["models"][target]["status"] = "active"
+    _model_state["current_model"] = target
+
+    switch_time_ms = (time.time() - start_time) * 1000
+
+    # Record history
+    event = {
+        "event_id": f"switch_{uuid.uuid4().hex[:8]}",
+        "from_model": previous,
+        "to_model": target,
+        "reason": request.reason or request.initiated_by,
+        "timestamp": datetime.utcnow().isoformat(),
+        "duration_ms": switch_time_ms,
+        "success": True,
+        "initiated_by": request.initiated_by
+    }
+    _model_state["switch_history"].append(event)
+
+    # Broadcast event
+    await _broadcast_event("model.switched", {
+        "from": previous,
+        "to": target,
+        "reason": request.reason,
+        "initiated_by": request.initiated_by
+    })
+
+    logger.info(f"Model switched: {previous} -> {target} ({switch_time_ms:.2f}ms)")
+
+    return ModelSwitchResponse(
+        success=True,
+        previous_model=previous,
+        current_model=target,
+        switch_time_ms=switch_time_ms,
+        reason=request.reason
+    )
+
+
+@router.get("/models/{provider}", response_model=ModelStatusResponse)
+async def get_model_status(provider: str):
+    """Get status of a specific AI model."""
+    provider = provider.lower()
+    if provider not in _model_state["models"]:
+        raise HTTPException(status_code=404, detail=f"Model not found: {provider}")
+
+    data = _model_state["models"][provider]
+    return ModelStatusResponse(
+        provider=provider,
+        status=data["status"],
+        is_active=(provider == _model_state["current_model"]),
+        health_score=data["health_score"],
+        capabilities=["chat", "reasoning", "code"] if provider != "llama" else ["chat", "reasoning"],
+        gdpr_compliant=data["gdpr_compliant"],
+        cost_per_1k_input=0.075 if provider == "gemini" else 0.01,
+        cost_per_1k_output=0.30 if provider == "gemini" else 0.03,
+        rate_limit_rpm=1500 if provider == "gemini" else 60
+    )
+
+
+@router.get("/models/history", response_model=List[ModelSwitchHistory])
+async def get_switch_history(limit: int = Query(50, le=100)):
+    """Get history of model switches."""
+    history = _model_state["switch_history"][-limit:]
+    return [ModelSwitchHistory(
+        event_id=e["event_id"],
+        from_model=e["from_model"],
+        to_model=e["to_model"],
+        reason=e["reason"],
+        timestamp=datetime.fromisoformat(e["timestamp"]),
+        duration_ms=e["duration_ms"],
+        success=e["success"],
+        initiated_by=e["initiated_by"]
+    ) for e in reversed(history)]
+
+
 # ========== Module Exports ==========
 
 __all__ = [
@@ -830,4 +1024,9 @@ __all__ = [
     "RoomSummary",
     "HITLRequest",
     "SystemOverview",
+    # Model Switching (CKC-24)
+    "ModelSwitchRequest",
+    "ModelStatusResponse",
+    "ModelSwitchResponse",
+    "ModelSwitchHistory",
 ]
