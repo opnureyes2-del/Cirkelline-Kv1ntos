@@ -5,16 +5,29 @@ import bcrypt
 from tzlocal import get_localzone_name
 import httpx
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('cirkelline.log'),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+# Phase B: Unified Logging Integration
+try:
+    from unified_logging import setup_admiral_logging
+    logger = setup_admiral_logging(
+        service_name="cirkelline-kv1ntos",
+        level=logging.INFO
+    )
+    logger.info("✅ Unified logging initialized for cirkelline-kv1ntos")
+except (ImportError, Exception) as e:
+    # Fallback to basic logging if unified_logging not available or fails
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler('cirkelline.log'),
+            logging.StreamHandler()
+        ]
+    )
+    logger = logging.getLogger(__name__)
+    if isinstance(e, ImportError):
+        logger.warning("⚠️ Unified logging not available, using basic logging")
+    else:
+        logger.warning(f"⚠️ Unified logging setup failed: {e}, using basic logging")
 
 logger.info("Starting Cirkelline AgentOS...")
 
@@ -80,6 +93,18 @@ logger.info("✅ Stage 1: FastAPI app created at module level")
 
 # Database connections (Phase 1)
 from cirkelline.database import db, vector_db
+
+# Gateway Client Integration (Cross-Platform SSO)
+from cirkelline.shared.gateway_client import GatewayClient
+
+# Initialize gateway client
+gateway_client = GatewayClient(
+    gateway_url=os.getenv("GATEWAY_URL", "http://localhost:7779"),
+    platform_code=os.getenv("GATEWAY_PLATFORM_CODE", "cirkelline"),
+    api_key=os.getenv("GATEWAY_API_KEY", ""),
+    timeout=5.0
+)
+logger.info(f"✅ Gateway client initialized: {gateway_client.gateway_url}")
 
 # ════════════════════════════════════════════════════════════════
 # DATABASE MIGRATIONS (v1.3.0 - Workflow Tables)
@@ -235,6 +260,14 @@ app.include_router(ckc_router, prefix="/api/ckc", tags=["CKC Control Panel"])
 # CKC Folder Switcher (v1.3.5 - Super Admin Folder Navigation)
 app.include_router(ckc_folder_router, prefix="/api/ckc", tags=["CKC Folder Switcher"])
 
+# Phase B7: Cross-Platform Navigation
+try:
+    from cirkelline.endpoints.cross_platform_auth import router as cross_platform_router
+    app.include_router(cross_platform_router, prefix="/auth", tags=["Cross-Platform Auth"])
+    logger.info("✅ Cross-Platform Auth API loaded (/auth/*)")
+except ImportError as e:
+    logger.warning(f"⚠️ Cross-Platform Auth not available: {e}")
+
 logger.info("✅ All extracted routers registered with FastAPI app")
 
 # Custom /config endpoint - MUST be before AgentOS creation
@@ -244,9 +277,38 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "cirkelline-system-backend",
-        "version": "1.3.3"
+        "version": "1.3.3",
+        "gateway": "connected" if gateway_client.is_configured else "not_configured"
     }
 logger.info("✅ Health check endpoint /config configured")
+
+@app.get("/api/gateway/status")
+async def gateway_status():
+    """Check connection status to CKC Gateway."""
+    try:
+        platforms = await gateway_client.get_platforms()
+        if platforms:
+            return {
+                "connected": True,
+                "gateway_url": gateway_client.gateway_url,
+                "platform_code": gateway_client.platform_code,
+                "available_platforms": len(platforms),
+                "platforms": platforms,
+                "status": "operational"
+            }
+        else:
+            return {
+                "connected": False,
+                "gateway_url": gateway_client.gateway_url,
+                "error": "No platforms returned"
+            }
+    except Exception as e:
+        return {
+            "connected": False,
+            "gateway_url": gateway_client.gateway_url,
+            "error": str(e)
+        }
+logger.info("✅ Gateway status endpoint /api/gateway/status configured")
 
 # TEMPORARY: Database migration endpoint to fix agno_memories schema
 @app.post("/admin/fix-memory-schema")
@@ -350,6 +412,12 @@ from cirkelline.middleware.middleware import (
     RateLimitMiddleware
 )
 
+# Import gateway authentication middleware (Phase B2: CKC Gateway Integration)
+from cirkelline.middleware.gateway_middleware import (
+    GatewayAuthMiddleware,
+    StrictGatewayAuthMiddleware
+)
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -368,10 +436,16 @@ app.add_middleware(
 )
 
 # Add custom middleware (ORDER IS CRITICAL - see docs/MIDDLEWARE-FLOW-DIAGRAM.md)
-# Execution order: SessionsDateFilter → Anonymous → SessionLogging → JWT (from AGNO)
+# Execution order: SessionsDateFilter → Anonymous → SessionLogging → GatewayAuth → JWT (from AGNO)
 app.add_middleware(SessionLoggingMiddleware)
 app.add_middleware(AnonymousUserMiddleware)
 app.add_middleware(SessionsDateFilterMiddleware)
+
+# Add Gateway Authentication Middleware (Phase B2: CKC Gateway Integration - 2026-01-16)
+# Validates tokens against CKC Gateway (lib-admin on port 7779)
+# Sets user context in request.state for downstream use
+# Falls back to local JWT validation if gateway unavailable
+app.add_middleware(GatewayAuthMiddleware)
 
 # Add JWT Middleware with proper configuration (was deleted during v1.2.30 modularization)
 # This extracts user_id, session_id, and tier information from JWT tokens
@@ -389,7 +463,8 @@ app.add_middleware(
 # Added: 2025-12-14 for scalability to 1M users
 app.add_middleware(RateLimitMiddleware, window_seconds=60)
 
-logger.info("✅ Stage 2: All middleware registered (CORS + Custom + JWT + RateLimit configured)")
+logger.info("✅ Stage 2: All middleware registered (CORS + Custom + GatewayAuth + JWT + RateLimit configured)")
+logger.info("✅ Phase B2: CKC Gateway Authentication Middleware Active")
 
 
 from typing import Optional
