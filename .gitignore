@@ -99,3 +99,8 @@ cla/src-tauri/models/**/*.onnx
 # Archive with potential secrets
 DNA-ARKIV/
 .agent-core
+
+# Additional env security patterns
+.env.production
+.env*.local
+*.env
