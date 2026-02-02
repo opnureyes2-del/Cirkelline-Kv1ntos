@@ -57,7 +57,7 @@ from agno.team import Team
 from agno.db.postgres import PostgresDb
 from agno.run import RunContext
 from agno.vectordb.pgvector import PgVector, SearchType
-from agno.knowledge.embedder.google import GeminiEmbedder
+from agno.knowledge.embedder.ollama import OllamaEmbedder
 from agno.knowledge.knowledge import Knowledge
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.exa import ExaTools
@@ -456,7 +456,18 @@ app.add_middleware(
     user_id_claim="user_id",
     session_id_claim="session_id",
     dependencies_claims=["user_name", "user_role", "user_type", "tier_slug", "tier_level"],
-    validate=False
+    validate=False,
+    excluded_route_paths=[
+        "/api/auth/signup",
+        "/api/auth/login",
+        "/api/auth/logout",
+        "/api/auth/refresh",
+        "/health",
+        "/config",
+        "/docs",
+        "/openapi.json",
+        "/redoc",
+    ],
 )
 
 # Add Rate Limiting Middleware (runs FIRST - protects all endpoints)

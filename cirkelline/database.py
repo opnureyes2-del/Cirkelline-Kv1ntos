@@ -7,7 +7,7 @@ Database connections: PostgreSQL and PgVector.
 import os
 from agno.db.postgres import PostgresDb
 from agno.vectordb.pgvector import PgVector, SearchType
-from agno.knowledge.embedder.google import GeminiEmbedder
+from agno.knowledge.embedder.ollama import OllamaEmbedder
 from sqlalchemy import create_engine
 from cirkelline.config import logger
 
@@ -23,13 +23,13 @@ db = PostgresDb(
 
 logger.info("Database connection configured with automatic pooling")
 
-# Vector database with Gemini embedder
-# Note: Uses SQLAlchemy automatic connection pooling
+# Vector database with LOCAL Ollama embedder (nomic-embed-text, 768d)
+# PERMANENT FIX: No more Gemini API rate limits
 # Uses same DATABASE_URL as above
 vector_db = PgVector(
     db_url=os.getenv("DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"),
     table_name="cirkelline_knowledge_vectors",
-    embedder=GeminiEmbedder(),
+    embedder=OllamaEmbedder(id="nomic-embed-text", dimensions=768),
     search_type=SearchType.hybrid  # Combines semantic + keyword search
 )
 

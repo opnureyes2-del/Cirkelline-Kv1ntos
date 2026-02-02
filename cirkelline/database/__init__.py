@@ -14,7 +14,7 @@ Princip: "Man behøver ikke se for at vide - vi bygger så alt er gennemsigtigt.
 import os
 from agno.db.postgres import PostgresDb
 from agno.vectordb.pgvector import PgVector, SearchType
-from agno.knowledge.embedder.google import GeminiEmbedder
+from agno.knowledge.embedder.ollama import OllamaEmbedder
 from sqlalchemy import create_engine
 
 # Legacy exports (backwards compatibility)
@@ -27,7 +27,7 @@ db = PostgresDb(
 vector_db = PgVector(
     db_url=os.getenv("DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"),
     table_name="cirkelline_knowledge_vectors",
-    embedder=GeminiEmbedder(),
+    embedder=OllamaEmbedder(id="nomic-embed-text", dimensions=768),
     search_type=SearchType.hybrid
 )
 
