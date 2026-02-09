@@ -46,7 +46,7 @@ rubato = "0.14"
 sysinfo = "0.30"
 
 # Database
-rusqlite = { version = "0.30", features = ["bundled"] }
+rusqlite = { version = "0.38", features = ["bundled"] }
 
 # HTTP Client for CKC communication (rustls for TLS, no OpenSSL dependency)
 reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls", "stream"] }
