@@ -33,7 +33,7 @@ futures-util = "0.3"
 ndarray = "0.16"
 
 # ONNX Runtime for AI inference
-ort = { version = "2.0.0-rc.10", features = ["load-dynamic"] }
+ort = { version = "2.0.0-rc.11", features = ["load-dynamic"] }
 
 # Tokenizer for text processing
 tokenizers = { version = "0.21", default-features = false, features = ["onig"] }
