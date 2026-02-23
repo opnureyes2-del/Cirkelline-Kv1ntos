@@ -268,6 +268,14 @@ try:
 except ImportError as e:
     logger.warning(f"⚠️ Cross-Platform Auth not available: {e}")
 
+# Agent Graduation (Cosmic Library → Cirkelline Pipeline)
+try:
+    from cirkelline.endpoints.graduation import router as graduation_router
+    app.include_router(graduation_router, tags=["Agent Graduation"])
+    logger.info("✅ Agent Graduation API loaded (/api/agents/import-from-cosmic)")
+except ImportError as e:
+    logger.warning(f"⚠️ Agent Graduation not available: {e}")
+
 logger.info("✅ All extracted routers registered with FastAPI app")
 
 # Custom /config endpoint - MUST be before AgentOS creation
@@ -462,6 +470,8 @@ app.add_middleware(
         "/api/auth/login",
         "/api/auth/logout",
         "/api/auth/refresh",
+        "/api/agents/import-from-cosmic",
+        "/api/agents/graduated",
         "/health",
         "/config",
         "/docs",
