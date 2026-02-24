@@ -2,6 +2,7 @@
 
 import { useSidebar } from '@/hooks/useSidebar'
 import UserDropdown from './UserDropdown'
+import AdmiralDot from './AdmiralDot'
 import { Menu, ChevronRight, ChevronLeft, ArrowLeft, Calendar, X, RefreshCw, Grid3X3, List, Settings, Maximize2, PanelRightClose } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -310,6 +311,8 @@ export default function TopBar({ calendarControls, showCalendarControls }: TopBa
                 </button>
               </div>
             )}
+            {/* Admiral status dot — micro indicator */}
+            <AdmiralDot />
             {/* UserDropdown - hidden on mobile when calendar is open */}
             <div className={showCalendarControls ? 'hidden md:block' : ''}>
               <UserDropdown />

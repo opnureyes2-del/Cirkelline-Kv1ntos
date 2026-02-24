@@ -276,6 +276,14 @@ try:
 except ImportError as e:
     logger.warning(f"⚠️ Agent Graduation not available: {e}")
 
+# Admiral Integration (ELLE.md ↔ Cirkelline)
+try:
+    from cirkelline.endpoints.admiral_integration import router as admiral_router
+    app.include_router(admiral_router, tags=["Admiral Integration"])
+    logger.info("✅ Admiral Integration API loaded (/api/admiral/status + /api/admiral/event)")
+except ImportError as e:
+    logger.warning(f"⚠️ Admiral Integration not available: {e}")
+
 logger.info("✅ All extracted routers registered with FastAPI app")
 
 # Custom /config endpoint - MUST be before AgentOS creation
@@ -472,6 +480,8 @@ app.add_middleware(
         "/api/auth/refresh",
         "/api/agents/import-from-cosmic",
         "/api/agents/graduated",
+        "/api/admiral/status",
+        "/api/admiral/event",
         "/health",
         "/config",
         "/docs",
