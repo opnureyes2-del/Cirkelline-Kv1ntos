@@ -30,8 +30,8 @@ router = APIRouter()
 
 # Admin emails for privilege checking
 ADMIN_EMAILS = {
-    "opnureyes2@gmail.com": "Ivo",
     "opnureyes2@gmail.com": "Rasmus",
+    "eenvywithin@gmail.com": "Ivo",
     "test_admin@example.com": "Test Admin"  # FOR TESTING ONLY
 }
 

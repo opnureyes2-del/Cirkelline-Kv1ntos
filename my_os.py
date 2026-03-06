@@ -209,6 +209,10 @@ from cirkelline.admin import (
     admin_workflows_router
 )
 
+# Local Calendar & Tasks endpoints (work without Google OAuth)
+from cirkelline.endpoints.calendar import router as local_calendar_router
+from cirkelline.endpoints.tasks import router as local_tasks_router
+
 # Terminal API endpoint (FASE 1.3 - Terminal Integration)
 from cirkelline.api.terminal import router as terminal_router
 
@@ -247,6 +251,10 @@ app.include_router(admin_stats_router, tags=["Admin - Stats"])
 app.include_router(admin_subscriptions_router, tags=["Admin - Subscriptions"])
 app.include_router(admin_activity_router, tags=["Admin - Activity"])
 app.include_router(admin_workflows_router, tags=["Admin - Workflows"])
+
+# Local Calendar & Tasks (work without Google)
+app.include_router(local_calendar_router, tags=["Local Calendar"])
+app.include_router(local_tasks_router, tags=["Local Tasks"])
 
 # Terminal API (FASE 1.3)
 app.include_router(terminal_router, tags=["Terminal"])
@@ -482,6 +490,10 @@ app.add_middleware(
         "/api/agents/graduated",
         "/api/admiral/status",
         "/api/admiral/event",
+        "/api/oauth/google/start",
+        "/api/oauth/google/callback",
+        "/api/oauth/notion/start",
+        "/api/oauth/notion/callback",
         "/health",
         "/config",
         "/docs",

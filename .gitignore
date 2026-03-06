@@ -104,3 +104,7 @@ DNA-ARKIV/
 .env.production
 .env*.local
 *.env
+*credentials*
+*secrets*
+*.pem
+*.key

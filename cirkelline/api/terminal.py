@@ -148,25 +148,32 @@ async def terminal_ask(
             git_info += "]"
             enhanced_prompt = f"{payload.message}{git_info}"
 
-        # Call Cirkelline team for response
-        # TODO: Integrate with actual Cirkelline orchestrator
-        # For now, return a structured response
+        # Call full Cirkelline Team orchestrator (6 specialists + tools + memory + knowledge)
+        try:
+            from cirkelline.orchestrator.cirkelline_team import cirkelline as cirkelline_team
 
-        answer = f"""Kommandanten har modtaget din forespørgsel.
-
-**Din besked:** {payload.message}
-
-**Kontekst registreret:**
-- Terminal session: aktiv
-- Tier: {tier_slug}
-"""
-        if git_context and git_context.is_git_repo:
-            answer += f"""- Repository: {git_context.repo_name}
-- Branch: {git_context.current_branch}
-- Commit: {git_context.commit_short or 'N/A'}
-"""
-
-        answer += "\n*Integration med Cirkelline Team kommer i næste iteration.*"
+            run_response = cirkelline_team.run(
+                enhanced_prompt,
+                user_id=user_id,
+                session_id=session_id,
+            )
+            answer = run_response.content if run_response.content else "Ingen respons fra AI."
+        except Exception as ai_err:
+            logger.warning(f"Cirkelline Team failed, trying simple Gemini: {ai_err}")
+            # Fallback to simple Gemini if Team fails
+            try:
+                from agno.agent import Agent
+                from agno.models.google import Gemini
+                agent = Agent(
+                    model=Gemini(id="gemini-2.5-flash"),
+                    description="Du er Kommandanten, Cirkelline AI-assistent. Svar på dansk.",
+                    markdown=True,
+                )
+                run_response = agent.run(enhanced_prompt)
+                answer = run_response.content if run_response.content else "Ingen respons."
+            except Exception as fallback_err:
+                logger.error(f"Both Team and fallback failed: {fallback_err}")
+                answer = f"AI-integration fejlede. Prøv igen senere."
 
         processing_time = int((time.time() - start_time) * 1000)
 

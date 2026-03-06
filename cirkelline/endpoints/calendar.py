@@ -15,7 +15,10 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from cirkelline.config import logger
-from cirkelline.database import engine
+from cirkelline.database import db
+from sqlalchemy import create_engine as _ce
+import os
+engine = db.db_engine if hasattr(db, 'db_engine') else _ce(os.getenv("DATABASE_URL"))
 from cirkelline.integrations.google.google_oauth import get_user_google_credentials
 
 router = APIRouter()

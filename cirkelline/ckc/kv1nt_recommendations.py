@@ -778,6 +778,20 @@ class KV1NTRecommendationEngine:
         self.recommendations = all_recommendations
         return all_recommendations
 
+    def generate_recommendations(self) -> List[Recommendation]:
+        """Wrapper for analyze_system with default empty analysis."""
+        default_analysis = SystemAnalysis(
+            timestamp=datetime.now(),
+            total_tests=0,
+            passed_tests=0,
+            failed_tests=0,
+            success_rate=100.0,
+            services_status={},
+            warnings=[],
+            errors=[]
+        )
+        return self.analyze_system(default_analysis)
+
     def to_markdown(self) -> str:
         """Konverterer anbefalinger til markdown format."""
         lines = [

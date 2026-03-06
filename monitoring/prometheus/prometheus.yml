@@ -45,15 +45,6 @@ scrape_configs:
     scrape_timeout: 5s
 
   # ============================================================
-  # CADVISOR - Container Metrics
-  # ============================================================
-  - job_name: 'cadvisor'
-    static_configs:
-      - targets: ['cadvisor:8080']
-        labels:
-          service: 'cadvisor'
-
-  # ============================================================
   # ADMIRAL EXECUTOR (Flask /metrics)
   # ============================================================
   - job_name: 'executor'
@@ -62,4 +53,59 @@ scrape_configs:
       - targets: ['172.18.0.1:5593']
         labels:
           service: 'executor'
+    scrape_interval: 30s
+
+  # ============================================================
+  # ADMIRAL EVENT BRIDGE (Flask /metrics via Prometheus instrumentation)
+  # ============================================================
+  - job_name: 'event-bridge'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['172.18.0.1:5594']
+        labels:
+          service: 'event-bridge'
+    scrape_interval: 30s
+
+  # ============================================================
+  # ADMIRAL HQ (Flask /metrics via Prometheus instrumentation)
+  # ============================================================
+  - job_name: 'admiral-hq'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['172.18.0.1:5555']
+        labels:
+          service: 'admiral-hq'
+    scrape_interval: 30s
+
+  # ============================================================
+  # ADMIRAL RUNTIME ENGINE (Hand-built /metrics — 28 admirals, skills, council)
+  # ============================================================
+  - job_name: 'runtime-engine'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['172.18.0.1:5596']
+        labels:
+          service: 'runtime-engine'
+    scrape_interval: 30s
+
+  # ============================================================
+  # ADMIRAL PRE-EXECUTION ORCHESTRATOR (Hand-built /metrics)
+  # ============================================================
+  - job_name: 'orchestrator'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['172.18.0.1:5598']
+        labels:
+          service: 'orchestrator'
+    scrape_interval: 30s
+
+  # ============================================================
+  # SOVEREIGN PULSE (Hand-built /metrics — constellations, pulse count)
+  # ============================================================
+  - job_name: 'sovereign-pulse'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['172.18.0.1:5599']
+        labels:
+          service: 'sovereign-pulse'
     scrape_interval: 30s
