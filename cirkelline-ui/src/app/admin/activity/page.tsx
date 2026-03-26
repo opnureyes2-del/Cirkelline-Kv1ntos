@@ -303,7 +303,7 @@ export default function AdminActivityPage() {
               <button
                 onClick={() => fetchLogs()}
                 disabled={loading}
-                className="p-2 rounded-lg border border-border-primary hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary disabled:opacity-50 transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-border-primary hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary disabled:opacity-50 transition-colors flex items-center justify-center"
                 title="Refresh now"
               >
                 <RefreshCw
@@ -332,7 +332,7 @@ export default function AdminActivityPage() {
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="w-full pl-9 pr-8 py-2 rounded-lg border border-border-primary bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="w-full min-h-[44px] pl-9 pr-8 py-2 rounded-lg border border-border-primary bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                   {userSearch && (
                     <button
@@ -360,7 +360,7 @@ export default function AdminActivityPage() {
                   setActionFilter(e.target.value)
                   setPage(1)
                 }}
-                className="w-full px-3 py-2 rounded-lg border border-border-primary bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-border-primary bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 {actionTypes.map(action => (
                   <option key={action} value={action}>
@@ -381,7 +381,7 @@ export default function AdminActivityPage() {
                   setSuccessFilter(e.target.value)
                   setPage(1)
                 }}
-                className="w-full px-3 py-2 rounded-lg border border-border-primary bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-border-primary bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="all">All Status</option>
                 <option value="success">Success Only</option>
@@ -398,7 +398,7 @@ export default function AdminActivityPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-lg border border-border-primary bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
+                  className="flex-1 min-h-[44px] px-3 py-2 rounded-lg border border-border-primary bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
                 >
                   <option value="timestamp">Time</option>
                   <option value="action_type">Action</option>
@@ -407,7 +407,7 @@ export default function AdminActivityPage() {
                 </select>
                 <button
                   onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                  className="px-3 py-2 rounded-lg border border-border-primary hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary text-light-text dark:text-dark-text transition-colors"
+                  className="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg border border-border-primary hover:bg-light-bg-secondary dark:hover:bg-dark-bg-secondary text-light-text dark:text-dark-text transition-colors flex items-center justify-center"
                 >
                   {sortOrder === 'asc' ? '↑' : '↓'}
                 </button>
@@ -722,14 +722,14 @@ export default function AdminActivityPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors flex items-center justify-center"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="p-2 rounded-lg border border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors flex items-center justify-center"
               >
                 <ChevronRight size={18} />
               </button>

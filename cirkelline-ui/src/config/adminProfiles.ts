@@ -14,7 +14,7 @@ export interface AdminProfile {
 }
 
 export const ADMIN_PROFILES: Record<string, AdminProfile> = {
-  "opnureyes2@gmail.com": {
+  "eenvywithin@gmail.com": {
     name: "Ivo",
     role: "CEO & Creator",
     context: "Co-founder of Cirkelline, focuses on AI strategy and product development",

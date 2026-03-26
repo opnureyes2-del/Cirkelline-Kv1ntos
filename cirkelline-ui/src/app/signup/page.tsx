@@ -49,10 +49,7 @@ export default function SignupPage() {
         <div className="text-center">
           <h2 className="text-3xl font-bold text-light-text dark:text-dark-text">Create Account</h2>
           <p className="mt-2 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-            Or{' '}
-            <Link href="/" className="font-medium text-accent hover:underline">
-              continue as guest
-            </Link>
+            Create a new account to get started
           </p>
         </div>
 

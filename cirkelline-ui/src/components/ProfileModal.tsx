@@ -70,7 +70,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         return
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
       const response = await fetch(`${apiUrl}/api/user/profile`, {
         method: 'PATCH',
         headers: {

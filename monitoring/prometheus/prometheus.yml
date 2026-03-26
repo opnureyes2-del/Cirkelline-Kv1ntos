@@ -89,7 +89,8 @@ scrape_configs:
     scrape_interval: 30s
 
   # ============================================================
-  # ADMIRAL PRE-EXECUTION ORCHESTRATOR (Hand-built /metrics)
+  # ADMIRAL PRE-EXECUTION ORCHESTRATOR (6-phase pipeline, port 5598)
+  # Re-enabled 2026-03-08 — was disabled, now running
   # ============================================================
   - job_name: 'orchestrator'
     metrics_path: /metrics

@@ -72,7 +72,7 @@ export default function ProfileAccountPage() {
         const token = localStorage.getItem('token')
         if (!token) return
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com'
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
         const response = await fetch(`${apiUrl}/api/user/statistics`, {
           method: 'GET',
           headers: {
@@ -151,7 +151,7 @@ export default function ProfileAccountPage() {
         return
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
       const response = await fetch(`${apiUrl}/api/user/profile`, {
         method: 'PATCH',
         headers: {

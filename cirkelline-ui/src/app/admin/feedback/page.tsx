@@ -141,7 +141,7 @@ export default function AdminFeedbackPage() {
                 setStatusFilter(e.target.value)
                 setPage(1)
               }}
-              className="px-3 py-2 rounded-lg border border-border-primary bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
+              className="min-h-[44px] px-3 py-2 rounded-lg border border-border-primary bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
             >
               <option value="all">All Status</option>
               <option value="unread">Unread</option>
@@ -229,7 +229,7 @@ export default function AdminFeedbackPage() {
                           e.stopPropagation()
                           setExpandedId(expandedId === item.id ? null : item.id)
                         }}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg text-light-text dark:text-dark-text transition-colors font-sans"
+                        className="text-xs min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg text-light-text dark:text-dark-text transition-colors active:scale-95 font-sans"
                       >
                         {expandedId === item.id ? 'Collapse' : 'Expand'}
                       </button>
@@ -292,21 +292,21 @@ export default function AdminFeedbackPage() {
                           <button
                             onClick={() => updateStatus(item.id, 'unread')}
                             disabled={item.status === 'unread'}
-                            className="text-xs px-3 py-1.5 rounded-lg bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans"
+                            className="text-xs min-h-[44px] px-4 py-2 rounded-lg bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors active:scale-95 font-sans"
                           >
                             Unread
                           </button>
                           <button
                             onClick={() => updateStatus(item.id, 'seen')}
                             disabled={item.status === 'seen'}
-                            className="text-xs px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans"
+                            className="text-xs min-h-[44px] px-4 py-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors active:scale-95 font-sans"
                           >
                             Seen
                           </button>
                           <button
                             onClick={() => updateStatus(item.id, 'done')}
                             disabled={item.status === 'done'}
-                            className="text-xs px-3 py-1.5 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans"
+                            className="text-xs min-h-[44px] px-4 py-2 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors active:scale-95 font-sans"
                           >
                             Done
                           </button>
@@ -330,14 +330,14 @@ export default function AdminFeedbackPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors flex items-center justify-center"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors flex items-center justify-center"
               >
                 <ChevronRight size={18} />
               </button>

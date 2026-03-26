@@ -90,7 +90,7 @@ const ChatInput = () => {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
       fetch(`${apiUrl}/api/sessions/${sessionId}/state`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -169,7 +169,7 @@ const ChatInput = () => {
         throw new Error('Not authenticated')
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
       const response = await fetch(`${apiUrl}/api/knowledge/upload`, {
         method: 'POST',
         headers: {

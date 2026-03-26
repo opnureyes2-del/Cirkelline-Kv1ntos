@@ -156,11 +156,11 @@ export default function AdminUsersPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1 px-3 py-2 rounded-lg border border-border-primary bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
+              className="flex-1 min-h-[44px] px-3 py-2 rounded-lg border border-border-primary bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
             />
             <button
               onClick={handleSearch}
-              className="px-4 py-2 rounded-lg text-white text-sm font-sans transition-colors"
+              className="min-h-[44px] px-4 py-2 rounded-lg text-white text-sm font-sans transition-colors active:scale-95"
               style={{ backgroundColor: 'rgb(var(--accent-rgb))' }}
             >
               Search
@@ -176,7 +176,7 @@ export default function AdminUsersPage() {
                 setStatusFilter(e.target.value)
                 setPage(1)
               }}
-              className="px-3 py-2 rounded-lg border border-border-primary bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
+              className="min-h-[44px] px-3 py-2 rounded-lg border border-border-primary bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text text-sm font-sans focus:outline-none focus:ring-2 focus:ring-accent"
             >
               <option value="all">All Users</option>
               <option value="online">Online</option>
@@ -274,7 +274,7 @@ export default function AdminUsersPage() {
                           e.stopPropagation()
                           handleExpand(user.id)
                         }}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg text-light-text dark:text-dark-text transition-colors font-sans"
+                        className="text-xs min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg text-light-text dark:text-dark-text transition-colors active:scale-95 font-sans"
                       >
                         {expandedId === user.id ? 'Collapse' : 'Details'}
                       </button>
@@ -522,14 +522,14 @@ export default function AdminUsersPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors flex items-center justify-center"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-border-primary hover:bg-light-bg dark:hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-light-text dark:text-dark-text transition-colors flex items-center justify-center"
               >
                 <ChevronRight size={18} />
               </button>

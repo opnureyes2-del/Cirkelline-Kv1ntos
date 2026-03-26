@@ -488,8 +488,8 @@ app.add_middleware(
         "/api/auth/refresh",
         "/api/agents/import-from-cosmic",
         "/api/agents/graduated",
-        "/api/admiral/status",
-        "/api/admiral/event",
+        "/api/admiral/*",
+        "/api/kv1nt/*",
         "/api/oauth/google/start",
         "/api/oauth/google/callback",
         "/api/oauth/notion/start",
@@ -1250,7 +1250,7 @@ if __name__ == "__main__":
 
     logger.info(f"Monitoring: {'ENABLED' if monitoring_enabled else 'DISABLED'}")
     logger.info(f"Session Summaries: ENABLED")
-    logger.info(f"AWS Ready: 1 worker + listening on 0.0.0.0")
+    logger.info(f"Listening on 127.0.0.1 (behind reverse proxy)")
     logger.info("═" * 50)
 
     try:
@@ -1258,7 +1258,7 @@ if __name__ == "__main__":
         logger.info("Starting uvicorn in single-process mode...")
         uvicorn.run(
             app,                  # Pass app object directly for single-process mode
-            host="0.0.0.0",       # Listen on all interfaces (required for AWS)
+            host="127.0.0.1",     # Localhost only — exposed via Caddy reverse proxy
             port=7777,
             log_level="info",
             access_log=True,

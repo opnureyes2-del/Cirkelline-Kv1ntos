@@ -159,7 +159,7 @@ const Endpoint = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <p className="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary group-hover:text-accent transition-colors">
               {isMounted
                 ? truncateText(selectedEndpoint, 21) || ENDPOINT_PLACEHOLDER
-                : 'https://api.cirkelline.com'}
+                : 'http://localhost:7777'}
             </p>
             <div
               className={`size-2 shrink-0 rounded-full ${getStatusColor(isEndpointActive)}`}

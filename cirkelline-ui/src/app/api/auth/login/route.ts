@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // Get backend API URL from environment
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777';
 
     // Forward request to backend API
     const response = await fetch(`${apiUrl}/api/auth/login`, {

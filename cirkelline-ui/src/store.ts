@@ -90,7 +90,7 @@ export const useStore = create<Store>()(
             typeof messages === 'function' ? messages(state.messages) : messages
         })),
       chatInputRef: { current: null },
-      selectedEndpoint: process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com',
+      selectedEndpoint: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777',
       setSelectedEndpoint: (selectedEndpoint) =>
         set(() => ({ selectedEndpoint })),
       agents: [],

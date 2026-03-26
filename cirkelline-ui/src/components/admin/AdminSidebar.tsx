@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, Users, MessageSquare, Activity, CreditCard, BarChart3, X, ChevronLeft, Workflow, FolderOpen } from 'lucide-react'
+import { LayoutDashboard, Users, MessageSquare, Activity, CreditCard, BarChart3, X, ChevronLeft, Workflow, FolderOpen, Ship } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -28,6 +28,11 @@ const AdminSidebar = () => {
       name: 'Overview',
       path: '/admin',
       icon: LayoutDashboard
+    },
+    {
+      name: 'Admiral Fleet',
+      path: '/admin/fleet',
+      icon: Ship
     },
     {
       name: 'Metrics',
@@ -63,6 +68,11 @@ const AdminSidebar = () => {
       name: 'Workflows',
       path: '/admin/workflows',
       icon: Workflow
+    },
+    {
+      name: 'Admiral Fleet',
+      path: '/admin/fleet',
+      icon: Ship
     }
   ]
 

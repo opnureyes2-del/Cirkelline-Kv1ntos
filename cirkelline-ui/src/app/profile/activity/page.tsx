@@ -69,7 +69,7 @@ export default function UserActivityPage() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
       const actionParam = actionFilter !== 'all' ? `&action_filter=${actionFilter}` : ''
       const successParam = successFilter !== 'all' ? `&success_filter=${successFilter}` : ''
 

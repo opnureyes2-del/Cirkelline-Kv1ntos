@@ -29,7 +29,7 @@ export default function UploadToKnowledgeButton() {
         throw new Error('Not authenticated')
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
       const response = await fetch(`${apiUrl}/api/knowledge/upload`, {
         method: 'POST',
         headers: {

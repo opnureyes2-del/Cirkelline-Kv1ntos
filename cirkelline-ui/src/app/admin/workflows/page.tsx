@@ -93,10 +93,10 @@ export default function WorkflowsOverviewPage() {
             </div>
             <button
               onClick={() => { setLoading(true); fetchData(); }}
-              className="flex items-center gap-2 px-4 py-2 bg-light-surface dark:bg-dark-surface border border-border-primary rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
+              className="flex items-center gap-2 min-h-[44px] px-4 py-2 bg-light-surface dark:bg-dark-surface border border-border-primary rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg active:scale-95 transition-all"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
+              <span className="text-sm text-light-text dark:text-dark-text">Refresh</span>
             </button>
           </div>
           <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary font-body">
@@ -116,11 +116,11 @@ export default function WorkflowsOverviewPage() {
             {/* Memory Optimization Workflow Card */}
             <div
               onClick={() => router.push('/admin/workflows/memory')}
-              className="bg-light-surface dark:bg-dark-surface rounded-xl border border-border-primary p-6 cursor-pointer hover:border-accent transition-colors group"
+              className="bg-light-surface dark:bg-dark-surface rounded-xl border border-border-primary p-4 sm:p-6 cursor-pointer hover:border-accent active:scale-[0.98] transition-all group min-h-[72px]"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
                     <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
@@ -199,11 +199,11 @@ export default function WorkflowsOverviewPage() {
             {/* Daily Journals Workflow Card */}
             <div
               onClick={() => router.push('/admin/workflows/journals')}
-              className="bg-light-surface dark:bg-dark-surface rounded-xl border border-border-primary p-6 cursor-pointer hover:border-accent transition-colors group"
+              className="bg-light-surface dark:bg-dark-surface rounded-xl border border-border-primary p-4 sm:p-6 cursor-pointer hover:border-accent active:scale-[0.98] transition-all group min-h-[72px]"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
                     <BookOpen className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>

@@ -72,9 +72,10 @@ export default function MetricsPage() {
     setError(null)
 
     try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
       const url = selectedAgent === 'all'
-        ? `${process.env.NEXT_PUBLIC_API_URL}/api/admin/token-usage`
-        : `${process.env.NEXT_PUBLIC_API_URL}/api/admin/token-usage?agent_id=${selectedAgent}`
+        ? `${apiBase}/api/admin/token-usage`
+        : `${apiBase}/api/admin/token-usage?agent_id=${selectedAgent}`
 
       const response = await fetch(url, {
         headers: {
@@ -107,7 +108,7 @@ export default function MetricsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto"></div>
           <p className="mt-4 text-light-text-secondary dark:text-dark-text-secondary">Loading metrics...</p>
@@ -118,12 +119,12 @@ export default function MetricsPage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <p className="text-red-500">{error}</p>
           <button
             onClick={fetchMetrics}
-            className="mt-4 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90"
+            className="mt-4 min-h-[44px] px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 active:scale-95 transition-all"
           >
             Retry
           </button>
@@ -135,19 +136,19 @@ export default function MetricsPage() {
   if (!metrics) return null
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
       >
         <div>
-          <h1 className="text-3xl font-heading font-semibold text-light-text dark:text-dark-text">
+          <h1 className="text-2xl sm:text-3xl font-heading font-semibold text-light-text dark:text-dark-text">
             Token Usage Metrics
           </h1>
           <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1">
-            Comprehensive analytics for AI token usage and costs
+            AI token usage and cost analytics
           </p>
         </div>
 
@@ -157,7 +158,7 @@ export default function MetricsPage() {
           <select
             value={selectedAgent}
             onChange={(e) => setSelectedAgent(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-border-primary bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-accent"
+            className="min-h-[44px] px-4 py-2 rounded-lg border border-border-primary bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <option value="all">All Agents</option>
             {metrics.by_agent.map((agent) => (
@@ -174,7 +175,7 @@ export default function MetricsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
       >
         {/* Total Messages */}
         <div className="bg-light-surface dark:bg-dark-surface rounded-xl p-6 border border-border-primary">
@@ -339,7 +340,7 @@ export default function MetricsPage() {
           <TrendingUp size={20} className="text-accent" />
           Cost Projections
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <div className="p-4 rounded-lg bg-light-bg dark:bg-dark-bg">
             <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mb-1">Daily Average</p>
             <p className="text-2xl font-semibold text-light-text dark:text-dark-text">

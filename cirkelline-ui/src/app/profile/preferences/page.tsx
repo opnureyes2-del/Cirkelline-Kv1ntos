@@ -58,7 +58,7 @@ export default function ProfilePreferencesPage() {
     try {
       const token = localStorage.getItem('token')
       if (token) {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com'
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
         await fetch(`${apiUrl}/api/user/preferences`, {
           method: 'PATCH',
           headers: {
@@ -84,7 +84,7 @@ export default function ProfilePreferencesPage() {
     try {
       const token = localStorage.getItem('token')
       if (token) {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cirkelline.com'
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'
         await fetch(`${apiUrl}/api/user/preferences`, {
           method: 'PATCH',
           headers: {

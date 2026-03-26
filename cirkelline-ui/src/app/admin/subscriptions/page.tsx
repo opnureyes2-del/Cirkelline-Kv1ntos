@@ -251,7 +251,7 @@ export default function AdminSubscriptionsPage() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search by email..."
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text border border-border-primary focus:outline-none focus:border-accent"
+                  className="w-full min-h-[44px] pl-10 pr-4 py-2 rounded-lg bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text border border-border-primary focus:outline-none focus:border-accent"
                 />
               </div>
             </div>
@@ -264,7 +264,7 @@ export default function AdminSubscriptionsPage() {
               <select
                 value={tierFilter}
                 onChange={(e) => setTierFilter(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text border border-border-primary focus:outline-none focus:border-accent"
+                className="w-full min-h-[44px] px-4 py-2 rounded-lg bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text border border-border-primary focus:outline-none focus:border-accent"
               >
                 <option value="all">All Tiers</option>
                 <option value="member">Member</option>
@@ -283,7 +283,7 @@ export default function AdminSubscriptionsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text border border-border-primary focus:outline-none focus:border-accent"
+                className="w-full min-h-[44px] px-4 py-2 rounded-lg bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text border border-border-primary focus:outline-none focus:border-accent"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -417,14 +417,14 @@ export default function AdminSubscriptionsPage() {
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-4 py-2 rounded-lg bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text border border-border-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
+                  className="min-h-[44px] px-4 py-2 rounded-lg bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text border border-border-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:hover:bg-dark-bg active:scale-95 transition-all"
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => setPage(p => p + 1)}
                   disabled={page * limit >= total}
-                  className="px-4 py-2 rounded-lg bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text border border-border-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
+                  className="min-h-[44px] px-4 py-2 rounded-lg bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text border border-border-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:hover:bg-dark-bg active:scale-95 transition-all"
                 >
                   Next
                 </button>

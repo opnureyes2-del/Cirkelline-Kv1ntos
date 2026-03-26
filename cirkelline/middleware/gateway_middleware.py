@@ -61,6 +61,8 @@ PUBLIC_ENDPOINTS = [
     "/api/auth/google",
     "/api/auth/google/callback",
     "/api/status",
+    "/api/admiral/",
+    "/api/kv1nt/",
 ]
 
 
