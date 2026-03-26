@@ -37,7 +37,7 @@ scrape_configs:
   - job_name: 'social-nexus'
     metrics_path: /metrics
     static_configs:
-      - targets: ['172.18.0.1:5592']
+      - targets: ['127.0.0.1:5592']
         labels:
           service: 'social-nexus'
           environment: 'development'
@@ -50,7 +50,7 @@ scrape_configs:
   - job_name: 'executor'
     metrics_path: /metrics
     static_configs:
-      - targets: ['172.18.0.1:5593']
+      - targets: ['127.0.0.1:5593']
         labels:
           service: 'executor'
     scrape_interval: 30s
@@ -61,7 +61,7 @@ scrape_configs:
   - job_name: 'event-bridge'
     metrics_path: /metrics
     static_configs:
-      - targets: ['172.18.0.1:5594']
+      - targets: ['127.0.0.1:5594']
         labels:
           service: 'event-bridge'
     scrape_interval: 30s
@@ -72,7 +72,7 @@ scrape_configs:
   - job_name: 'admiral-hq'
     metrics_path: /metrics
     static_configs:
-      - targets: ['172.18.0.1:5555']
+      - targets: ['127.0.0.1:5555']
         labels:
           service: 'admiral-hq'
     scrape_interval: 30s
@@ -83,7 +83,7 @@ scrape_configs:
   - job_name: 'runtime-engine'
     metrics_path: /metrics
     static_configs:
-      - targets: ['172.18.0.1:5596']
+      - targets: ['127.0.0.1:5596']
         labels:
           service: 'runtime-engine'
     scrape_interval: 30s
@@ -95,7 +95,7 @@ scrape_configs:
   - job_name: 'orchestrator'
     metrics_path: /metrics
     static_configs:
-      - targets: ['172.18.0.1:5598']
+      - targets: ['127.0.0.1:5598']
         labels:
           service: 'orchestrator'
     scrape_interval: 30s
@@ -106,7 +106,7 @@ scrape_configs:
   - job_name: 'sovereign-pulse'
     metrics_path: /metrics
     static_configs:
-      - targets: ['172.18.0.1:5599']
+      - targets: ['127.0.0.1:5599']
         labels:
           service: 'sovereign-pulse'
     scrape_interval: 30s
