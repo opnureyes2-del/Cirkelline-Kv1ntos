@@ -42,7 +42,7 @@
     "autoprefixer": "^10.4.16",
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.4",
+    "eslint-plugin-react-refresh": "^0.4.26",
     "fake-indexeddb": "^5.0.0",
     "jsdom": "^23.0.0",
     "postcss": "^8.4.31",
