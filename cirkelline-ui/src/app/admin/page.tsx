@@ -159,6 +159,12 @@ export default function AdminOverviewPage() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
+        {/* HQ Link Banner */}
+        <div className="mb-4 p-3 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-between">
+          <a href="https://hq.myaddspace.com" target="_blank" className="text-accent font-semibold hover:underline text-sm sm:text-base">→ Admiral HQ™ Operations Center</a>
+          <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary hidden sm:inline">hq.myaddspace.com</span>
+        </div>
+
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">

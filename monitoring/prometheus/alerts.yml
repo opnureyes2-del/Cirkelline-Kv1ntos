@@ -18,5 +18,5 @@ groups:
         for: 10m
         labels:
           severity: critical
-          annotations:
-            summary: "Engine RSS > 2GB"
+        annotations:
+          summary: "Engine RSS > 2GB"

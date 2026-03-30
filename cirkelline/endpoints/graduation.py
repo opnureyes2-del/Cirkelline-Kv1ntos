@@ -98,9 +98,12 @@ def _assign_team(specialty: str, skills: List[str]) -> str:
 def _publish_graduation_event(agent_name: str, agent_id: int, team: str):
     """Publish graduation event to RabbitMQ if available"""
     try:
+        import os
         import pika
+        rmq_user = os.environ.get("RABBITMQ_USER", "admiral")
+        rmq_pass = os.environ.get("RABBITMQ_PASS", "")
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters("localhost", 5672, credentials=pika.PlainCredentials("guest", "guest"))
+            pika.ConnectionParameters("localhost", 5672, credentials=pika.PlainCredentials(rmq_user, rmq_pass))
         )
         channel = connection.channel()
         channel.exchange_declare(exchange="elle_integration_hub", exchange_type="topic", durable=True)

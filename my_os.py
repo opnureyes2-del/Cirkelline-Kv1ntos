@@ -197,6 +197,7 @@ from cirkelline.integrations.notion import (
 # User endpoints - memories and feedback (Phase 8G, moved to endpoints/ in v1.2.30)
 from cirkelline.endpoints.memories import router as memories_router
 from cirkelline.endpoints.feedback import router as feedback_router
+from cirkelline.endpoints.support_request import router as support_router
 from cirkelline.endpoints.preferences import router as preferences_router
 from cirkelline.endpoints.subscriptions import router as subscriptions_router
 
@@ -243,6 +244,7 @@ app.include_router(notion_legacy_router, tags=["Notion Legacy"])
 
 app.include_router(memories_router, tags=["Memories"])
 app.include_router(feedback_router, tags=["Feedback"])
+app.include_router(support_router, tags=["Support Requests"])
 app.include_router(preferences_router, tags=["User Preferences"])
 app.include_router(subscriptions_router, tags=["User Subscriptions"])
 
@@ -490,6 +492,7 @@ app.add_middleware(
         "/api/agents/graduated",
         "/api/admiral/*",
         "/api/kv1nt/*",
+        "/api/support/*",
         "/api/oauth/google/start",
         "/api/oauth/google/callback",
         "/api/oauth/notion/start",
