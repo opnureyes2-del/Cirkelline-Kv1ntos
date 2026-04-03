@@ -78,6 +78,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -e .
 
       - name: Wait for PostgreSQL
         run: |
@@ -113,16 +114,7 @@ jobs:
           pip install bandit safety
 
       - name: Run Bandit security scan
-        run: >-
-          bandit -r . --severity-level medium
-          -x ./tests,./venv,./.venv,./ecosystems,./cla,./CKC-COMPONENTS,
-          ./backups,./scripts,./services,./integration,./aws_deployment,
-          ./infrastructure,./k8s,./loadtest,./monitoring,./elk,./migrations,
-          ./database_migrations,./cli,./my_admin_workspace,./alembic,
-          ./cirkelline/ckc,./cirkelline/web3,./cirkelline/endpoints,
-          ./cirkelline/integrations,./cirkelline/deployment,./cirkelline/admin,
-          ./cirkelline/kommandanter,./cirkelline/workflows,./cirkelline/i18n,
-          ./cirkelline/headquarters/learning_rooms,./utils,./cirkelline-ui
+        run: bandit -r . --severity-level medium -x ./tests,./venv,./.venv,./ecosystems,./cla,./CKC-COMPONENTS,./backups,./scripts,./services,./integration,./aws_deployment,./infrastructure,./k8s,./loadtest,./monitoring,./elk,./migrations,./database_migrations,./cli,./my_admin_workspace,./alembic,./cirkelline/ckc,./cirkelline/web3,./cirkelline/endpoints,./cirkelline/integrations,./cirkelline/deployment,./cirkelline/admin,./cirkelline/kommandanter,./cirkelline/workflows,./cirkelline/i18n,./cirkelline/headquarters/learning_rooms,./utils,./cirkelline-ui
 
       - name: Check dependencies for vulnerabilities
         run: safety check -r requirements.txt --ignore 70612
