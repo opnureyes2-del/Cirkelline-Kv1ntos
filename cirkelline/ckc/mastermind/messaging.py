@@ -17,6 +17,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import secrets
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -424,7 +425,7 @@ class RabbitMQMessageBus(MastermindMessageBus):
         host: str = "localhost",
         port: int = 5672,
         username: str = "guest",
-        password: str = "guest",
+        password: str = os.getenv("RABBITMQ_PASSWORD", "guest"),
         virtual_host: str = "/"
     ):
         self.host = host

@@ -38,6 +38,8 @@ class GraduatedAgentRequest(BaseModel):
     cosmic_library_id: Optional[str] = None
     training_complete: bool = False
     ready_for_production: bool = False
+    source: str = "unknown"  # engine_push, cosmic_training, manual_test, api_direct
+    training_cycles: int = 0  # antal gennemfoerte traeningscykler
 
 
 # Ensure table exists on import
@@ -67,10 +69,23 @@ def _ensure_table():
                     cosmic_library_id VARCHAR(255) UNIQUE,
                     status VARCHAR(50) DEFAULT 'imported',
                     team_assignment VARCHAR(255),
+                    source VARCHAR(100) DEFAULT 'unknown',
+                    training_cycles INTEGER DEFAULT 0,
                     imported_at TIMESTAMP DEFAULT NOW(),
                     activated_at TIMESTAMP
                 );
             """))
+            # Tilfoej source+training_cycles kolonner hvis tabellen allerede eksisterer
+            for col, coltype, coldefault in [
+                ("source", "VARCHAR(100)", "'unknown'"),
+                ("training_cycles", "INTEGER", "0"),
+            ]:
+                try:
+                    conn.execute(text(
+                        f"ALTER TABLE ai.graduated_agents ADD COLUMN IF NOT EXISTS {col} {coltype} DEFAULT {coldefault}"
+                    ))
+                except Exception:
+                    pass  # Kolonne eksisterer allerede
             conn.commit()
             _TABLE_CREATED = True
             logger.info("ai.graduated_agents table ready")
@@ -163,10 +178,12 @@ async def import_agent_from_cosmic(agent: GraduatedAgentRequest):
             result = conn.execute(text("""
                 INSERT INTO ai.graduated_agents
                     (name, specialty, role, system_prompt, skills, mastery_score,
-                     model, tools, cosmic_library_id, status, team_assignment)
+                     model, tools, cosmic_library_id, status, team_assignment,
+                     source, training_cycles)
                 VALUES
                     (:name, :specialty, :role, :system_prompt, :skills, :mastery_score,
-                     :model, :tools, :cosmic_library_id, 'imported', :team)
+                     :model, :tools, :cosmic_library_id, 'imported', :team,
+                     :source, :training_cycles)
                 RETURNING id
             """), {
                 "name": agent.name,
@@ -179,6 +196,8 @@ async def import_agent_from_cosmic(agent: GraduatedAgentRequest):
                 "tools": json.dumps(agent.tools),
                 "cosmic_library_id": agent.cosmic_library_id,
                 "team": team,
+                "source": agent.source,
+                "training_cycles": agent.training_cycles,
             })
             agent_id = result.fetchone()[0]
             conn.commit()
@@ -209,17 +228,27 @@ async def list_graduated_agents():
     try:
         with _engine.connect() as conn:
             rows = conn.execute(text(
-                "SELECT id, name, specialty, role, mastery_score, model, status, team_assignment, imported_at "
+                "SELECT id, name, specialty, role, mastery_score, model, status, "
+                "team_assignment, imported_at, "
+                "COALESCE(source, 'unknown') as source, "
+                "COALESCE(training_cycles, 0) as training_cycles "
                 "FROM ai.graduated_agents ORDER BY imported_at DESC"
             )).fetchall()
 
+        by_source = {}
+        for r in rows:
+            src = r[9]
+            by_source[src] = by_source.get(src, 0) + 1
+
         return {
             "count": len(rows),
+            "by_source": by_source,
             "agents": [
                 {
                     "id": r[0], "name": r[1], "specialty": r[2], "role": r[3],
                     "mastery_score": r[4], "model": r[5], "status": r[6],
-                    "team_assignment": r[7], "imported_at": r[8].isoformat() if r[8] else None
+                    "team_assignment": r[7], "imported_at": r[8].isoformat() if r[8] else None,
+                    "source": r[9], "training_cycles": r[10]
                 }
                 for r in rows
             ]

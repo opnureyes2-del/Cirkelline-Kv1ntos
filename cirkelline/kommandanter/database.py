@@ -35,7 +35,7 @@ class DatabaseConfig:
     port: int = 5532
     database: str = "cirkelline"
     user: str = "cirkelline"
-    password: str = "cirkelline123"
+    password: str = os.getenv("DB_PASSWORD", "cirkelline123")
 
     @classmethod
     def from_env(cls) -> "DatabaseConfig":
