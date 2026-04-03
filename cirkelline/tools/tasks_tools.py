@@ -532,6 +532,11 @@ class CirkellineTasksTools(Toolkit):
 
                 updates.append("updated_at = NOW()")
 
+                _ALLOWED_COLS = {"title", "notes", "due_date", "priority", "completed", "completed_at", "updated_at"}
+                for u in updates:
+                    col = u.split("=")[0].strip()
+                    if col not in _ALLOWED_COLS:
+                        return f"Invalid column: {col}"
                 query = f"UPDATE tasks SET {', '.join(updates)} WHERE id = :task_id AND user_id = :user_id RETURNING title, completed"
                 result = conn.execute(text(query), params)
                 row = result.fetchone()

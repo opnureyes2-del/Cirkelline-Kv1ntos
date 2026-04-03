@@ -1353,13 +1353,24 @@ async def run_interactive_terminal(user_id: str = "rasmus") -> None:
             cmd = cmd.replace('ckc.', 'ckc.')
 
             try:
-                # Sikker eval af async kommandoer
+                # Safe method dispatch — NO eval()
                 if 'ckc.' in cmd:
-                    result = eval(cmd.replace('ckc.', 'ckc.'))
-                    if asyncio.iscoroutine(result):
-                        result = await result
-                    if result and isinstance(result, dict):
-                        print(f"\n{Colors.DIM}Resultat: {result}{Colors.RESET}")
+                    # Parse method name and args from "ckc.method_name(args)"
+                    import re as _re
+                    _match = _re.match(r'ckc\.(\w+)\((.*)\)', cmd)
+                    if _match:
+                        _method_name = _match.group(1)
+                        _method = getattr(ckc, _method_name, None)
+                        if _method and callable(_method):
+                            result = _method()
+                            if asyncio.iscoroutine(result):
+                                result = await result
+                            if result and isinstance(result, dict):
+                                print(f"\n{Colors.DIM}Resultat: {result}{Colors.RESET}")
+                        else:
+                            print_warning(f"Ukendt metode: {_method_name}")
+                    else:
+                        print_warning(f"Ugyldigt format: {cmd}")
                 else:
                     print_warning(f"Ukendt kommando: {cmd}")
                     print(f"{Colors.DIM}Skriv 'help' for at se tilgængelige kommandoer{Colors.RESET}")

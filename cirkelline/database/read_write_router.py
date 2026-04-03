@@ -109,7 +109,7 @@ class RouterConfig:
             port=int(os.getenv("DB_PRIMARY_PORT", "5532")),
             database=os.getenv("DB_NAME", "cirkelline"),
             user=os.getenv("DB_USER", "cirkelline"),
-            password=os.getenv("DB_PASSWORD", "cirkelline123"),
+            password=os.getenv("DB_PASSWORD", os.getenv("CIRKELLINE_DB_PASSWORD", "")),
             is_primary=True,
         )
 
@@ -145,7 +145,7 @@ class RouterConfig:
                 port=5532,
                 database="cirkelline",
                 user="cirkelline",
-                password="cirkelline123",
+                password=os.getenv("DB_PASSWORD", os.getenv("CIRKELLINE_DB_PASSWORD", "")),
                 is_primary=True,
             ),
             replicas=[],  # No replicas in dev

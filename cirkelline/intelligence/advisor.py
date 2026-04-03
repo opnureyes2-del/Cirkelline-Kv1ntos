@@ -376,7 +376,11 @@ class ContextualAdvisor:
         }
 
         try:
-            # Evaluate condition
+            # Evaluate condition — restricted: no builtins, no imports, no calls to dangerous functions
+            # Only DEFAULT_RULES conditions (hardcoded) should reach here
+            _FORBIDDEN = ["import", "exec", "eval", "open", "system", "__", "compile", "globals"]
+            if any(kw in rule.condition for kw in _FORBIDDEN):
+                return None
             if not eval(rule.condition, {"__builtins__": {}}, eval_context):
                 return None
 

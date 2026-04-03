@@ -437,6 +437,11 @@ class CirkellineCalendarTools(Toolkit):
 
                 updates.append("updated_at = NOW()")
 
+                _ALLOWED_COLS = {"title", "description", "location", "start_time", "end_time", "all_day", "updated_at"}
+                for u in updates:
+                    col = u.split("=")[0].strip()
+                    if col not in _ALLOWED_COLS:
+                        return f"Invalid column: {col}"
                 query = f"UPDATE calendar_events SET {', '.join(updates)} WHERE id = :id AND user_id = :user_id RETURNING title"
                 result = conn.execute(text(query), params)
                 row = result.fetchone()

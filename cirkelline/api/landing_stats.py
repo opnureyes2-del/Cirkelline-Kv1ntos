@@ -92,7 +92,10 @@ async def get_landing_stats():
     try:
         with db.get_session() as session:
             # Knowledge
+            _ALLOWED_TABLES = {"documents", "knowledge_domains"}
             for table in ["documents", "knowledge_domains"]:
+                if table not in _ALLOWED_TABLES:
+                    continue
                 try:
                     row = session.execute(db.text(f"SELECT COUNT(*) FROM {table}")).fetchone()
                     if row:
