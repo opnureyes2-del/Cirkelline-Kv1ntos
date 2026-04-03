@@ -6,9 +6,10 @@ Helper functions for JWT token generation and verification.
 
 import os
 import time
+from typing import Any, Dict, Optional
+
 import jwt as pyjwt
-from typing import Dict, Any, Optional
-from fastapi import Request, HTTPException
+from fastapi import HTTPException, Request
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -44,7 +45,7 @@ def generate_jwt_token(
         "iat": int(time.time()),
         "exp": int(time.time()) + (7 * 24 * 60 * 60)  # 7 days
     }
-    
+
     if is_admin and admin_profile:
         jwt_payload.update({
             "user_name": admin_profile.get("name", display_name),
@@ -71,7 +72,7 @@ def generate_jwt_token(
             "user_type": "Regular",
             "is_admin": False
         })
-    
+
     # Add tier information
     if tier_info:
         jwt_payload.update({
@@ -86,14 +87,14 @@ def generate_jwt_token(
             "tier_level": 1,
             "subscription_status": "active"
         })
-    
+
     # Sign JWT
     token = pyjwt.encode(
         jwt_payload,
         os.getenv("JWT_SECRET_KEY"),
         algorithm="HS256"
     )
-    
+
     return token
 
 
@@ -111,15 +112,15 @@ def decode_jwt_token(request: Request) -> Dict[str, Any]:
         HTTPException: If token is missing, invalid, or expired
     """
     auth_header = request.headers.get("authorization", "")
-    
+
     if not auth_header.startswith("Bearer "):
         raise HTTPException(
             status_code=401,
             detail="Not authenticated - Missing or invalid Authorization header"
         )
-    
+
     token = auth_header[7:]  # Remove "Bearer " prefix
-    
+
     try:
         payload = pyjwt.decode(
             token,
@@ -160,7 +161,7 @@ def load_admin_profile(user_id: str, session: Session) -> Optional[Dict[str, Any
             {"user_id": user_id}
         )
         row = result.fetchone()
-        
+
         if row:
             return {
                 "name": row[0],
@@ -198,7 +199,7 @@ def load_tier_info(user_id: str, session: Session) -> Dict[str, Any]:
             {"user_id": user_id}
         )
         row = result.fetchone()
-        
+
         if row:
             return {
                 "tier_slug": row[0],

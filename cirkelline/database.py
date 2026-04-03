@@ -5,10 +5,12 @@ Database connections: PostgreSQL and PgVector.
 """
 
 import os
+
 from agno.db.postgres import PostgresDb
-from agno.vectordb.pgvector import PgVector, SearchType
 from agno.knowledge.embedder.ollama import OllamaEmbedder
+from agno.vectordb.pgvector import PgVector, SearchType
 from sqlalchemy import create_engine
+
 from cirkelline.config import logger
 
 # Database connection

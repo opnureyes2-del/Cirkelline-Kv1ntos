@@ -16,20 +16,17 @@ from cirkelline.headquarters.agents.coordinator import (
     CoordinatorAgent,
     get_coordinator,
 )
-
+from cirkelline.headquarters.agents.dispatcher import (
+    DispatcherAgent,
+    get_dispatcher,
+)
 from cirkelline.headquarters.agents.monitor import (
     MonitorAgent,
     get_monitor,
 )
-
 from cirkelline.headquarters.agents.scheduler import (
     SchedulerAgent,
     get_scheduler,
-)
-
-from cirkelline.headquarters.agents.dispatcher import (
-    DispatcherAgent,
-    get_dispatcher,
 )
 
 __all__ = [

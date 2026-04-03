@@ -18,55 +18,34 @@ KRITISK: Alle destruktive tests køres i ISOLERET SANDBOX MILJØ!
 """
 
 import asyncio
-import sys
 import os
-import traceback
-import random
+import sys
 import time
-import hashlib
-import json
-import copy
-from datetime import datetime, timedelta, timezone
-from typing import Dict, Any, List, Tuple, Optional, Set, Callable
-from dataclasses import dataclass, field
-from enum import Enum
 from collections import defaultdict
-import concurrent.futures
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+from cirkelline.ckc.advanced_protocols import (
+    SecurityLevel,
+    get_ilcp_manager,
+    get_security_manager,
+    get_terminal,
+)
+from cirkelline.ckc.agents import create_all_agents
 from cirkelline.ckc.learning_rooms import (
+    RoomStatus,
     get_room_manager,
     initialize_default_rooms,
-    RoomStatus,
-    LearningRoom,
 )
 from cirkelline.ckc.orchestrator import (
     get_orchestrator,
-    TaskPriority,
-    TaskStatus,
-    AgentCapability,
 )
-from cirkelline.ckc.agents import create_all_agents, BaseAgent
-from cirkelline.ckc.kommandanter import (
-    get_historiker,
-    get_bibliotekar,
-    HistoricalEventType,
-    KnowledgeCategory,
-)
-from cirkelline.ckc.dashboard import get_dashboard_manager, StatusLevel
-from cirkelline.ckc.security import get_sanitizer, InputType, ThreatLevel, get_corruption_detector
-from cirkelline.ckc.advanced_protocols import (
-    get_security_manager,
-    get_ilcp_manager,
-    get_terminal,
-    SecurityLevel,
-    MessageType,
-    MessagePriority,
-    AuthorizationLevel,
-)
+from cirkelline.ckc.security import ThreatLevel, get_corruption_detector, get_sanitizer
 from cirkelline.config import logger
-
 
 # ═══════════════════════════════════════════════════════════════
 # ENUMS OG DATAKLASSER
@@ -116,7 +95,7 @@ class AuditFinding:
     risk_impact: float  # 0.0-1.0
     risk_likelihood: float  # 0.0-1.0
     iso_standard_reference: Optional[str] = None
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     resolved: bool = False
     resolution_notes: str = ""
 
@@ -153,7 +132,7 @@ class HITLPrompt:
     consequence_reject: str
     findings: List[AuditFinding]
     checklist: List[Tuple[str, bool]]  # (item, checked)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def display(self) -> str:
         """Generer terminalvenlig visning."""
@@ -264,7 +243,7 @@ class SandboxEnvironment:
 
         self.operations_log.append({
             "action": "SANDBOX_ACTIVATED",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "state_preserved": True
         })
 
@@ -291,7 +270,7 @@ class SandboxEnvironment:
 
         self.operations_log.append({
             "action": "SANDBOX_DEACTIVATED",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "state_restored": True
         })
 
@@ -307,7 +286,7 @@ class SandboxEnvironment:
         self.operations_log.append({
             "operation": operation,
             "details": details,
-            "timestamp": datetime.now(timezone.utc).isoformat()
+            "timestamp": datetime.now(UTC).isoformat()
         })
 
 
@@ -331,7 +310,7 @@ class FaseIII2Auditor:
         self.sandbox = SandboxEnvironment()
         self.stress_results: List[StressTestResult] = []
         self.finding_counter = 0
-        self.started_at = datetime.now(timezone.utc)
+        self.started_at = datetime.now(UTC)
 
         # Komponenter
         self.room_manager = get_room_manager()
@@ -1413,7 +1392,7 @@ class FaseIII2Auditor:
         ]
 
         return HITLPrompt(
-            action_id=f"FASE_III_{section}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}",
+            action_id=f"FASE_III_{section}_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}",
             summary=summary,
             consequence_approve=consequence_approve,
             consequence_reject=consequence_reject,

@@ -32,10 +32,11 @@ Usage (in kv1ntos):
     exchange_token = await gateway.exchange_token(token, "consulting")
 """
 
-import httpx
 from dataclasses import dataclass
-from typing import Optional, List, Dict, Any
 from enum import Enum
+from typing import Any, Dict, List, Optional
+
+import httpx
 
 
 class CustomerTier(str, Enum):
@@ -468,7 +469,7 @@ class GatewayAuthDependency:
         Raises:
             HTTPException if invalid
         """
-        from fastapi import HTTPException, status, Header
+        from fastapi import HTTPException, status
 
         if not authorization:
             raise HTTPException(
@@ -598,7 +599,7 @@ class LocalTokenValidator:
             TokenValidationResult with validation details
         """
         try:
-            from jose import jwt, JWTError
+            from jose import JWTError, jwt
 
             payload = jwt.decode(
                 token,

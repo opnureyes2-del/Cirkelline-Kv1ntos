@@ -11,34 +11,30 @@ Responsibilities:
 - Track SLA compliance
 """
 
-import logging
 import asyncio
-from typing import Optional, Dict, Any, List
+import logging
+from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from collections import defaultdict
+from typing import Any, Dict, List, Optional
 
+from cirkelline.context.agent_protocol import (
+    AgentDescriptor,
+    get_capability_registry,
+)
+from cirkelline.context.system_status import (
+    SystemStatus,
+    get_system_status,
+)
 from cirkelline.headquarters.event_bus import (
-    EventBus,
     Event,
+    EventBus,
     EventType,
     get_event_bus,
 )
 from cirkelline.headquarters.shared_memory import (
     SharedMemory,
-    AgentState,
     get_shared_memory,
-)
-from cirkelline.context.system_status import (
-    SystemStatus,
-    HealthStatus,
-    ServiceHealth,
-    get_system_status,
-)
-from cirkelline.context.agent_protocol import (
-    AgentDescriptor,
-    AgentCapability,
-    get_capability_registry,
 )
 
 logger = logging.getLogger(__name__)
@@ -216,7 +212,7 @@ class MonitorAgent:
             await self._create_alert(
                 severity="warning",
                 title="System Health Degraded",
-                message=f"Some services are degraded",
+                message="Some services are degraded",
                 source="health_check",
             )
 

@@ -16,14 +16,13 @@ Features:
 Flow: Observation -> Analyse -> Delegation -> Validering -> Respons
 """
 
+import asyncio
+import traceback
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Callable, Set, Tuple, Union
 from enum import Enum
-import uuid
-import asyncio
-from collections import defaultdict
-import traceback
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 from cirkelline.config import logger
 
@@ -34,7 +33,7 @@ def _get_task_context():
     """Lazy import of TaskContext to avoid circular imports."""
     global TaskContext
     if TaskContext is None:
-        from .context import TaskContext as TC, WorkflowStep, WorkflowStepStatus
+        from .context import TaskContext as TC
         TaskContext = TC
     return TaskContext
 
@@ -618,7 +617,7 @@ class WorkLoopSequencer:
             else:
                 return False, f"Unknown step type: {step.step_type}"
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return False, f"Step {step.step_id} timed out after {step.timeout_seconds}s"
         except Exception as e:
             return False, str(e)
@@ -686,7 +685,7 @@ class WorkLoopSequencer:
                 results[step_id] = result
                 if not success:
                     all_success = False
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 results[step_id] = {"error": "timeout"}
                 all_success = False
             except Exception as e:

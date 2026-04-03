@@ -6,8 +6,9 @@ Captures identity, emotional state, preferences, goals, and patterns organically
 """
 
 from agno.memory import MemoryManager
-from cirkelline.database import db
+
 from cirkelline.config import logger
+from cirkelline.database import db
 
 # Enhanced Memory Manager (v1.1.19+)
 # ✅ v1.2.33: Added db parameter explicitly (AGNO best practice)

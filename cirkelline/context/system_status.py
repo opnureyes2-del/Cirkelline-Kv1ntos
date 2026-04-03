@@ -13,13 +13,13 @@ Services monitored:
 Provides health checks and status aggregation.
 """
 
-import os
-import logging
 import asyncio
-from enum import Enum
-from typing import Optional, Dict, Any, List
+import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -220,6 +220,7 @@ class SystemStatus:
     ) -> ServiceHealth:
         """Check external API health."""
         import time
+
         import httpx
 
         health = ServiceHealth(name=name)

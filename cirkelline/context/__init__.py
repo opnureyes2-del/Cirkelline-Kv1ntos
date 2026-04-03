@@ -19,25 +19,23 @@ Usage:
 
 __version__ = "1.0.0"
 
+from cirkelline.context.agent_protocol import (
+    AgentCapability,
+    AgentMessage,
+    MessageType,
+    create_agent_message,
+)
 from cirkelline.context.collector import (
     ContextCollector,
     ContextSource,
     ContextType,
     get_context_collector,
 )
-
 from cirkelline.context.system_status import (
-    SystemStatus,
-    ServiceHealth,
     HealthStatus,
+    ServiceHealth,
+    SystemStatus,
     get_system_status,
-)
-
-from cirkelline.context.agent_protocol import (
-    AgentMessage,
-    MessageType,
-    AgentCapability,
-    create_agent_message,
 )
 
 __all__ = [

@@ -10,12 +10,12 @@ This ensures AI and UI always see the same data.
 v1.3.4: Created to replace AGNO GoogleCalendarTools
 """
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional, List
-from uuid import uuid4
+from datetime import UTC, datetime, timedelta
+from typing import Optional
+from zoneinfo import ZoneInfo
+
 from agno.tools import Toolkit
 from sqlalchemy import text
-from zoneinfo import ZoneInfo
 
 from cirkelline.config import logger
 from cirkelline.database import engine
@@ -151,8 +151,8 @@ class CirkellineCalendarTools(Toolkit):
             Use this to check what's scheduled, find conflicts, or review the calendar.
         """
         try:
-            time_min = datetime.now(timezone.utc) - timedelta(days=days_behind)
-            time_max = datetime.now(timezone.utc) + timedelta(days=days_ahead)
+            time_min = datetime.now(UTC) - timedelta(days=days_behind)
+            time_max = datetime.now(UTC) + timedelta(days=days_ahead)
 
             with engine.connect() as conn:
                 query = """
@@ -270,8 +270,8 @@ class CirkellineCalendarTools(Toolkit):
                     logger.info(f"📅 Interpreted end time as {user_tz_str}: {end_dt.isoformat()}")
 
                 # Convert to UTC for storage
-                start_dt = start_dt.astimezone(timezone.utc)
-                end_dt = end_dt.astimezone(timezone.utc)
+                start_dt = start_dt.astimezone(UTC)
+                end_dt = end_dt.astimezone(UTC)
                 logger.info(f"📅 Converted to UTC: start={start_dt.isoformat()}, end={end_dt.isoformat()}")
 
             except ValueError as e:
@@ -489,8 +489,9 @@ class CirkellineCalendarTools(Toolkit):
     def _try_google_sync(self, user_id: str, event_id: str, action: str, data: dict) -> str:
         """Try to sync with Google Calendar if connected. Returns status message."""
         try:
-            from cirkelline.integrations.google.google_oauth import get_user_google_credentials
             import asyncio
+
+            from cirkelline.integrations.google.google_oauth import get_user_google_credentials
 
             # Get Google credentials
             loop = asyncio.new_event_loop()

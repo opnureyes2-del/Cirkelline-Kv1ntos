@@ -13,35 +13,32 @@ Components:
 __version__ = "1.0.0"
 
 from cirkelline.intelligence.advisor import (
-    ContextualAdvisor,
     Advice,
-    AdviceType,
     AdvicePriority,
+    AdviceType,
+    ContextualAdvisor,
     get_advisor,
 )
-
 from cirkelline.intelligence.anomaly_detector import (
-    AnomalyDetector,
     Anomaly,
-    AnomalyType,
+    AnomalyDetector,
     AnomalySeverity,
+    AnomalyType,
     get_detector,
 )
-
 from cirkelline.intelligence.collaboration import (
-    CollaborationEngine,
-    CollaborationSession,
-    CollaborationMode,
-    CollaborationStatus,
     AgentContribution,
+    CollaborationEngine,
+    CollaborationMode,
+    CollaborationSession,
+    CollaborationStatus,
     get_collaboration_engine,
 )
-
 from cirkelline.intelligence.semantic_search import (
-    SemanticSearch,
-    SearchResult,
-    SearchMode,
     Document,
+    SearchMode,
+    SearchResult,
+    SemanticSearch,
     get_semantic_search,
 )
 

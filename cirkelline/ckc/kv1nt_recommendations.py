@@ -15,14 +15,14 @@ Author: Claude (Ultimate Instruktor & Dirigent)
 Super Admin: Rasmus (System Creator & Visionary)
 """
 
+import json
+import re
+import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional, Callable, Union
 from enum import Enum
-import json
-import subprocess
-import re
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
 class RecommendationPriority(Enum):
@@ -693,7 +693,7 @@ class KV1NTRecommendationEngine:
                             "delta": latest_rate - previous_rate
                         }
                     ))
-        except Exception as e:
+        except Exception:
             pass  # Ignorér fejl ved læsning af rapporter
 
         return recommendations
@@ -1027,7 +1027,7 @@ class KV1NTPatternAnalyzer:
                         )
 
                 loaded += 1
-            except (json.JSONDecodeError, IOError) as e:
+            except (OSError, json.JSONDecodeError):
                 pass  # Ignorér korrupte filer
 
         return loaded

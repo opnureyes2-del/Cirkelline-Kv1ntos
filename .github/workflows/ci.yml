@@ -32,7 +32,7 @@ jobs:
           pip install ruff black isort
 
       - name: Run Ruff (linter)
-        run: ruff check . --ignore E501,E402
+        run: ruff check .
 
       - name: Check formatting with Black
         run: black --check . --exclude "(venv|\.venv|\.git)"

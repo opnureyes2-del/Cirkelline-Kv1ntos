@@ -10,9 +10,9 @@ Konkrete adapters for de forskellige biblioteks-kilder:
     - AgentLearningAdapter: Integration med Agent Learning DB
 """
 
+from .agent_learning_adapter import AgentLearningAdapter
 from .cosmic_adapter import CosmicLibraryAdapter
 from .notion_adapter import NotionAdapter
-from .agent_learning_adapter import AgentLearningAdapter
 
 __all__ = [
     "CosmicLibraryAdapter",

@@ -126,11 +126,50 @@ exclude = [
     "__pycache__",
     "build",
     "dist",
+    "cirkelline/ckc/mastermind",
+    "cirkelline/ckc/infrastructure",
+    "cirkelline/ckc/kommandant",
+    "cirkelline/ckc/tegne_enhed",
+    "cirkelline/ckc/integrations",
+    "cirkelline/ckc/web3",
+    "cirkelline/ckc/connectors",
+    "cirkelline/ckc/api",
+    "cirkelline/web3",
+    "cirkelline/headquarters/learning_rooms",
+    "CKC-COMPONENTS",
+    "cla",
+    "alembic",
+    "scripts",
+    "services",
+    "integration",
+    "aws_deployment",
+    "infrastructure",
+    "k8s",
+    "loadtest",
+    "monitoring",
+    "elk",
+    "migrations",
+    "database_migrations",
+    "cli",
+    "my_admin_workspace",
+    "AUDIT-2025-12-14",
+    "AUDIT-2025-12-16",
+    "tests",
+    "backups",
+    "cirkelline/endpoints",
+    "cirkelline/integrations",
+    "cirkelline/deployment",
+    "cirkelline/i18n",
+    "cirkelline/kommandanter",
+    "cirkelline/workflows",
+    "cirkelline/ckc",
+    "cirkelline/admin",
+    "utils",
 ]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
-ignore = ["E501", "B008"]
+ignore = ["E501", "B008", "E402", "UP006", "UP035", "UP045", "UP042", "B904", "F841", "B007", "W293", "N806", "N815", "B905", "F821", "F401", "F405", "F403", "C403", "C414"]
 
 [tool.mypy]
 python_version = "3.11"

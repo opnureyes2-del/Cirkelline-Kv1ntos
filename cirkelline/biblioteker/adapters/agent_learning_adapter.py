@@ -14,18 +14,18 @@ Features:
 """
 
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
 
+from ...kommandanter.database import AgentLearningDB, get_agent_learning_db
 from ..base import (
-    BibliotekSource,
     BibliotekAdapter,
+    BibliotekSource,
+    ItemType,
     LibraryItem,
     SearchQuery,
     SearchResult,
     SyncStatus,
-    ItemType,
 )
-from ...kommandanter.database import AgentLearningDB, get_agent_learning_db
 
 
 class AgentLearningAdapter(BibliotekAdapter):

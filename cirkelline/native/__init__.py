@@ -19,8 +19,8 @@ Usage:
 
 import hashlib
 import logging
-from typing import Dict, List, Optional, Any
 from functools import lru_cache
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +29,18 @@ NATIVE_AVAILABLE = False
 try:
     from cirkelline_native import (
         NativeCache as _RustCache,
-        fast_hash as _rust_hash,
-        build_cache_key as _rust_build_key,
+    )
+    from cirkelline_native import (
         batch_hash as _rust_batch_hash,
+    )
+    from cirkelline_native import (
+        build_cache_key as _rust_build_key,
+    )
+    from cirkelline_native import (
         extract_json_keys as _rust_extract_keys,
+    )
+    from cirkelline_native import (
+        fast_hash as _rust_hash,
     )
     NATIVE_AVAILABLE = True
     logger.info("Native Rust extensions loaded - performance mode enabled")

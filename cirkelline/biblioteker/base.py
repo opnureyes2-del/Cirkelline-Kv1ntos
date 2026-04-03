@@ -8,12 +8,12 @@ Base interfaces og dataklasser for Multi-Bibliotek systemet.
 Definerer kontrakten som alle bibliotek-adapters skal følge.
 """
 
+import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Dict, Any
-import uuid
+from typing import Any, Dict, List, Optional
 
 
 class BibliotekSource(Enum):

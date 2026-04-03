@@ -7,37 +7,35 @@ UPDATED: 2026-01-09 - P2-INT-2 Gateway Authentication Integration
 """
 
 # Local JWT utilities (for backwards compatibility)
-from cirkelline.shared.jwt_utils import (
-    decode_jwt_token,
-    generate_jwt_token,
-    load_admin_profile,
-    load_tier_info
+from cirkelline.shared.database import get_db_engine, get_db_session
+from cirkelline.shared.gateway_auth import (
+    exchange_token,
+    gateway_auth,
+    get_gateway_client,
+    get_user_info,
+    is_gateway_configured,
+    optional_gateway_auth,
+    require_feature,
+    require_platform,
+    require_tier,
+    validate_token_direct,
 )
 
 # CKC Gateway Authentication (P2-INT-2)
 from cirkelline.shared.gateway_client import (
-    GatewayClient,
-    TokenValidationResult,
-    TokenExchangeResult,
-    GatewayAuthDependency,
-    LocalTokenValidator,
     CustomerTier,
+    GatewayAuthDependency,
+    GatewayClient,
+    LocalTokenValidator,
+    TokenExchangeResult,
+    TokenValidationResult,
 )
-
-from cirkelline.shared.gateway_auth import (
-    gateway_auth,
-    optional_gateway_auth,
-    require_tier,
-    require_feature,
-    require_platform,
-    validate_token_direct,
-    exchange_token,
-    get_user_info,
-    get_gateway_client,
-    is_gateway_configured,
+from cirkelline.shared.jwt_utils import (
+    decode_jwt_token,
+    generate_jwt_token,
+    load_admin_profile,
+    load_tier_info,
 )
-
-from cirkelline.shared.database import get_db_session, get_db_engine
 
 __all__ = [
     # Local JWT (backwards compatibility)

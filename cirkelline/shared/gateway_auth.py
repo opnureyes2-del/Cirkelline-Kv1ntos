@@ -28,13 +28,13 @@ Usage:
 
 import os
 from typing import Optional
-from fastapi import HTTPException, Header, status
+
+from fastapi import Header, HTTPException, status
 
 from cirkelline.config import logger
 from cirkelline.shared.gateway_client import (
     GatewayClient,
     TokenValidationResult,
-    GatewayAuthDependency,
 )
 
 # =============================================================================

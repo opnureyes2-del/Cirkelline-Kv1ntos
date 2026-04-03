@@ -3,9 +3,8 @@ Document Processing Tools for Cirkelline
 Handles DOCX conversion guidance and structured text extraction
 """
 
+
 from agno.tools import Toolkit
-import os
-from typing import Optional
 
 
 class DocumentProcessingTools(Toolkit):
@@ -62,7 +61,7 @@ class DocumentProcessingTools(Toolkit):
         try:
             # For text-based files, read directly
             if file_path.lower().endswith(('.txt', '.md', '.html', '.xml')):
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, encoding='utf-8') as f:
                     content = f.read()
 
                 if preserve_formatting:

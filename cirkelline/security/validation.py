@@ -10,13 +10,12 @@ Responsibilities:
 - Support custom validation rules
 """
 
+import html
 import logging
 import re
-import html
-from typing import Optional, Dict, Any, List, Callable, Union
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

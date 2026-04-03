@@ -13,10 +13,11 @@ Provides:
 Import routers to add to FastAPI app.
 """
 
-from cirkelline.admin.users import router as admin_users_router
+from cirkelline.admin.activity import broadcast_activity_log
+from cirkelline.admin.activity import router as admin_activity_router
 from cirkelline.admin.stats import router as admin_stats_router
 from cirkelline.admin.subscriptions import router as admin_subscriptions_router
-from cirkelline.admin.activity import router as admin_activity_router, broadcast_activity_log
+from cirkelline.admin.users import router as admin_users_router
 from cirkelline.admin.workflows import router as admin_workflows_router
 
 __all__ = [

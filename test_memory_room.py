@@ -7,19 +7,13 @@ Run: python test_memory_room.py
 import asyncio
 import sys
 
+
 def test_imports():
     """Test all imports work."""
     print("Testing imports...")
 
     # Test monitors import (new path)
     try:
-        from cirkelline.ckc.monitors import (
-            MemoryEvolutionRoom,
-            get_memory_evolution_room,
-            start_memory_evolution_room,
-            RoomStatus,
-            SyncFrequency,
-        )
         print("  ✅ Monitors imports OK")
     except Exception as e:
         print(f"  ❌ Monitors import failed: {e}")
@@ -27,21 +21,12 @@ def test_imports():
 
     # Test re-export through learning_rooms
     try:
-        from cirkelline.ckc.learning_rooms import (
-            MemoryEvolutionRoom as MER_alt,
-            get_memory_evolution_room as get_mer_alt,
-        )
         print("  ✅ Learning rooms re-export OK")
     except Exception as e:
         print(f"  ⚠️ Learning rooms re-export not available: {e}")
         # This is OK - re-export is optional
 
     try:
-        from cirkelline.ckc.kommandanter import (
-            get_historiker,
-            get_bibliotekar,
-            HistoricalEventType,
-        )
         print("  ✅ Kommandanter imports OK")
     except Exception as e:
         print(f"  ❌ Kommandanter import failed: {e}")

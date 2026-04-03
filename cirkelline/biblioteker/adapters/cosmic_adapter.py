@@ -15,18 +15,19 @@ Features:
 """
 
 import os
-import aiohttp
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
+
+import aiohttp
 
 from ..base import (
-    BibliotekSource,
     BibliotekAdapter,
+    BibliotekSource,
+    ItemType,
     LibraryItem,
     SearchQuery,
     SearchResult,
     SyncStatus,
-    ItemType,
 )
 
 

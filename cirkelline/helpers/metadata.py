@@ -5,8 +5,10 @@ Functions for creating and filtering document metadata.
 """
 
 from datetime import datetime
-from typing import Optional, Dict
+from typing import Dict, Optional
+
 from cirkelline.config import logger
+
 
 def create_document_metadata(
     user_id: str,

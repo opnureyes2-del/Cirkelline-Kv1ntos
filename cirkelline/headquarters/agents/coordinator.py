@@ -11,40 +11,36 @@ Responsibilities:
 - Report completion/failure
 """
 
-import logging
 import asyncio
-from typing import Optional, Dict, Any, List
+import logging
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-import uuid
+from typing import Any, Dict, List, Optional
 
+from cirkelline.context.agent_protocol import (
+    AgentCapability,
+    AgentDescriptor,
+    create_delegation_request,
+    get_capability_registry,
+)
 from cirkelline.headquarters.event_bus import (
-    EventBus,
     Event,
+    EventBus,
     EventType,
     get_event_bus,
-)
-from cirkelline.headquarters.shared_memory import (
-    SharedMemory,
-    Mission,
-    MissionStatus,
-    MissionPriority,
-    get_shared_memory,
 )
 from cirkelline.headquarters.knowledge_graph import (
     KnowledgeGraph,
     NodeType,
-    EdgeType,
     get_knowledge_graph,
 )
-from cirkelline.context.agent_protocol import (
-    AgentMessage,
-    MessageType,
-    AgentCapability,
-    AgentDescriptor,
-    create_agent_message,
-    create_delegation_request,
-    get_capability_registry,
+from cirkelline.headquarters.shared_memory import (
+    Mission,
+    MissionPriority,
+    MissionStatus,
+    SharedMemory,
+    get_shared_memory,
 )
 
 logger = logging.getLogger(__name__)

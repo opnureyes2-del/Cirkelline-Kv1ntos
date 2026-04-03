@@ -24,9 +24,10 @@ Execution Order (add BEFORE RBACGatewayMiddleware):
 
 import os
 from typing import Optional
-from starlette.requests import Request as StarletteRequest
-from starlette.middleware.base import BaseHTTPMiddleware
+
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
 
 from cirkelline.config import logger
 
@@ -36,7 +37,6 @@ from cirkelline.shared.gateway_auth import (
     is_gateway_configured,
 )
 from cirkelline.shared.gateway_client import TokenValidationResult
-
 
 # =============================================================================
 # CONFIGURATION

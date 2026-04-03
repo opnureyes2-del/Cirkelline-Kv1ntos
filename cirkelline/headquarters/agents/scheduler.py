@@ -11,31 +11,28 @@ Responsibilities:
 - Queue management
 """
 
-import logging
 import asyncio
-from typing import Optional, Dict, Any, List, Tuple
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from heapq import heappush, heappop
+import logging
 import uuid
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from heapq import heappop, heappush
+from typing import Any, Dict, List, Optional, Tuple
 
+from cirkelline.context.agent_protocol import (
+    AgentDescriptor,
+    get_capability_registry,
+)
 from cirkelline.headquarters.event_bus import (
-    EventBus,
     Event,
+    EventBus,
     EventType,
     get_event_bus,
 )
 from cirkelline.headquarters.shared_memory import (
-    SharedMemory,
-    Mission,
-    MissionStatus,
     MissionPriority,
-    AgentState,
+    SharedMemory,
     get_shared_memory,
-)
-from cirkelline.context.agent_protocol import (
-    AgentDescriptor,
-    get_capability_registry,
 )
 
 logger = logging.getLogger(__name__)

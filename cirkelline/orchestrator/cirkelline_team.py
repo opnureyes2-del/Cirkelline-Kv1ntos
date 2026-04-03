@@ -6,12 +6,14 @@ Receives user requests and intelligently routes to appropriate specialists.
 """
 
 import os
-from agno.team import Team
-from agno.models.google import Gemini
+
 from agno.memory import MemoryManager  # v1.2.34.5: Explicit MemoryManager for memory creation
+from agno.models.google import Gemini
+from agno.team import Team
 from agno.tools.duckduckgo import DuckDuckGoTools  # v1.2.34: Added for news/current events
 from agno.tools.reasoning import ReasoningTools
 from agno.tools.user_control_flow import UserControlFlowTools
+
 # v1.2.34.1: REMOVED MemoryTools - using enable_user_memories=True instead (auto-memory)
 
 # KERNEMANDAT: Prioriter gratis løsninger - Exa og Tavily er valgfrie
@@ -24,24 +26,26 @@ if TAVILY_AVAILABLE:
     from agno.tools.tavily import TavilyTools
 
 # Import all specialist agents
-from cirkelline.agents.specialists import audio_agent, video_agent, image_agent, document_agent
+from cirkelline.agents.law_team import law_team
 
 # Import specialist teams
 from cirkelline.agents.research_team import research_team
-from cirkelline.agents.law_team import law_team
+from cirkelline.agents.specialists import audio_agent, document_agent, image_agent, video_agent
+from cirkelline.config import ADMIN_USER_IDS, logger
+from cirkelline.database import db
+from cirkelline.knowledge_base import knowledge
 
 # Import orchestrator components
 # NOTE: memory_manager.py DEPRECATED in v1.2.34 - now using MemoryTools for agent-controlled memory
 from cirkelline.orchestrator.instructions import get_cirkelline_instructions
+from cirkelline.tools.ckc_tools import get_ckc_tools  # v1.3.3: CKC Bridge integration
 
 # Import tools and infrastructure
 from cirkelline.tools.knowledge_tools import FilteredKnowledgeSearchTool
+from cirkelline.tools.memory_search_tool import (
+    IntelligentMemoryTool,  # v1.2.34.4: Intelligent memory search
+)
 from cirkelline.tools.notion_tools import NotionTools
-from cirkelline.tools.memory_search_tool import IntelligentMemoryTool  # v1.2.34.4: Intelligent memory search
-from cirkelline.tools.ckc_tools import get_ckc_tools  # v1.3.3: CKC Bridge integration
-from cirkelline.database import db
-from cirkelline.knowledge_base import knowledge
-from cirkelline.config import logger, ADMIN_USER_IDS
 
 # Create custom knowledge search tool with permission filtering
 filtered_search_tool = FilteredKnowledgeSearchTool(
@@ -222,6 +226,7 @@ cirkelline = Team(
 # session_naming.py needs access to cirkelline team for intelligent session naming
 # This must be called AFTER cirkelline team is created
 from cirkelline.helpers.session_naming import set_cirkelline_team
+
 set_cirkelline_team(cirkelline)
 # ═══════════════════════════════════════════════════════════════
 

@@ -11,32 +11,30 @@ Responsibilities:
 - Request queueing
 """
 
-import logging
 import asyncio
-from typing import Optional, Dict, Any, List, Tuple
-from dataclasses import dataclass, field
-from datetime import datetime
+import logging
 import uuid
 from collections import defaultdict
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 
+from cirkelline.context.agent_protocol import (
+    AgentCapability,
+    AgentDescriptor,
+    MessageType,
+    create_agent_message,
+    get_capability_registry,
+)
 from cirkelline.headquarters.event_bus import (
-    EventBus,
     Event,
+    EventBus,
     EventType,
     get_event_bus,
 )
 from cirkelline.headquarters.shared_memory import (
     SharedMemory,
-    AgentState,
     get_shared_memory,
-)
-from cirkelline.context.agent_protocol import (
-    AgentDescriptor,
-    AgentCapability,
-    AgentMessage,
-    MessageType,
-    create_agent_message,
-    get_capability_registry,
 )
 
 logger = logging.getLogger(__name__)

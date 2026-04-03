@@ -15,14 +15,14 @@ Event Types:
 - SYSTEM_* : System health and alerts
 """
 
-import json
 import asyncio
+import json
 import logging
-from enum import Enum
-from typing import Optional, Dict, Any, List, Callable, Awaitable
-from dataclasses import dataclass, field, asdict
-from datetime import datetime
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 try:
     import redis.asyncio as aioredis

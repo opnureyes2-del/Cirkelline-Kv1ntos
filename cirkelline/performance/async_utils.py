@@ -10,17 +10,13 @@ Responsibilities:
 - Concurrent execution helpers
 """
 
-import logging
 import asyncio
-import time
 import functools
-from typing import (
-    Optional, Dict, Any, List, Callable, TypeVar, Generic,
-    Awaitable, Tuple, Union
-)
+import logging
+import time
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum
+from typing import Any, Awaitable, Callable, Dict, Generic, List, Optional, Tuple, TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +85,7 @@ class AsyncTimeout:
         """
         try:
             return await asyncio.wait_for(coro, timeout=self.timeout_seconds)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning(f"Operation timed out after {self.timeout_seconds}s")
             return default
 
@@ -315,7 +311,7 @@ class AsyncBatcher(Generic[T, R]):
                             timeout=remaining,
                         )
                         batch.append(item)
-                    except asyncio.TimeoutError:
+                    except TimeoutError:
                         break
 
                 if not batch:
@@ -385,7 +381,7 @@ async def batch_process(
 
     semaphore = asyncio.Semaphore(max_concurrency)
 
-    async def process_item(item: T) -> Tuple[bool, Union[R, Exception]]:
+    async def process_item(item: T) -> Tuple[bool, R | Exception]:
         async with semaphore:
             try:
                 return True, await processor(item)
@@ -416,7 +412,7 @@ async def gather_with_concurrency(
     coros: List[Awaitable[T]],
     max_concurrency: int = 10,
     return_exceptions: bool = False,
-) -> List[Union[T, Exception]]:
+) -> List[T | Exception]:
     """
     Execute coroutines with concurrency limit.
 
@@ -464,7 +460,7 @@ async def first_completed(
         )
 
         if not done:
-            raise asyncio.TimeoutError("No task completed within timeout")
+            raise TimeoutError("No task completed within timeout")
 
         # Get first completed
         completed_task = next(iter(done))

@@ -11,15 +11,13 @@ Sikkerhedslag for CKC med:
 Alt input forstørres og obduceres ved mistanke FØR det når et læringsrum.
 """
 
+import base64
+import hashlib
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple, Set, Callable
 from enum import Enum
-import re
-import hashlib
-import base64
-import json
-import asyncio
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from cirkelline.config import logger
 
@@ -369,7 +367,7 @@ class InputSanitizer:
         analysis = []
         content_str = str(content)
 
-        analysis.append(f"=== MAGNIFIED ANALYSIS ===")
+        analysis.append("=== MAGNIFIED ANALYSIS ===")
         analysis.append(f"Input Type: {input_type.value}")
         analysis.append(f"Content Length: {len(content_str)}")
         analysis.append(f"Unique Characters: {len(set(content_str))}")

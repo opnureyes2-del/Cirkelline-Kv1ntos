@@ -10,34 +10,29 @@ Responsibilities:
 - Resolve conflicts in agent recommendations
 """
 
-import logging
 import asyncio
-from typing import Optional, Dict, Any, List, Set, Callable
+import logging
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import uuid
+from typing import Any, Dict, List, Optional
 
+from cirkelline.context.agent_protocol import (
+    AgentCapability,
+    MessageType,
+    create_agent_message,
+    get_capability_registry,
+)
 from cirkelline.headquarters.event_bus import (
-    EventBus,
     Event,
+    EventBus,
     EventType,
     get_event_bus,
 )
 from cirkelline.headquarters.shared_memory import (
     SharedMemory,
-    Mission,
-    MissionStatus,
     get_shared_memory,
-)
-from cirkelline.context.agent_protocol import (
-    AgentDescriptor,
-    AgentCapability,
-    AgentMessage,
-    MessageType,
-    create_agent_message,
-    create_broadcast,
-    get_capability_registry,
 )
 
 logger = logging.getLogger(__name__)
@@ -484,7 +479,7 @@ class CollaborationEngine:
                     self._pending_responses[session_id].wait(),
                     timeout=wait_time,
                 )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning(f"Collaboration session {session_id} timed out")
             # Continue with partial contributions
 

@@ -13,9 +13,9 @@ Usage:
         # Use with agent
 """
 
-import os
 import logging
-from typing import Optional, Dict, Any, List
+import os
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,6 @@ def _get_llm():
 
     # Use google-genai directly (same as Cirkelline uses)
     from google import genai
-    from google.genai import types
 
     client = genai.Client(api_key=google_key)
     return client

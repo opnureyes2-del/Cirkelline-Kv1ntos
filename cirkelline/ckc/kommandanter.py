@@ -14,15 +14,15 @@ Disse kommandanter sikrer at CKC's viden er:
 - Bevaret over tid
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Set
-from enum import Enum
-import asyncio
 import uuid
 from collections import defaultdict
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set
 
 from cirkelline.config import logger
+
 from .orchestrator import AgentCapability
 
 

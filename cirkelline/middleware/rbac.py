@@ -14,10 +14,11 @@ Usage:
         ...
 """
 
-from enum import Enum
-from typing import List, Optional, Set, Dict, Any
-from fastapi import Depends, HTTPException, Request
 import logging
+from enum import Enum
+from typing import Any, Dict, List, Set
+
+from fastapi import HTTPException, Request
 
 logger = logging.getLogger(__name__)
 

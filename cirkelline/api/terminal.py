@@ -10,20 +10,15 @@ Provides:
 - CI/CD and database monitoring
 """
 
-import os
-import time
 import logging
-from typing import Optional, Dict, Any, List
+import time
 from datetime import datetime
+from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from cirkelline.middleware.rbac import (
-    require_permissions,
-    require_tier,
-    Permission,
-    resolve_permissions,
     get_tier_features_summary,
 )
 
@@ -173,7 +168,7 @@ async def terminal_ask(
                 answer = run_response.content if run_response.content else "Ingen respons."
             except Exception as fallback_err:
                 logger.error(f"Both Team and fallback failed: {fallback_err}")
-                answer = f"AI-integration fejlede. Prøv igen senere."
+                answer = "AI-integration fejlede. Prøv igen senere."
 
         processing_time = int((time.time() - start_time) * 1000)
 

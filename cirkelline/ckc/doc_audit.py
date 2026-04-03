@@ -10,20 +10,16 @@ Standard: "Kompromisløs Komplethed og Fejlfri Præcision"
 """
 
 import asyncio
-import sys
 import os
-import glob
 import re
-from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional, Tuple
-from dataclasses import dataclass, field
+import sys
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from collections import defaultdict
+from typing import Any, Dict, List
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from cirkelline.config import logger
 
 # ═══════════════════════════════════════════════════════════════
 # ENUMS OG DATAKLASSER
@@ -202,7 +198,7 @@ class FaseIII3Auditor:
             if not filepath.exists():
                 continue
 
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, encoding='utf-8') as f:
                 content = f.read()
 
             # Find classes and functions
@@ -256,7 +252,7 @@ class FaseIII3Auditor:
         comment_lines = 0
 
         for pyfile in ckc_path.glob("*.py"):
-            with open(pyfile, 'r', encoding='utf-8') as f:
+            with open(pyfile, encoding='utf-8') as f:
                 lines = f.readlines()
 
             for line in lines:
@@ -278,7 +274,7 @@ class FaseIII3Auditor:
         # Check for TODO/FIXME tracking
         todos_found = 0
         for pyfile in ckc_path.glob("*.py"):
-            with open(pyfile, 'r', encoding='utf-8') as f:
+            with open(pyfile, encoding='utf-8') as f:
                 content = f.read()
                 todos_found += len(re.findall(r'#\s*(TODO|FIXME|XXX)', content))
 
@@ -331,7 +327,7 @@ class FaseIII3Auditor:
             if not filepath.exists():
                 continue
 
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, encoding='utf-8') as f:
                 content = f.read()
 
             # Find async def methods (potential API endpoints)
@@ -366,7 +362,7 @@ class FaseIII3Auditor:
         for config in config_files:
             if config.exists():
                 documented = True
-                with open(config, 'r', encoding='utf-8') as f:
+                with open(config, encoding='utf-8') as f:
                     content = f.read()
                 # Count documented env vars
                 env_vars_documented += len(re.findall(r'#.*\w+.*=', content))
@@ -491,7 +487,7 @@ class FaseIII3Auditor:
         ]
 
         for pyfile in self.base_path.glob("*.py"):
-            with open(pyfile, 'r', encoding='utf-8') as f:
+            with open(pyfile, encoding='utf-8') as f:
                 content = f.read()
                 for pattern in pii_patterns:
                     if re.search(pattern, content, re.IGNORECASE):
@@ -937,7 +933,7 @@ class FaseIII4Auditor:
     async def _verify_threat_detection(self) -> Dict[str, Any]:
         """Verificer threat detection kapabiliteter."""
         try:
-            from cirkelline.ckc.security import get_sanitizer, get_corruption_detector
+            from cirkelline.ckc.security import get_corruption_detector, get_sanitizer
 
             sanitizer = get_sanitizer()
             detector = get_corruption_detector()

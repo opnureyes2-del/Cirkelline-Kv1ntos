@@ -17,17 +17,18 @@ Alle agenter følger CKC's kerneprincipper:
 - Brugerinddragelse
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Set
-from enum import Enum
-from pathlib import Path
 import asyncio
-import uuid
 import json
 import os
+import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set
 
 from cirkelline.config import logger
+
 from .orchestrator import AgentCapability
 
 # F-004: Persistence konfiguration
@@ -527,7 +528,7 @@ class ToolExplorerAgent(BaseAgent):
                 "capabilities_saved": len(self._capability_mastery)
             }
 
-        except (OSError, IOError, json.JSONDecodeError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             logger.error(f"Failed to save mastery data: {e}")
             return {"saved": False, "reason": str(e)}
 
@@ -546,12 +547,12 @@ class ToolExplorerAgent(BaseAgent):
             return {"loaded": False, "reason": "file_not_found"}
 
         try:
-            with open(self._mastery_file, 'r', encoding='utf-8') as f:
+            with open(self._mastery_file, encoding='utf-8') as f:
                 data = json.load(f)
 
             # Valider data struktur
             if data.get("agent_id") != self.agent_id:
-                logger.warning(f"Mastery file agent_id mismatch")
+                logger.warning("Mastery file agent_id mismatch")
                 return {"loaded": False, "reason": "agent_id_mismatch"}
 
             # Merge loaded data med defaults (bevar nye capabilities)
@@ -574,7 +575,7 @@ class ToolExplorerAgent(BaseAgent):
                 "saved_at": data.get("saved_at")
             }
 
-        except (OSError, IOError, json.JSONDecodeError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             logger.error(f"Failed to load mastery data: {e}")
             return {"loaded": False, "reason": str(e)}
 
@@ -885,7 +886,7 @@ class ToolExplorerAgent(BaseAgent):
         discovered = [
             {
                 "id": f"tool_{uuid.uuid4().hex[:8]}",
-                "name": f"Discovered Tool",
+                "name": "Discovered Tool",
                 "category": category,
                 "source": "discovery_scan",
                 "security_rating": "pending",

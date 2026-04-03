@@ -10,17 +10,16 @@ Responsibilities:
 - Provide tamper-evident logging
 """
 
-import logging
-import json
 import hashlib
-import time
+import json
+import logging
 import threading
-from typing import Optional, Dict, Any, List, Callable
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-import uuid
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -255,7 +254,7 @@ class FileAuditStorage(AuditStorage):
 
         for log_file in log_files:
             try:
-                with open(log_file, 'r') as f:
+                with open(log_file) as f:
                     for line in f:
                         if line.strip():
                             data = json.loads(line)

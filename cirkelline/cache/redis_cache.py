@@ -6,16 +6,15 @@ Provides caching functionality for the Cirkelline system.
 Falls back to in-memory cache if Redis is unavailable.
 """
 
-import os
-import json
-import hashlib
 import asyncio
-from typing import Optional, Any, Dict, Callable, Union
-from datetime import timedelta
-from functools import wraps
-from dataclasses import dataclass
-from collections import OrderedDict
+import hashlib
+import json
 import logging
+import os
+from collections import OrderedDict
+from dataclasses import dataclass
+from functools import wraps
+from typing import Any, Callable, Dict, Optional
 
 logger = logging.getLogger("cirkelline.cache")
 
@@ -195,7 +194,7 @@ class RedisCache:
     async def set(
         self,
         key: str,
-        value: Union[str, dict, list],
+        value: str | dict | list,
         ttl: int = None,
         prefix: str = ""
     ) -> bool:

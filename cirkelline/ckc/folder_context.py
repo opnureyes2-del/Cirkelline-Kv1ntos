@@ -10,13 +10,12 @@ Oprettet: 2025-12-16
 Agent: Kommandør #4
 """
 
+import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
-import uuid
-
 
 # ============================================================================
 # ENUMS
@@ -186,7 +185,7 @@ class FolderSwitchEvent:
             from_folder=from_folder,
             to_folder=to_folder,
             switch_method=method,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             success=success,
             error_message=error_message
         )

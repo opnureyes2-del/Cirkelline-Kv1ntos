@@ -16,18 +16,18 @@ Funktioner:
 
 import asyncio
 import time
-from datetime import datetime
-from typing import Dict, List, Optional, Type, Any
 from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Type
 
 from .base import (
-    BibliotekSource,
     BibliotekAdapter,
+    BibliotekSource,
+    ItemType,
     LibraryItem,
     SearchQuery,
     SearchResult,
     SyncStatus,
-    ItemType,
 )
 
 

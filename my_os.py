@@ -1,8 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-import time
-import bcrypt
-from tzlocal import get_localzone_name
+
 import httpx
 
 # Phase B: Unified Logging Integration
@@ -33,9 +31,9 @@ logger.info("Starting Cirkelline AgentOS...")
 
 # Load environment variables from .env file
 import os
-import uuid
-import shutil
+
 from dotenv import load_dotenv
+
 load_dotenv()
 logger.info("Environment variables loaded from .env")
 
@@ -49,30 +47,15 @@ os.environ["AGNO_MONITOR"] = "true"
 os.environ["AGNO_DEBUG"] = "false"
 logger.info("Monitoring forcefully enabled via code")
 
-from agno.agent import Agent
-from agno.models.google import Gemini
-from agno.models.message import Message
-from agno.os import AgentOS
-from agno.team import Team
-from agno.db.postgres import PostgresDb
-from agno.run import RunContext
-from agno.vectordb.pgvector import PgVector, SearchType
-from agno.knowledge.embedder.ollama import OllamaEmbedder
-from agno.knowledge.knowledge import Knowledge
-from agno.tools.duckduckgo import DuckDuckGoTools
-from agno.tools.exa import ExaTools
-from agno.tools.tavily import TavilyTools
-from agno.tools.reasoning import ReasoningTools
-from agno.memory import MemoryManager
-from agno.tools.user_control_flow import UserControlFlowTools
-from cirkelline.tools.media import DocumentProcessingTools
-import uvicorn
-from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Body, Query, BackgroundTasks
-from fastapi.responses import StreamingResponse, JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import json
+
 import jwt as pyjwt
+import uvicorn
+from agno.knowledge.knowledge import Knowledge
+from agno.os import AgentOS
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from sqlalchemy import text
 
 # ════════════════════════════════════════════════════════════════
@@ -112,8 +95,9 @@ logger.info(f"✅ Gateway client initialized: {gateway_client.gateway_url}")
 def run_migrations():
     """Run database migrations on startup."""
     try:
-        from cirkelline.middleware.middleware import _shared_engine
         from sqlalchemy import text as sql_text
+
+        from cirkelline.middleware.middleware import _shared_engine
 
         with _shared_engine.connect() as conn:
             # Create archive table
@@ -163,68 +147,66 @@ def run_migrations():
 run_migrations()
 
 # Specialist agents (Phase 4)
-from cirkelline.agents.specialists import audio_agent, video_agent, image_agent, document_agent
+# Admin endpoints (Phase 9)
+from cirkelline.admin import (
+    admin_activity_router,
+    admin_stats_router,
+    admin_subscriptions_router,
+    admin_users_router,
+    admin_workflows_router,
+)
+from cirkelline.agents.law_team import law_team
 
 # Teams (Phase 4-5)
 from cirkelline.agents.research_team import research_team
-from cirkelline.agents.law_team import law_team
-from cirkelline.orchestrator.cirkelline_team import cirkelline
-
-# ════════════════════════════════════════════════════════════════
-# IMPORT AND REGISTER ALL EXTRACTED ROUTERS
-# ════════════════════════════════════════════════════════════════
-
-# Core API endpoints (Phase 7)
-from cirkelline.endpoints.auth import router as auth_router
-from cirkelline.endpoints.user import router as user_router
-from cirkelline.endpoints.knowledge import router as knowledge_router
-from cirkelline.endpoints.sessions import router as sessions_router
-from cirkelline.endpoints.custom_cirkelline import router as cirkelline_router
-
-# Google integration endpoints (Phase 8B, 8C, 8D)
-from cirkelline.integrations.google.oauth_endpoints import router as google_oauth_router
-from cirkelline.integrations.google.gmail_endpoints import router as gmail_router
-from cirkelline.integrations.google.calendar_endpoints import router as calendar_router
-from cirkelline.integrations.google.tasks_endpoints import router as tasks_router
-
-# Notion integration endpoints (Phase 8E, 8F)
-from cirkelline.integrations.notion import (
-    notion_oauth_router,
-    notion_database_router,
-    notion_legacy_router
-)
-
-# User endpoints - memories and feedback (Phase 8G, moved to endpoints/ in v1.2.30)
-from cirkelline.endpoints.memories import router as memories_router
-from cirkelline.endpoints.feedback import router as feedback_router
-from cirkelline.endpoints.support_request import router as support_router
-from cirkelline.endpoints.preferences import router as preferences_router
-from cirkelline.endpoints.subscriptions import router as subscriptions_router
-
-# Admin endpoints (Phase 9)
-from cirkelline.admin import (
-    admin_users_router,
-    admin_stats_router,
-    admin_subscriptions_router,
-    admin_activity_router,
-    admin_workflows_router
-)
-
-# Local Calendar & Tasks endpoints (work without Google OAuth)
-from cirkelline.endpoints.calendar import router as local_calendar_router
-from cirkelline.endpoints.tasks import router as local_tasks_router
+from cirkelline.agents.specialists import audio_agent, document_agent, image_agent, video_agent
 
 # Terminal API endpoint (FASE 1.3 - Terminal Integration)
 from cirkelline.api.terminal import router as terminal_router
-
-# KV1NT Dashboard API (FASE 2.2 - KV1NT Integration)
-from cirkelline.endpoints.kv1nt_dashboard import router as kv1nt_router
 
 # CKC Control Panel API (v1.3.3 - CKC Bridge Integration)
 from cirkelline.ckc.api import control_panel_router as ckc_router
 
 # CKC Folder Switcher API (v1.3.5 - Super Admin Folder Navigation)
 from cirkelline.ckc.api import folder_switcher_router as ckc_folder_router
+
+# ════════════════════════════════════════════════════════════════
+# IMPORT AND REGISTER ALL EXTRACTED ROUTERS
+# ════════════════════════════════════════════════════════════════
+# Core API endpoints (Phase 7)
+from cirkelline.endpoints.auth import router as auth_router
+
+# Local Calendar & Tasks endpoints (work without Google OAuth)
+from cirkelline.endpoints.calendar import router as local_calendar_router
+from cirkelline.endpoints.custom_cirkelline import router as cirkelline_router
+from cirkelline.endpoints.feedback import router as feedback_router
+from cirkelline.endpoints.knowledge import router as knowledge_router
+
+# KV1NT Dashboard API (FASE 2.2 - KV1NT Integration)
+from cirkelline.endpoints.kv1nt_dashboard import router as kv1nt_router
+
+# User endpoints - memories and feedback (Phase 8G, moved to endpoints/ in v1.2.30)
+from cirkelline.endpoints.memories import router as memories_router
+from cirkelline.endpoints.preferences import router as preferences_router
+from cirkelline.endpoints.sessions import router as sessions_router
+from cirkelline.endpoints.subscriptions import router as subscriptions_router
+from cirkelline.endpoints.support_request import router as support_router
+from cirkelline.endpoints.tasks import router as local_tasks_router
+from cirkelline.endpoints.user import router as user_router
+from cirkelline.integrations.google.calendar_endpoints import router as calendar_router
+from cirkelline.integrations.google.gmail_endpoints import router as gmail_router
+
+# Google integration endpoints (Phase 8B, 8C, 8D)
+from cirkelline.integrations.google.oauth_endpoints import router as google_oauth_router
+from cirkelline.integrations.google.tasks_endpoints import router as tasks_router
+
+# Notion integration endpoints (Phase 8E, 8F)
+from cirkelline.integrations.notion import (
+    notion_database_router,
+    notion_legacy_router,
+    notion_oauth_router,
+)
+from cirkelline.orchestrator.cirkelline_team import cirkelline
 
 # Register all routers with FastAPI app
 app.include_router(auth_router, tags=["Authentication"])
@@ -349,8 +331,9 @@ logger.info("✅ Gateway status endpoint /api/gateway/status configured")
 async def fix_memory_schema():
     """Fix agno_memories created_at column type from TIMESTAMP to BIGINT"""
     try:
-        from sqlalchemy import text, create_engine
         import os
+
+        from sqlalchemy import create_engine, text
 
         db_url = os.getenv("DATABASE_URL")
         engine = create_engine(db_url)
@@ -435,21 +418,18 @@ async def load_knowledge_async():
 
 # Import middleware dependencies
 from agno.os.middleware import JWTMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request as StarletteRequest
-
-# Import custom middleware classes from modularized code
-from cirkelline.middleware.middleware import (
-    SessionsDateFilterMiddleware,
-    AnonymousUserMiddleware,
-    SessionLoggingMiddleware,
-    RateLimitMiddleware
-)
 
 # Import gateway authentication middleware (Phase B2: CKC Gateway Integration)
 from cirkelline.middleware.gateway_middleware import (
     GatewayAuthMiddleware,
-    StrictGatewayAuthMiddleware
+)
+
+# Import custom middleware classes from modularized code
+from cirkelline.middleware.middleware import (
+    AnonymousUserMiddleware,
+    RateLimitMiddleware,
+    SessionLoggingMiddleware,
+    SessionsDateFilterMiddleware,
 )
 
 # Add CORS middleware
@@ -522,10 +502,6 @@ logger.info("✅ Stage 2: All middleware registered (CORS + Custom + GatewayAuth
 logger.info("✅ Phase B2: CKC Gateway Authentication Middleware Active")
 
 
-from typing import Optional
-from fastapi import Form
-from fastapi.responses import StreamingResponse, JSONResponse
-import json
 
 # ════════════════════════════════════════════════════════════════
 # INTELLIGENT SESSION NAMING HELPERS
@@ -1025,10 +1001,11 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
     Uses synchronous version for compatibility with existing code
     """
     try:
+        import json
+
         from notion_client import Client
         from sqlalchemy import create_engine, text
         from sqlalchemy.orm import Session
-        import json
 
         notion = Client(auth=access_token)
 
@@ -1247,8 +1224,8 @@ if __name__ == "__main__":
     logger.info(f"Total Agents: {len(agent_os.agents)}")
     logger.info(f"Total Teams: {len(agent_os.teams)}")
     logger.info(f"Database: {db.db_url}")
-    logger.info(f"Database: SQLAlchemy automatic pooling (pool_size=5, max_overflow=10 per worker)")
-    logger.info(f"Workers: 1 process = 15 total connections available")
+    logger.info("Database: SQLAlchemy automatic pooling (pool_size=5, max_overflow=10 per worker)")
+    logger.info("Workers: 1 process = 15 total connections available")
 
     # Check monitoring status with debugging
     agno_monitor_value = os.getenv("AGNO_MONITOR")
@@ -1261,8 +1238,8 @@ if __name__ == "__main__":
         monitoring_enabled = False
 
     logger.info(f"Monitoring: {'ENABLED' if monitoring_enabled else 'DISABLED'}")
-    logger.info(f"Session Summaries: ENABLED")
-    logger.info(f"Listening on 127.0.0.1 (behind reverse proxy)")
+    logger.info("Session Summaries: ENABLED")
+    logger.info("Listening on 127.0.0.1 (behind reverse proxy)")
     logger.info("═" * 50)
 
     try:

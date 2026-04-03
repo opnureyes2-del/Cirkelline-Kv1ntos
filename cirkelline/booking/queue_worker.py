@@ -48,16 +48,16 @@ Princip: "Man behøver ikke se for at vide - vi bygger så alt er gennemsigtigt.
 
 from __future__ import annotations
 
-import os
-import json
 import asyncio
+import json
 import logging
+import os
 import uuid
-from typing import Optional, List, Dict, Any, Callable
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +95,7 @@ class QueueConfig:
     db_pool_size: int = 20
 
     @classmethod
-    def from_env(cls) -> "QueueConfig":
+    def from_env(cls) -> QueueConfig:
         """Create config from environment variables."""
         return cls(
             queue_url=os.getenv("SQS_BOOKING_QUEUE_URL", ""),
@@ -119,7 +119,7 @@ class BookingMessage:
     received_at: datetime = field(default_factory=datetime.now)
 
     @classmethod
-    def from_sqs_message(cls, message: Dict[str, Any]) -> "BookingMessage":
+    def from_sqs_message(cls, message: Dict[str, Any]) -> BookingMessage:
         """Create from SQS message."""
         body = json.loads(message.get("Body", "{}"))
         return cls(

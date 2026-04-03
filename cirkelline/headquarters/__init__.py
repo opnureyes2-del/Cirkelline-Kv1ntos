@@ -30,23 +30,21 @@ Architecture:
 __version__ = "1.0.0"
 
 from cirkelline.headquarters.event_bus import (
-    EventBus,
     Event,
+    EventBus,
     EventType,
     get_event_bus,
 )
-
 from cirkelline.headquarters.knowledge_graph import (
+    EdgeType,
     KnowledgeGraph,
     NodeType,
-    EdgeType,
     get_knowledge_graph,
 )
-
 from cirkelline.headquarters.shared_memory import (
-    SharedMemory,
     Mission,
     MissionStatus,
+    SharedMemory,
     get_shared_memory,
 )
 

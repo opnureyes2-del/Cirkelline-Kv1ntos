@@ -26,19 +26,19 @@ Princip: "Man behøver ikke se for at vide - vi bygger så alt er gennemsigtigt.
 
 from __future__ import annotations
 
+import asyncio
+import logging
 import os
 import random
-import logging
-import asyncio
-from typing import Optional, List, Dict, Any, Literal
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from contextlib import asynccontextmanager
+from typing import Any, Dict, List, Optional
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import QueuePool
 
 logger = logging.getLogger(__name__)
@@ -96,7 +96,7 @@ class RouterConfig:
     sticky_session_seconds: int = 0  # 0 = disabled
 
     @classmethod
-    def from_env(cls) -> "RouterConfig":
+    def from_env(cls) -> RouterConfig:
         """Create config from environment variables."""
         # Primary database
         primary = DatabaseNode(
@@ -130,7 +130,7 @@ class RouterConfig:
         return cls(primary=primary, replicas=replicas)
 
     @classmethod
-    def localhost_single(cls) -> "RouterConfig":
+    def localhost_single(cls) -> RouterConfig:
         """Create localhost single-node config (development)."""
         return cls(
             primary=DatabaseNode(
@@ -314,7 +314,7 @@ class DatabaseRouter:
 
         try:
             yield session
-        except Exception as e:
+        except Exception:
             self._metrics.errors += 1
             raise
         finally:
@@ -334,7 +334,7 @@ class DatabaseRouter:
 
         try:
             yield session
-        except Exception as e:
+        except Exception:
             self._metrics.errors += 1
             session.rollback()
             raise

@@ -11,13 +11,11 @@ Responsibilities:
 """
 
 import logging
-import time
 import threading
-from typing import Optional, Dict, Any, List, Tuple
-from dataclasses import dataclass, field
-from datetime import datetime
+import time
+from dataclasses import dataclass
 from enum import Enum
-from collections import defaultdict
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 

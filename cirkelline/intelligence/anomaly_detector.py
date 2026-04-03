@@ -10,29 +10,28 @@ Responsibilities:
 - Track error patterns
 """
 
-import logging
 import asyncio
-from typing import Optional, Dict, Any, List, Tuple
+import logging
+import statistics
+from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from collections import defaultdict
-import statistics
+from typing import Any, Dict, List, Optional, Tuple
 
+from cirkelline.context.system_status import (
+    SystemStatus,
+    get_system_status,
+)
 from cirkelline.headquarters.event_bus import (
-    EventBus,
     Event,
+    EventBus,
     EventType,
     get_event_bus,
 )
 from cirkelline.headquarters.shared_memory import (
     SharedMemory,
     get_shared_memory,
-)
-from cirkelline.context.system_status import (
-    SystemStatus,
-    HealthStatus,
-    get_system_status,
 )
 
 logger = logging.getLogger(__name__)

@@ -8,12 +8,13 @@ Provides:
 - GET /api/admin/activity/stream - SSE stream for real-time activity updates
 """
 
-import os
-import json
 import asyncio
+import json
+import os
+from typing import Optional, Set
+
 import jwt as pyjwt
-from typing import Set, Optional
-from fastapi import APIRouter, Request, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
@@ -42,7 +43,7 @@ async def broadcast_activity_log(log_data: dict):
     for client_queue in activity_log_clients:
         try:
             await asyncio.wait_for(client_queue.put(log_data), timeout=1.0)
-        except (asyncio.TimeoutError, Exception):
+        except (TimeoutError, Exception):
             disconnected.add(client_queue)
 
     # Remove disconnected clients

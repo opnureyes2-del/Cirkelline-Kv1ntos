@@ -7,6 +7,6 @@ Modules:
 - encryption: AES-256-GCM encryption for Google OAuth tokens
 """
 
-from .encryption import encrypt_token, decrypt_token, test_encryption
+from .encryption import decrypt_token, encrypt_token, test_encryption
 
 __all__ = ['encrypt_token', 'decrypt_token', 'test_encryption']

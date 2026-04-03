@@ -17,10 +17,10 @@ Created: 2025-10-24
 Part of: Google Integration - Phase 1 (Backend OAuth Infrastructure)
 """
 
-import os
 import base64
+import os
+
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.backends import default_backend
 
 
 def get_encryption_key() -> bytes:

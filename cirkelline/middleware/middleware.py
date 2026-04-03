@@ -18,22 +18,22 @@ Execution Order (CRITICAL):
 6. JWTMiddleware (last - from AGNO)
 """
 
-import os
-import json
 import asyncio
-import math
+import json
+import os
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
+import jwt as pyjwt
 from fastapi import Request
 from fastapi.responses import JSONResponse
-from starlette.requests import Request as StarletteRequest
-from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
-import jwt as pyjwt
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
 
-from cirkelline.database import db
 from cirkelline.config import logger
+from cirkelline.database import db
 
 # ═══════════════════════════════════════════════════════════════
 # SHARED DATABASE ENGINE FOR ACTIVITY LOGGING
@@ -208,9 +208,8 @@ class SessionLoggingMiddleware(BaseHTTPMiddleware):
     Handles: DELETE /sessions/{session_id}, POST /sessions/{session_id}/rename
     """
     async def dispatch(self, request: StarletteRequest, call_next):
-        import re
         import json
-        from urllib.parse import parse_qs, urlparse
+        import re
 
         # Check if this is a session operation
         is_session_delete = False
@@ -322,7 +321,6 @@ class SessionsDateFilterMiddleware(BaseHTTPMiddleware):
     and executes custom date filtering logic before AGNO's endpoint is reached.
     """
     async def dispatch(self, request: StarletteRequest, call_next):
-        from urllib.parse import parse_qs, urlparse
 
         # Only intercept GET /sessions with date filters
         if request.method == "GET" and request.url.path == "/sessions":
@@ -333,9 +331,10 @@ class SessionsDateFilterMiddleware(BaseHTTPMiddleware):
                 logger.info(f"🚀 SessionsDateFilterMiddleware: Intercepting /sessions with date filters: {query_params}")
 
                 try:
+                    import math
+
                     from sqlalchemy import create_engine, text
                     from sqlalchemy.orm import Session
-                    import math
 
                     # Get user_id from JWT token in Authorization header
                     auth_header = request.headers.get('Authorization')
@@ -432,7 +431,7 @@ class SessionsDateFilterMiddleware(BaseHTTPMiddleware):
                         page = int(query_params.get("page", 1))
                         limit = int(query_params.get("limit", 20))
                         offset = (page - 1) * limit
-                        query += f" LIMIT :limit OFFSET :offset"
+                        query += " LIMIT :limit OFFSET :offset"
                         params["limit"] = limit
                         params["offset"] = offset
 
@@ -571,10 +570,10 @@ class RBACGatewayMiddleware(BaseHTTPMiddleware):
         if required_permission_str:
             try:
                 from cirkelline.middleware.rbac import (
-                    Permission,
-                    resolve_permissions,
                     TIER_NAMES,
-                    get_tier_for_permission
+                    Permission,
+                    get_tier_for_permission,
+                    resolve_permissions,
                 )
 
                 # Get required permission enum
@@ -712,8 +711,8 @@ class AuditTrailMiddleware(BaseHTTPMiddleware):
         """
         Log all sensitive operations with compliance-grade detail.
         """
-        import uuid
         import time
+        import uuid
 
         path = request.url.path
         method = request.method
@@ -884,6 +883,7 @@ logger.info("✅ RBAC Gateway and Audit Trail middleware loaded")
 import time
 from collections import defaultdict
 from threading import Lock
+
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """

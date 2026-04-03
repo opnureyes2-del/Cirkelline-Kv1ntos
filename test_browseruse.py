@@ -1,6 +1,8 @@
 """Quick BrowserUse test"""
 import asyncio
-from cirkelline.tools.browser_use_tool import BrowserUseTool, BROWSERUSE_AVAILABLE
+
+from cirkelline.tools.browser_use_tool import BROWSERUSE_AVAILABLE, BrowserUseTool
+
 
 async def test():
     if not BROWSERUSE_AVAILABLE:

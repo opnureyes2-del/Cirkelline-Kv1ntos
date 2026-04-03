@@ -15,16 +15,13 @@ Features:
 Version: 1.0.0
 """
 
-from dataclasses import dataclass, field, asdict
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union
-from enum import Enum
-import uuid
-import json
 import copy
-
-from cirkelline.config import logger
-
+import json
+import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 # ==============================================================================
 # ENUMS

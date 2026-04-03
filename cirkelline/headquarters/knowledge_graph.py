@@ -26,11 +26,10 @@ Edge Types:
 
 import json
 import logging
-from enum import Enum
-from typing import Optional, Dict, Any, List, Set, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
-import uuid
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set
 
 try:
     import networkx as nx

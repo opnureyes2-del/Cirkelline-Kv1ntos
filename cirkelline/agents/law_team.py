@@ -9,12 +9,13 @@ Specialized team for legal research and analysis:
 
 # ✅ v1.2.33: Removed datetime/tzlocal imports - now using session_state template syntax
 from agno.agent import Agent
-from agno.team import Team
 from agno.models.google import Gemini
+from agno.team import Team
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.reasoning import ReasoningTools
-from cirkelline.database import db
+
 from cirkelline.config import logger
+from cirkelline.database import db
 
 # Legal Researcher
 legal_researcher = Agent(

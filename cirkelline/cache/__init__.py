@@ -10,11 +10,11 @@ Redis-based caching for:
 """
 
 from cirkelline.cache.redis_cache import (
-    RedisCache,
-    get_cache,
-    cache_response,
-    invalidate_cache,
     CacheConfig,
+    RedisCache,
+    cache_response,
+    get_cache,
+    invalidate_cache,
 )
 
 __all__ = [

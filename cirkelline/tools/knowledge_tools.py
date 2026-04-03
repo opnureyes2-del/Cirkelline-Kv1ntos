@@ -6,12 +6,14 @@ Tools for saving and searching user's private knowledge base.
 
 import os
 from typing import Optional
-from agno.tools import Toolkit
-from agno.knowledge.knowledge import Knowledge
+
 from agno.db.postgres import PostgresDb
+from agno.knowledge.knowledge import Knowledge
+from agno.tools import Toolkit
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
-from cirkelline.config import logger, ADMIN_USER_IDS
+
+from cirkelline.config import logger
 from cirkelline.helpers.metadata import create_private_document_metadata
 
 

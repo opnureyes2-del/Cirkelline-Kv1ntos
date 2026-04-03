@@ -11,28 +11,23 @@ Responsibilities:
 """
 
 import logging
-from typing import Optional, Dict, Any, List, Set
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from enum import Enum
 import re
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set
 
 from cirkelline.context.collector import (
     ContextCollector,
     GitContext,
-    UserContext,
-    SystemContext,
     get_context_collector,
 )
 from cirkelline.context.system_status import (
     SystemStatus,
-    HealthStatus,
     get_system_status,
 )
 from cirkelline.headquarters.event_bus import (
     EventBus,
-    Event,
-    EventType,
     get_event_bus,
 )
 from cirkelline.headquarters.knowledge_graph import (

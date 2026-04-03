@@ -27,25 +27,23 @@ Brug:
     results = await bibliotek.search("smart contracts", sources=["cosmic", "notion"])
 """
 
+from .adapters import (
+    AgentLearningAdapter,
+    CosmicLibraryAdapter,
+    NotionAdapter,
+)
 from .base import (
-    BibliotekSource,
     BibliotekAdapter,
+    BibliotekSource,
     LibraryItem,
     SearchQuery,
     SearchResult,
 )
-
 from .multi_bibliotek import (
     MultiBibliotek,
     get_bibliotek,
     list_biblioteker,
     register_adapter,
-)
-
-from .adapters import (
-    CosmicLibraryAdapter,
-    NotionAdapter,
-    AgentLearningAdapter,
 )
 
 __all__ = [

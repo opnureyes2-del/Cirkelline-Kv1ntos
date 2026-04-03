@@ -8,8 +8,10 @@ imported from cirkelline.orchestrator.cirkelline_team in Phase 5.
 """
 
 import asyncio
+
 from agno.models.google import Gemini
 from agno.models.message import Message
+
 from cirkelline.config import logger
 
 # Forward reference - will be set by main module

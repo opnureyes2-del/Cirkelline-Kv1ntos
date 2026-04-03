@@ -12,9 +12,10 @@ Princip: "Man behøver ikke se for at vide - vi bygger så alt er gennemsigtigt.
 """
 
 import os
+
 from agno.db.postgres import PostgresDb
-from agno.vectordb.pgvector import PgVector, SearchType
 from agno.knowledge.embedder.ollama import OllamaEmbedder
+from agno.vectordb.pgvector import PgVector, SearchType
 from sqlalchemy import create_engine
 
 # Legacy exports (backwards compatibility)
@@ -41,23 +42,19 @@ _shared_engine = create_engine(
 )
 
 from cirkelline.database.read_write_router import (
-    # Enums
-    RouteMode,
-
     # Config
     DatabaseNode,
-    RouterConfig,
-
-    # Metrics
-    RouterMetrics,
-
     # Main class
     DatabaseRouter,
-
+    # Enums
+    RouteMode,
+    RouterConfig,
+    # Metrics
+    RouterMetrics,
+    close_database_router,
     # Global access
     get_database_router,
     init_database_router,
-    close_database_router,
 )
 
 __all__ = [

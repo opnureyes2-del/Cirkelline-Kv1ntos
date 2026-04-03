@@ -6,12 +6,14 @@ Allows Cirkelline to view and manage tasks, projects, companies, and documentati
 """
 
 import os
-from agno.tools import Toolkit
+
 from agno.db.postgres import PostgresDb
+from agno.tools import Toolkit
+
 from cirkelline.config import logger
 from cirkelline.helpers.notion_helpers import (
+    extract_property_value,
     get_user_notion_credentials_sync,
-    extract_property_value
 )
 
 
@@ -56,7 +58,6 @@ class NotionTools(Toolkit):
             # v1.3.4: Require authentication - no anonymous access
             if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
                 return "❌ Authentication required. Please log in to use Notion integration."
-            import json
 
             # Get user's Notion credentials
             creds = get_user_notion_credentials_sync(user_id)
@@ -186,7 +187,6 @@ class NotionTools(Toolkit):
             # v1.3.4: Require authentication - no anonymous access
             if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
                 return "❌ Authentication required. Please log in to use Notion integration."
-            import json
 
             # Get user's Notion credentials
             creds = get_user_notion_credentials_sync(user_id)
@@ -295,7 +295,6 @@ class NotionTools(Toolkit):
             # v1.3.4: Require authentication - no anonymous access
             if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
                 return "❌ Authentication required. Please log in to use Notion integration."
-            import json
 
             # Get user's Notion credentials
             creds = get_user_notion_credentials_sync(user_id)
@@ -404,7 +403,6 @@ class NotionTools(Toolkit):
             # v1.3.4: Require authentication - no anonymous access
             if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
                 return "❌ Authentication required. Please log in to use Notion integration."
-            import json
 
             # Get user's Notion credentials
             creds = get_user_notion_credentials_sync(user_id)
@@ -524,7 +522,6 @@ class NotionTools(Toolkit):
             # v1.3.4: Require authentication - no anonymous access
             if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
                 return "❌ Authentication required. Please log in to use Notion integration."
-            import json
 
             # Get user's Notion credentials
             creds = get_user_notion_credentials_sync(user_id)

@@ -16,27 +16,28 @@ Team Medlemmer:
     3. Compliance & Legal Review Agent
 """
 
-from typing import Optional, Dict, Any, List
 from datetime import datetime
-from agno.agent import Agent
-from agno.team import Team
-from agno.models.google import Gemini
-from agno.tools.reasoning import ReasoningTools
-from agno.tools.duckduckgo import DuckDuckGoTools
+from typing import Any, Dict, List, Optional
 
-from cirkelline.database import db
+from agno.agent import Agent
+from agno.models.google import Gemini
+from agno.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.reasoning import ReasoningTools
+
 from cirkelline.config import logger
+from cirkelline.database import db
 
 # Try to import FASE 6 modules
 try:
     from cirkelline.biblioteker.multi_bibliotek import (
+        BibliotekSource,
         MultiBibliotek,
         get_bibliotek,
-        BibliotekSource,
     )
+    from cirkelline.marketplace.quota import QuotaTier, get_user_quota
     from cirkelline.marketplace.registry import get_registry, list_apis
-    from cirkelline.marketplace.quota import get_user_quota, QuotaTier
-    from cirkelline.marketplace.usage import track_usage, get_usage_stats
+    from cirkelline.marketplace.usage import get_usage_stats, track_usage
     FASE_6_AVAILABLE = True
     logger.info("FASE 6 modules available - C4-Team enabled")
 except ImportError as e:

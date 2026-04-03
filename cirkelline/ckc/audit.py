@@ -14,46 +14,39 @@ Kør audit med:
 """
 
 import asyncio
-import sys
 import os
-from datetime import datetime, timedelta, timezone
-from typing import Dict, Any, List, Tuple, Optional
+import sys
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from enum import Enum
-import traceback
+from typing import Any, Dict, List
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+from cirkelline.ckc.advanced_protocols import (
+    MessagePriority,
+    MessageType,
+    get_ilcp_manager,
+    get_security_manager,
+    get_terminal,
+)
+from cirkelline.ckc.agents import create_all_agents
+from cirkelline.ckc.dashboard import StatusLevel, get_dashboard_manager
+from cirkelline.ckc.kommandanter import (
+    HistoricalEventType,
+    KnowledgeCategory,
+    get_bibliotekar,
+    get_historiker,
+)
 from cirkelline.ckc.learning_rooms import (
     get_room_manager,
     initialize_default_rooms,
-    RoomStatus,
-    LearningRoom,
 )
 from cirkelline.ckc.orchestrator import (
-    get_orchestrator,
     TaskPriority,
-    TaskStatus,
-    AgentCapability,
+    get_orchestrator,
 )
-from cirkelline.ckc.agents import create_all_agents
-from cirkelline.ckc.kommandanter import (
-    get_historiker,
-    get_bibliotekar,
-    HistoricalEventType,
-    KnowledgeCategory,
-)
-from cirkelline.ckc.dashboard import get_dashboard_manager, StatusLevel
-from cirkelline.ckc.security import get_sanitizer, InputType, ThreatLevel
-from cirkelline.ckc.advanced_protocols import (
-    get_security_manager,
-    get_ilcp_manager,
-    get_terminal,
-    SecurityLevel,
-    MessageType,
-    MessagePriority,
-    AuthorizationLevel,
-)
+from cirkelline.ckc.security import InputType, get_sanitizer
 
 
 class AuditStatus(Enum):
@@ -71,7 +64,7 @@ class AuditResult:
     test_name: str
     status: AuditStatus
     details: str
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     recommendations: List[str] = field(default_factory=list)
     metrics: Dict[str, Any] = field(default_factory=dict)
 
@@ -143,7 +136,7 @@ class CKCAudit:
 
     def __init__(self):
         self.results: List[AuditResult] = []
-        self.started_at = datetime.now(timezone.utc)
+        self.started_at = datetime.now(UTC)
 
         # Initialize managers
         self.room_manager = get_room_manager()
@@ -831,8 +824,8 @@ class CKCAudit:
         return {
             "audit_id": f"audit_{self.started_at.strftime('%Y%m%d_%H%M%S')}",
             "started_at": self.started_at.isoformat(),
-            "completed_at": datetime.now(timezone.utc).isoformat(),
-            "duration_seconds": (datetime.now(timezone.utc) - self.started_at).total_seconds(),
+            "completed_at": datetime.now(UTC).isoformat(),
+            "duration_seconds": (datetime.now(UTC) - self.started_at).total_seconds(),
             "overall_status": overall_status,
             "summary": {
                 "total_tests": len(self.results),

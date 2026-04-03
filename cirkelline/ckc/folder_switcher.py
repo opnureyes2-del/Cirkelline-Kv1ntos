@@ -20,19 +20,19 @@ Agent: Kommandør #4
 import json
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any, Callable, Dict, List, Optional
 
 from .folder_context import (
+    CIRKELLINE_CKC_FOLDERS,
+    CKC_COMPONENTS_FOLDERS,
     CKCFolderInfo,
     FolderCategory,
     FolderContextState,
     FolderStatus,
     FolderSwitchEvent,
     SwitchMethod,
-    CKC_COMPONENTS_FOLDERS,
-    CIRKELLINE_CKC_FOLDERS
 )
 
 logger = logging.getLogger(__name__)
@@ -148,7 +148,7 @@ class CKCFolderSwitcher:
             version = "1.0.0"
             if manifest_path.exists():
                 try:
-                    with open(manifest_path, 'r') as f:
+                    with open(manifest_path) as f:
                         metadata = json.load(f)
                         version = metadata.get("version", "1.0.0")
                 except Exception as e:
@@ -198,7 +198,7 @@ class CKCFolderSwitcher:
             init_path = folder_path / "__init__.py"
             if init_path.exists():
                 try:
-                    with open(init_path, 'r') as f:
+                    with open(init_path) as f:
                         content = f.read()
                         for line in content.split('\n'):
                             if '__version__' in line:
@@ -306,7 +306,7 @@ class CKCFolderSwitcher:
         # Opdater state
         self._state.current_folder_id = folder_id
         self._state.current_folder = folder
-        self._state.last_switch = datetime.now(timezone.utc)
+        self._state.last_switch = datetime.now(UTC)
         self._state.switch_count += 1
         self._state.add_to_recent(folder_id)
 
@@ -612,7 +612,7 @@ class CKCFolderSwitcher:
             "custom_folders": self._state.custom_folders,
             "last_switch": self._state.last_switch.isoformat() if self._state.last_switch else None,
             "switch_count": self._state.switch_count,
-            "saved_at": datetime.now(timezone.utc).isoformat()
+            "saved_at": datetime.now(UTC).isoformat()
         }
 
         try:
@@ -631,7 +631,7 @@ class CKCFolderSwitcher:
             return
 
         try:
-            with open(pref_path, 'r') as f:
+            with open(pref_path) as f:
                 data = json.load(f)
 
             self._state = FolderContextState(

@@ -23,25 +23,21 @@ Usage:
 """
 
 from .localstack_config import (
-    # Configuration
-    LOCALSTACK_ENDPOINT,
     AWS_REGION,
     BOTO3_AVAILABLE,
-
-    # Client factories
-    get_localstack_client,
-    get_localstack_resource,
-
-    # Health checks
-    is_localstack_available,
-    get_localstack_health,
-    check_service_available,
-
+    # Configuration
+    LOCALSTACK_ENDPOINT,
+    LocalStackDynamoDB,
     # Helper classes
     LocalStackS3,
     LocalStackSQS,
-    LocalStackDynamoDB,
-
+    check_service_available,
+    # Client factories
+    get_localstack_client,
+    get_localstack_health,
+    get_localstack_resource,
+    # Health checks
+    is_localstack_available,
     # Setup/Teardown
     setup_test_infrastructure,
     teardown_test_infrastructure,

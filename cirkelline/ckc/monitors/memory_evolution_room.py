@@ -20,19 +20,18 @@ Integration:
 
 import asyncio
 import json
-import os
 import shutil
-from datetime import datetime, timedelta
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional, Callable, TYPE_CHECKING
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 
 from cirkelline.config import logger
 
 # Import Historiker for integration
 if TYPE_CHECKING:
-    from cirkelline.ckc.kommandanter import HistorikerKommandant, HistoricalEventType
+    pass
 
 
 class RoomStatus(Enum):
@@ -152,7 +151,7 @@ class MemoryEvolutionRoom:
     def _connect_to_historiker(self) -> bool:
         """Connect to Historiker-Kommandant for event tracking."""
         try:
-            from cirkelline.ckc.kommandanter import get_historiker, HistoricalEventType
+            from cirkelline.ckc.kommandanter import HistoricalEventType, get_historiker
             self._historiker = get_historiker()
 
             # Register callback

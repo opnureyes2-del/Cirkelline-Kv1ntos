@@ -15,19 +15,17 @@ Kerneprincipper:
 - HITL-godkendelse for alle kritiske handlinger
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Set, Callable, Tuple, Union
-from enum import Enum
 import asyncio
-import uuid
 import hashlib
 import secrets
-import json
+import uuid
 from collections import defaultdict
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from cirkelline.config import logger
-
 
 # Forward reference for TaskContext (imported lazily to avoid circular imports)
 TaskContext = None
@@ -683,7 +681,7 @@ class ILCPManager:
 
         return len(errors) == 0, errors
 
-    def _check_type(self, value: Any, expected_type: Union[str, List[str]]) -> bool:
+    def _check_type(self, value: Any, expected_type: str | List[str]) -> bool:
         """Check if value matches expected type(s)."""
         type_mapping = {
             "string": str,

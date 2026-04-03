@@ -13,11 +13,11 @@ Used by agents to communicate through the Event Bus.
 """
 
 import logging
-from enum import Enum
-from typing import Optional, Dict, Any, List
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-import uuid
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

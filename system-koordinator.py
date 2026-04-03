@@ -20,17 +20,16 @@ Version: 2.0.0
 Updated: 2025-12-13 (FASE 0 Enhancement)
 """
 
-import os
-import sys
-import subprocess
-import socket
-import time
 import json
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+import os
+import socket
+import subprocess
+import sys
+import time
 from dataclasses import dataclass, field
 from enum import Enum
-from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 # ============================================================================
 # KONFIGURATION
@@ -568,7 +567,7 @@ def cmd_env():
                     print(f"     ✗ {var}: MANGLER!")
                     issues.append(f"{service_name}: {var} mangler")
         else:
-            print(f"     ⚠️  Ingen .env fil fundet")
+            print("     ⚠️  Ingen .env fil fundet")
             issues.append(f"{service_name}: .env fil mangler")
 
     print("\n" + "-" * 60)

@@ -9,9 +9,10 @@ Provides:
 """
 
 import os
+from datetime import UTC, datetime, timedelta
+
 import jwt as pyjwt
-from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, Request, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 
@@ -167,10 +168,10 @@ async def list_users(
                 # Determine online status
                 is_online = False
                 if row.last_login:
-                    fifteen_min_ago = datetime.now(timezone.utc) - timedelta(minutes=15)
+                    fifteen_min_ago = datetime.now(UTC) - timedelta(minutes=15)
                     # Convert row.last_login to timezone-aware datetime
                     if row.last_login.tzinfo is None:
-                        last_login_aware = row.last_login.replace(tzinfo=timezone.utc)
+                        last_login_aware = row.last_login.replace(tzinfo=UTC)
                     else:
                         last_login_aware = row.last_login
                     is_online = last_login_aware > fifteen_min_ago
@@ -393,9 +394,9 @@ async def get_user_details(user_id: str, request: Request):
             # Format response
             is_online = False
             if user_row.last_login:
-                fifteen_min_ago = datetime.now(timezone.utc) - timedelta(minutes=15)
+                fifteen_min_ago = datetime.now(UTC) - timedelta(minutes=15)
                 if user_row.last_login.tzinfo is None:
-                    last_login_aware = user_row.last_login.replace(tzinfo=timezone.utc)
+                    last_login_aware = user_row.last_login.replace(tzinfo=UTC)
                 else:
                     last_login_aware = user_row.last_login
                 is_online = last_login_aware > fifteen_min_ago
@@ -403,9 +404,9 @@ async def get_user_details(user_id: str, request: Request):
             # Calculate account age
             account_age_days = 0
             if user_row.created_at:
-                now = datetime.now(timezone.utc)
+                now = datetime.now(UTC)
                 if user_row.created_at.tzinfo is None:
-                    created_aware = user_row.created_at.replace(tzinfo=timezone.utc)
+                    created_aware = user_row.created_at.replace(tzinfo=UTC)
                 else:
                     created_aware = user_row.created_at
                 account_age_days = (now - created_aware).days

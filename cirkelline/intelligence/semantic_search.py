@@ -10,16 +10,16 @@ Responsibilities:
 - Cache embeddings for performance
 """
 
+import hashlib
 import logging
-from typing import Optional, Dict, Any, List, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import hashlib
+from typing import Any, Dict, List, Optional
 
 from cirkelline.headquarters.knowledge_graph import (
-    KnowledgeGraph,
     GraphNode,
+    KnowledgeGraph,
     NodeType,
     get_knowledge_graph,
 )

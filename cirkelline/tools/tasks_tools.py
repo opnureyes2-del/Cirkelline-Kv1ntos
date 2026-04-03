@@ -8,10 +8,11 @@ v1.3.5: Created to match calendar_tools pattern
 v1.3.6: Added automatic Google Tasks sync (like calendar_tools)
 """
 
+from datetime import UTC, datetime
+from typing import Optional
+
 from agno.tools import Toolkit
 from sqlalchemy import text
-from datetime import datetime, timezone
-from typing import Optional
 
 from cirkelline.config import logger
 from cirkelline.database import engine
@@ -94,8 +95,9 @@ class CirkellineTasksTools(Toolkit):
         regardless of sync_enabled flag. Creates task in user's primary task list if no external_id.
         """
         try:
-            from cirkelline.integrations.google.google_oauth import get_user_google_credentials
             import asyncio
+
+            from cirkelline.integrations.google.google_oauth import get_user_google_credentials
 
             # Get Google credentials
             loop = asyncio.new_event_loop()
@@ -358,9 +360,9 @@ class CirkellineTasksTools(Toolkit):
             parsed_due = None
             if due_date:
                 try:
-                    parsed_due = datetime.strptime(due_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                    parsed_due = datetime.strptime(due_date, "%Y-%m-%d").replace(tzinfo=UTC)
                 except ValueError:
-                    return f"Invalid date format. Use YYYY-MM-DD (e.g., 2025-12-25)."
+                    return "Invalid date format. Use YYYY-MM-DD (e.g., 2025-12-25)."
 
             with engine.connect() as conn:
                 # Verify list ownership
@@ -480,7 +482,7 @@ class CirkellineTasksTools(Toolkit):
 
                 if due_date is not None:
                     try:
-                        parsed_due = datetime.strptime(due_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                        parsed_due = datetime.strptime(due_date, "%Y-%m-%d").replace(tzinfo=UTC)
                         params["due_date"] = parsed_due
                         updates.append("due_date = :due_date")
                     except ValueError:

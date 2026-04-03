@@ -14,42 +14,38 @@ Eller direkte:
 """
 
 import asyncio
-import sys
 import os
 import secrets
-from datetime import datetime
-from typing import Dict, Any, Optional, List, Set
+import sys
 import uuid
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Set
 
 # Tilføj parent path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from cirkelline.ckc.learning_rooms import (
-    get_room_manager,
-    initialize_default_rooms,
-    RoomStatus,
-)
-from cirkelline.ckc.orchestrator import (
-    get_orchestrator,
-    TaskPriority,
-    AgentCapability,
+from cirkelline.ckc.advanced_protocols import (
+    AuthorizationLevel,
+    MessagePriority,
+    get_ilcp_manager,
+    get_security_manager,
+    get_terminal,
 )
 from cirkelline.ckc.agents import create_all_agents
-from cirkelline.ckc.kommandanter import get_historiker, get_bibliotekar, HistoricalEventType
-from cirkelline.ckc.dashboard import get_dashboard_manager, StatusLevel
-from cirkelline.ckc.security import get_sanitizer
-from cirkelline.ckc.advanced_protocols import (
-    get_security_manager,
-    get_ilcp_manager,
-    get_terminal,
-    SecurityLevel,
-    MessageType,
-    MessagePriority,
-    AuthorizationLevel,
-)
-from cirkelline.ckc.folder_switcher import get_folder_switcher
+from cirkelline.ckc.dashboard import StatusLevel, get_dashboard_manager
 from cirkelline.ckc.folder_context import FolderCategory
-
+from cirkelline.ckc.folder_switcher import get_folder_switcher
+from cirkelline.ckc.kommandanter import HistoricalEventType, get_bibliotekar, get_historiker
+from cirkelline.ckc.learning_rooms import (
+    RoomStatus,
+    get_room_manager,
+    initialize_default_rooms,
+)
+from cirkelline.ckc.orchestrator import (
+    TaskPriority,
+    get_orchestrator,
+)
+from cirkelline.ckc.security import get_sanitizer
 
 # ═══════════════════════════════════════════════════════════════
 # TERMINAL FARVER OG FORMATTERING
@@ -315,9 +311,9 @@ class CKCTerminal:
         new_level = new_security["state"]["current_level"]
 
         if new_level == "high":
-            print_success(f"FAIL-SAFE AKTIVERET: Sikkerhed rullet tilbage til HIGH")
+            print_success("FAIL-SAFE AKTIVERET: Sikkerhed rullet tilbage til HIGH")
         else:
-            print_error(f"FEJL: Sikkerhed ikke rullet tilbage korrekt")
+            print_error("FEJL: Sikkerhed ikke rullet tilbage korrekt")
 
         # Log event
         await self.historiker.record_event(
@@ -420,7 +416,7 @@ class CKCTerminal:
         print_success(f"Task oprettet: {task.id}")
         print(f"  Prioritet: {task.priority.name}")
         print(f"  Status: {task.status.value}")
-        print(f"  Kræver validering: Ja")
+        print("  Kræver validering: Ja")
 
         # Log
         await self.historiker.record_event(
@@ -560,7 +556,7 @@ class CKCTerminal:
                 # Sæt status til LOCKED (rød)
                 await self.room_manager.set_room_status(room_id, RoomStatus.RED)
                 return {"success": True, "room_id": room_id}
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return {"success": False, "room_id": room_id, "error": "timeout"}
         except Exception as e:
             return {"success": False, "room_id": room_id, "error": str(e)}
@@ -684,7 +680,7 @@ class CKCTerminal:
                 results["error"] = f"Emergency stop partial failure - {len(partial_failures)} rooms failed to lock"
 
                 print_error(f"\n{'═' * 50}")
-                print_error(f"  NØDSTOP FEJLET - ROLLBACK UDFØRT")
+                print_error("  NØDSTOP FEJLET - ROLLBACK UDFØRT")
                 print_error(f"  Låste rum genåbnet: {rollback_result['success']}/{rollback_result['attempted']}")
                 print_error(f"{'═' * 50}")
 
@@ -704,7 +700,7 @@ class CKCTerminal:
                         cancelled = await self.orchestrator.cancel_all_tasks(reason="Emergency stop")
                         results["actions_taken"].append(f"Afbrød {cancelled} aktive opgaver")
                         print_warning(f"  → {cancelled} opgaver afbrudt")
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 results["actions_taken"].append("Task cancellation timed out (fortsætter)")
                 print_warning("  → Task cancellation timed out")
 
@@ -732,7 +728,7 @@ class CKCTerminal:
                     print_info(f"  → HITL Request: {hitl_result.get('hitl_request_id')}")
             except Exception as hitl_error:
                 results["actions_taken"].append(f"HITL notification fejlede: {hitl_error}")
-                print_warning(f"  → HITL notification fejlede (ikke kritisk)")
+                print_warning("  → HITL notification fejlede (ikke kritisk)")
 
             # 7. Opdater dashboard
             await self.dashboard.set_component_status(
@@ -818,7 +814,7 @@ class CKCTerminal:
                     async with asyncio.timeout(self._EMERGENCY_STOP_TIMEOUT):
                         await self.room_manager.set_room_status(room.room_id, RoomStatus.BLUE)
                         results["rooms_resumed"] += 1
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     results["partial_failures"].append({
                         "room_id": room.room_id,
                         "error": "timeout"

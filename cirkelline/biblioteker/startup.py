@@ -17,19 +17,19 @@ Brug:
         yield
 """
 
-from typing import Optional
 import os
+from typing import Optional
 
+from .adapters import (
+    AgentLearningAdapter,
+    CosmicLibraryAdapter,
+    NotionAdapter,
+)
 from .base import BibliotekSource
 from .multi_bibliotek import (
     MultiBibliotek,
-    register_adapter,
     get_bibliotek,
-)
-from .adapters import (
-    CosmicLibraryAdapter,
-    NotionAdapter,
-    AgentLearningAdapter,
+    register_adapter,
 )
 
 # Global initialization flag

@@ -4,12 +4,15 @@ Cirkelline Notion Integration Helpers
 Functions for Notion OAuth, database discovery, and schema extraction.
 """
 
-import os
 import json
+import os
+
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
-from cirkelline.database import db
+
 from cirkelline.config import logger
+from cirkelline.database import db
+
 
 def get_user_notion_credentials_sync(user_id: str):
     """

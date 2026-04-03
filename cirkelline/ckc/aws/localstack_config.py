@@ -19,7 +19,7 @@ Usage:
 """
 
 import os
-from typing import Optional, Any
+from typing import Any, Optional
 
 # Conditional boto3 import - kun nødvendig når AWS services bruges
 try:
@@ -151,8 +151,8 @@ def is_localstack_available() -> bool:
         True hvis LocalStack svarer, False ellers
     """
     try:
-        import urllib.request
         import urllib.error
+        import urllib.request
 
         url = f"{LOCALSTACK_ENDPOINT}/_localstack/health"
         request = urllib.request.Request(url, method='GET')
@@ -172,8 +172,8 @@ def get_localstack_health() -> dict:
         Dict med service status, eller tom dict hvis ikke tilgængelig
     """
     try:
-        import urllib.request
         import json
+        import urllib.request
 
         url = f"{LOCALSTACK_ENDPOINT}/_localstack/health"
         request = urllib.request.Request(url, method='GET')
@@ -405,7 +405,7 @@ if __name__ == "__main__":
 
         # Get health
         health = get_localstack_health()
-        print(f"\n📊 LocalStack Health:")
+        print("\n📊 LocalStack Health:")
         for service, status in health.get('services', {}).items():
             emoji = "✅" if status in ('running', 'available') else "❌"
             print(f"   {emoji} {service}: {status}")

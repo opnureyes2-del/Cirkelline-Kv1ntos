@@ -5,8 +5,9 @@ Knowledge base initialization with vector database.
 """
 
 from agno.knowledge.knowledge import Knowledge
-from cirkelline.database import db, vector_db
+
 from cirkelline.config import logger
+from cirkelline.database import db, vector_db
 
 # Knowledge base
 # ✅ v1.2.33: Added max_results (AGNO best practice for default retrieval limit)

@@ -15,13 +15,15 @@ New structure (1.2.34+):
 """
 
 import os
+
 from agno.agent import Agent
-from agno.team import Team
 from agno.models.google import Gemini
+from agno.team import Team
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.reasoning import ReasoningTools
-from cirkelline.database import db
+
 from cirkelline.config import logger
+from cirkelline.database import db
 
 # KERNEMANDAT: Prioriter gratis løsninger
 # Exa og Tavily er valgfrie - kun inkluder hvis API keys er sat

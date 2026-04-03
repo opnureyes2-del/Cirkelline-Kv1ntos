@@ -14,14 +14,14 @@ Features:
 Flow: Observeret Læringsrum -> Kommandør -> Chat -> Bruger -> tilbage til læringsrum
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Callable
-from enum import Enum
-import uuid
 import asyncio
 import hashlib
+import uuid
 from collections import defaultdict
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
 from cirkelline.config import logger
 
@@ -522,13 +522,15 @@ logger.info("CKC Learning Rooms module loaded")
 # Import specialized monitors for re-export
 try:
     from .monitors.memory_evolution_room import (
+        EvolutionSnapshot,
         MemoryEvolutionRoom,
+        SyncFrequency,
+        TestSchedule,
         get_memory_evolution_room,
         start_memory_evolution_room,
+    )
+    from .monitors.memory_evolution_room import (
         RoomStatus as MemoryRoomStatus,
-        SyncFrequency,
-        EvolutionSnapshot,
-        TestSchedule,
     )
     _HAS_MEMORY_EVOLUTION = True
     logger.info("Memory Evolution Room loaded from monitors/")

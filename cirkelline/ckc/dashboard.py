@@ -15,16 +15,17 @@ Farvekoder:
     RED    - Kritisk fejl, sikkerhedsproblem
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Callable
-from enum import Enum
 import asyncio
 import uuid
 from collections import defaultdict
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
 from cirkelline.config import logger
-from .learning_rooms import RoomStatus, get_room_manager
+
+from .learning_rooms import get_room_manager
 
 
 class StatusLevel(Enum):

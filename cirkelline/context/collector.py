@@ -13,13 +13,13 @@ Sources:
 Context is injected into agent prompts for better responses.
 """
 
-import os
 import logging
+import os
 import subprocess
-from enum import Enum
-from typing import Optional, Dict, Any, List
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

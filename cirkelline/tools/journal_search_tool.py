@@ -7,11 +7,12 @@ Uses SQL-level filtering for efficient querying.
 v1.0.0: Initial implementation
 """
 
-from typing import List, Optional
 from datetime import datetime, timedelta
-from sqlalchemy import text
+from typing import List, Optional
 
 from agno.tools import Toolkit
+from sqlalchemy import text
+
 from cirkelline.config import logger
 from cirkelline.database import _shared_engine
 
@@ -219,7 +220,7 @@ class JournalSearchTool(Toolkit):
             return "\n".join(lines)
 
         except ValueError:
-            return f"Invalid date format. Use YYYY-MM-DD (e.g., 2025-12-06)"
+            return "Invalid date format. Use YYYY-MM-DD (e.g., 2025-12-06)"
         except Exception as e:
             logger.error(f"Get journal by date failed: {e}")
             return f"Error: {e}"

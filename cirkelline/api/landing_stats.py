@@ -6,7 +6,9 @@ without sensitive data. Cached for performance.
 """
 
 import time
+
 from fastapi import APIRouter
+
 from cirkelline.config import logger
 from cirkelline.database import db
 
@@ -76,8 +78,8 @@ async def get_landing_stats():
 
     try:
         # Training room stats from Cosmic (port 7778)
-        import urllib.request
         import json
+        import urllib.request
         req = urllib.request.Request(
             "http://localhost:7778/api/training-rooms",
             headers={"Accept": "application/json"},

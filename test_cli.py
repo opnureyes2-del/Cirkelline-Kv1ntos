@@ -29,7 +29,6 @@ What does NOT work:
 """
 
 import argparse
-import sys
 from datetime import datetime
 
 # Parse arguments FIRST before any imports (avoids loading everything for --help)
@@ -44,11 +43,12 @@ args = parser.parse_args()
 
 # Now import Cirkelline (this loads all the heavy stuff)
 print("Loading Cirkelline...")
-from cirkelline.orchestrator.cirkelline_team import cirkelline
+from sqlalchemy import text
+from sqlalchemy.orm import Session as SQLAlchemySession
+
 from cirkelline.config import logger
 from cirkelline.middleware.middleware import _shared_engine
-from sqlalchemy.orm import Session as SQLAlchemySession
-from sqlalchemy import text
+from cirkelline.orchestrator.cirkelline_team import cirkelline
 
 
 def get_user_info(user_id: str) -> dict:
@@ -139,9 +139,9 @@ def main():
         original_tools = cirkelline.tools.copy() if cirkelline.tools else []
         cirkelline.tools = [
             tool for tool in cirkelline.tools
-            if not (tool.__class__.__name__ in ['ExaTools', 'TavilyTools'])
+            if tool.__class__.__name__ not in ['ExaTools', 'TavilyTools']
         ]
-        print(f"Deep Research Mode: Removed ExaTools and TavilyTools")
+        print("Deep Research Mode: Removed ExaTools and TavilyTools")
         print(f"Remaining tools: {[tool.__class__.__name__ for tool in cirkelline.tools]}")
         print()
 

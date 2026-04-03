@@ -18,12 +18,13 @@ Provides:
 v1.3.0: Full implementation with users-stats, active runs, config endpoints, auto-trigger
 """
 
+import json
 import os
 import uuid
-import json
+from datetime import datetime
+
 import jwt as pyjwt
-from datetime import datetime, timedelta
-from fastapi import APIRouter, Request, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 
@@ -2258,8 +2259,8 @@ async def get_journal_queue(request: Request):
     user_id = await verify_admin(request)
 
     from cirkelline.workflows.journal_queue import get_queue_stats, get_recent_queue_items
-    from cirkelline.workflows.journal_worker import get_worker_status
     from cirkelline.workflows.journal_scheduler import get_scheduler_status
+    from cirkelline.workflows.journal_worker import get_worker_status
 
     stats = get_queue_stats()
     items = get_recent_queue_items(limit=50)
@@ -2302,7 +2303,7 @@ async def backfill_user_journals(request: Request, target_user_id: str):
     """
     user_id = await verify_admin(request)
 
-    from cirkelline.workflows.journal_queue import get_user_gap_days, add_to_queue
+    from cirkelline.workflows.journal_queue import add_to_queue, get_user_gap_days
 
     # Find gap days
     gap_days = get_user_gap_days(target_user_id)
@@ -2473,7 +2474,7 @@ async def trigger_daily_scheduler_now(request: Request):
 
     await trigger_daily_job_now()
 
-    logger.info(f"[Admin] Manually triggered daily scheduler job")
+    logger.info("[Admin] Manually triggered daily scheduler job")
 
     await log_activity(
         request=request,

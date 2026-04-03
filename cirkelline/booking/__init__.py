@@ -9,26 +9,21 @@ Princip: "Man behøver ikke se for at vide - vi bygger så alt er gennemsigtigt.
 """
 
 from cirkelline.booking.queue_worker import (
-    # Enums
-    BookingStatus,
-
-    # Config
-    QueueConfig,
     BookingMessage,
-    WorkerStats,
-
-    # Clients
-    QueueClient,
-    LocalQueueClient,
-    SQSQueueClient,
-
     # Processors
     BookingProcessor,
-    DatabaseBookingProcessor,
-
+    # Enums
+    BookingStatus,
     # Worker
     BookingWorker,
-
+    DatabaseBookingProcessor,
+    LocalQueueClient,
+    # Clients
+    QueueClient,
+    # Config
+    QueueConfig,
+    SQSQueueClient,
+    WorkerStats,
     # Factory
     get_booking_worker,
     start_booking_worker,

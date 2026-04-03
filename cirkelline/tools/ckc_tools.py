@@ -19,18 +19,17 @@ Version: 1.1.0 (with Optimizer integration)
 Date: 2025-12-16
 """
 
-import logging
 import time
-from typing import Dict, Any, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from cirkelline.config import logger
 
 # Import CKC Optimizer for performance tracking
 try:
     from cirkelline.tools.ckc_optimizer import (
-        get_ckc_optimizer,
         ToolCallStatus,
+        get_ckc_optimizer,
     )
     CKC_OPTIMIZER_AVAILABLE = True
 except ImportError:
@@ -40,11 +39,11 @@ except ImportError:
 # Import CKC components
 try:
     from cirkelline.ckc.orchestrator import (
-        get_orchestrator,
-        get_orchestrator_status,
-        create_task,
         CKCOrchestrator,
         TaskPriority,
+        create_task,
+        get_orchestrator,
+        get_orchestrator_status,
     )
     CKC_ORCHESTRATOR_AVAILABLE = True
 except ImportError as e:
@@ -64,11 +63,11 @@ except ImportError as e:
 
 try:
     from cirkelline.ckc.mastermind import (
-        get_mastermind_coordinator,
-        create_mastermind_coordinator,
         MastermindCoordinator,
-        MastermindStatus,
         MastermindPriority,
+        MastermindStatus,
+        create_mastermind_coordinator,
+        get_mastermind_coordinator,
     )
     CKC_MASTERMIND_AVAILABLE = True
 except ImportError as e:

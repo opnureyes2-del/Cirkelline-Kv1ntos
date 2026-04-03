@@ -10,10 +10,11 @@ Individual specialist agents for handling specific modalities:
 
 from agno.agent import Agent
 from agno.models.google import Gemini
-from cirkelline.tools.media import DocumentProcessingTools
+
+from cirkelline.config import logger
 from cirkelline.database import db
 from cirkelline.knowledge_base import knowledge
-from cirkelline.config import logger
+from cirkelline.tools.media import DocumentProcessingTools
 
 # Audio Specialist
 audio_agent = Agent(
