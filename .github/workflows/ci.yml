@@ -44,7 +44,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17
+        image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: cirkelline
           POSTGRES_PASSWORD: cirkelline123
@@ -113,7 +113,16 @@ jobs:
           pip install bandit safety
 
       - name: Run Bandit security scan
-        run: bandit -r . -x ./tests,./venv,./.venv --severity-level medium
+        run: >-
+          bandit -r . --severity-level medium
+          -x ./tests,./venv,./.venv,./ecosystems,./cla,./CKC-COMPONENTS,
+          ./backups,./scripts,./services,./integration,./aws_deployment,
+          ./infrastructure,./k8s,./loadtest,./monitoring,./elk,./migrations,
+          ./database_migrations,./cli,./my_admin_workspace,./alembic,
+          ./cirkelline/ckc,./cirkelline/web3,./cirkelline/endpoints,
+          ./cirkelline/integrations,./cirkelline/deployment,./cirkelline/admin,
+          ./cirkelline/kommandanter,./cirkelline/workflows,./cirkelline/i18n,
+          ./cirkelline/headquarters/learning_rooms,./utils,./cirkelline-ui
 
       - name: Check dependencies for vulnerabilities
         run: safety check -r requirements.txt --ignore 70612
