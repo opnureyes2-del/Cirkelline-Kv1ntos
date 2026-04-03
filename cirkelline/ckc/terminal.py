@@ -51,18 +51,20 @@ from cirkelline.ckc.security import get_sanitizer
 # TERMINAL FARVER OG FORMATTERING
 # ═══════════════════════════════════════════════════════════════
 
+
 class Colors:
     """ANSI farver til terminal output."""
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    CYAN = '\033[96m'
-    MAGENTA = '\033[95m'
-    WHITE = '\033[97m'
-    BOLD = '\033[1m'
-    DIM = '\033[2m'
-    RESET = '\033[0m'
+
+    BLUE = "\033[94m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    RED = "\033[91m"
+    CYAN = "\033[96m"
+    MAGENTA = "\033[95m"
+    WHITE = "\033[97m"
+    BOLD = "\033[1m"
+    DIM = "\033[2m"
+    RESET = "\033[0m"
 
 
 def status_color(status: str) -> str:
@@ -122,6 +124,7 @@ def print_info(msg: str) -> None:
 # CKC TERMINAL KLASSE
 # ═══════════════════════════════════════════════════════════════
 
+
 class CKCTerminal:
     """
     Interaktiv CKC Kommandør Terminal.
@@ -167,8 +170,7 @@ class CKCTerminal:
         for room in rooms.values():
             await self.security_manager.register_room(room.room_id)
             await self.ilcp_manager.register_room_capabilities(
-                room.room_id,
-                {"general", room.name.lower().replace(" ", "_")}
+                room.room_id, {"general", room.name.lower().replace(" ", "_")}
             )
 
         # Registrer agenter i orchestrator
@@ -179,7 +181,7 @@ class CKCTerminal:
                 name=agent.name,
                 description=agent.description,
                 capabilities=agent.capabilities,
-                learning_room_id=room_id
+                learning_room_id=room_id,
             )
             room_id += 1
 
@@ -200,7 +202,7 @@ class CKCTerminal:
             HistoricalEventType.SYSTEM_START,
             f"CKC Terminal started by {self.user_id}",
             "terminal",
-            importance=4
+            importance=4,
         )
 
         self.initialized = True
@@ -209,14 +211,20 @@ class CKCTerminal:
     async def show_status(self) -> None:
         """Vis komplet systemstatus."""
         print_header("CKC SYSTEM STATUS")
-        print(f"{Colors.DIM}Session: {self.session_id} | User: {self.user_id} | {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC{Colors.RESET}")
+        print(
+            f"{Colors.DIM}Session: {self.session_id} | User: {self.user_id} | {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC{Colors.RESET}"
+        )
 
         # Kommandant Status
         print_section("KOMMANDANT-AGENT STATUS")
         orch_status = await self.orchestrator.get_status()
         print_status_dot("green", "CKC Orchestrator", "AKTIV - Fejlfri drift")
-        print(f"    Agenter: {orch_status['agents']['total']} registreret, {orch_status['agents']['available']} tilgængelige")
-        print(f"    Opgaver: {orch_status['tasks']['completed']} fuldført, {orch_status['tasks']['queued']} i kø")
+        print(
+            f"    Agenter: {orch_status['agents']['total']} registreret, {orch_status['agents']['available']} tilgængelige"
+        )
+        print(
+            f"    Opgaver: {orch_status['tasks']['completed']} fuldført, {orch_status['tasks']['queued']} i kø"
+        )
 
         # Læringsrum Status
         print_section("LÆRINGSRUM STATUS")
@@ -234,11 +242,13 @@ class CKCTerminal:
             emoji = status_emoji.get(room.status.value, "○")
             print(f"  {emoji} #{room.room_id:02d} {room.name} - {room.status.value.upper()}")
 
-        print(f"\n  {Colors.DIM}Samlet: {room_overview['total_rooms']} rum | "
-              f"Blå: {room_overview['status_counts'].get('blue', 0)} | "
-              f"Grøn: {room_overview['status_counts'].get('green', 0)} | "
-              f"Gul: {room_overview['status_counts'].get('yellow', 0)} | "
-              f"Rød: {room_overview['status_counts'].get('red', 0)}{Colors.RESET}")
+        print(
+            f"\n  {Colors.DIM}Samlet: {room_overview['total_rooms']} rum | "
+            f"Blå: {room_overview['status_counts'].get('blue', 0)} | "
+            f"Grøn: {room_overview['status_counts'].get('green', 0)} | "
+            f"Gul: {room_overview['status_counts'].get('yellow', 0)} | "
+            f"Rød: {room_overview['status_counts'].get('red', 0)}{Colors.RESET}"
+        )
 
         # Agent Status
         print_section("SPECIALISEREDE AGENTER")
@@ -246,14 +256,16 @@ class CKCTerminal:
             print_status_dot(
                 "green" if agent.status.value == "idle" else "yellow",
                 agent.name,
-                f"Tasks: {agent.tasks_processed}"
+                f"Tasks: {agent.tasks_processed}",
             )
 
         # Kommandanter
         print_section("KOMMANDANTER")
         hist_stats = await self.historiker.get_statistics()
         bibl_stats = await self.bibliotekar.get_statistics()
-        print_status_dot("blue", "Historiker-Kommandant", f"{hist_stats['total_events']} events logged")
+        print_status_dot(
+            "blue", "Historiker-Kommandant", f"{hist_stats['total_events']} events logged"
+        )
         print_status_dot("blue", "Bibliotekar-Kommandant", f"{bibl_stats['total_entries']} entries")
 
         # Protokol Status
@@ -263,8 +275,10 @@ class CKCTerminal:
         print_status_dot("green", "5.3 EIAP External Access Protocol", "OPERATIV")
 
         term_status = await self.super_admin.get_terminal_status()
-        print(f"\n  {Colors.DIM}HITL Pending: {term_status['pending_hitl_requests']} | "
-              f"Audit Log: {term_status['audit_log_size']} entries{Colors.RESET}")
+        print(
+            f"\n  {Colors.DIM}HITL Pending: {term_status['pending_hitl_requests']} | "
+            f"Audit Log: {term_status['audit_log_size']} entries{Colors.RESET}"
+        )
 
         # Nylige aktiviteter
         print_section("NYLIGE AKTIVITETER")
@@ -272,7 +286,9 @@ class CKCTerminal:
         if timeline:
             for event in timeline:
                 time_str = event.timestamp.strftime("%H:%M:%S")
-                print(f"  {Colors.DIM}[{time_str}]{Colors.RESET} {event.event_type.value}: {event.description[:50]}")
+                print(
+                    f"  {Colors.DIM}[{time_str}]{Colors.RESET} {event.event_type.value}: {event.description[:50]}"
+                )
         else:
             print(f"  {Colors.DIM}Ingen nylige aktiviteter{Colors.RESET}")
 
@@ -320,21 +336,18 @@ class CKCTerminal:
             HistoricalEventType.ERROR_OCCURRED,
             f"Simulated error in room {room_id} - fail-safe test",
             "terminal_simulation",
-            importance=3
+            importance=3,
         )
 
         return {
             "success": True,
             "old_level": old_level,
             "new_level": new_level,
-            "fail_safe_activated": new_level == "high"
+            "fail_safe_activated": new_level == "high",
         }
 
     async def initiate_ilcp_request(
-        self,
-        source_room_id: int,
-        target_room_id: int,
-        task_description: str
+        self, source_room_id: int, target_room_id: int, task_description: str
     ) -> Dict[str, Any]:
         """
         Test ILCP kommunikation mellem læringsrum.
@@ -353,7 +366,7 @@ class CKCTerminal:
             requester_room_id=source_room_id,
             task_description=task_description,
             required_capabilities={"general"},
-            urgency=MessagePriority.NORMAL
+            urgency=MessagePriority.NORMAL,
         )
 
         print_success(f"Request oprettet: {request.id}")
@@ -369,21 +382,18 @@ class CKCTerminal:
             HistoricalEventType.TASK_COMPLETED,
             f"ILCP request from room {source_room_id} to {target_room_id}",
             "ilcp_manager",
-            importance=2
+            importance=2,
         )
 
         return {
             "success": True,
             "request_id": request.id,
             "status": request.status,
-            "assigned_room": request.assigned_room_id
+            "assigned_room": request.assigned_room_id,
         }
 
     async def request_new_agent_feature(
-        self,
-        room_id: int,
-        agent_type: str,
-        feature_description: str
+        self, room_id: int, agent_type: str, feature_description: str
     ) -> Dict[str, Any]:
         """
         Test anmodning om ny agent/feature.
@@ -409,8 +419,8 @@ class CKCTerminal:
             metadata={
                 "type": "feature_request",
                 "agent_type": agent_type,
-                "feature": feature_description
-            }
+                "feature": feature_description,
+            },
         )
 
         print_success(f"Task oprettet: {task.id}")
@@ -423,21 +433,18 @@ class CKCTerminal:
             HistoricalEventType.KNOWLEDGE_ADDED,
             f"Feature request: {feature_description[:50]}",
             f"room_{room_id}",
-            importance=3
+            importance=3,
         )
 
         return {
             "success": True,
             "task_id": task.id,
             "status": task.status.value,
-            "requires_hitl": task.requires_validation
+            "requires_hitl": task.requires_validation,
         }
 
     async def trigger_eiap_test(
-        self,
-        external_entity_name: str,
-        access_level: str,
-        payload: Dict[str, Any]
+        self, external_entity_name: str, access_level: str, payload: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
         Test External Implementation Access Protocol (EIAP).
@@ -467,7 +474,7 @@ class CKCTerminal:
             authorization_level=auth_level,
             allowed_rooms={1, 2, 3},
             allowed_actions={"read", "query", "analyze"},
-            sandbox_only=True
+            sandbox_only=True,
         )
 
         print_success(f"Enhed registreret: {entity.entity_id}")
@@ -480,7 +487,7 @@ class CKCTerminal:
             entity_id=entity.entity_id,
             command="analyze",
             params=payload,
-            require_hitl=True  # Force HITL for test
+            require_hitl=True,  # Force HITL for test
         )
 
         if result.get("pending_hitl"):
@@ -493,14 +500,14 @@ class CKCTerminal:
             HistoricalEventType.USER_INTERVENTION,
             f"EIAP test: {external_entity_name} requested access",
             "eiap_protocol",
-            importance=4
+            importance=4,
         )
 
         return {
             "success": True,
             "entity_id": entity.entity_id,
             "hitl_required": result.get("pending_hitl", False),
-            "hitl_request_id": result.get("hitl_request_id")
+            "hitl_request_id": result.get("hitl_request_id"),
         }
 
     async def approve_hitl(self, request_id: str) -> Dict[str, Any]:
@@ -538,11 +545,7 @@ class CKCTerminal:
     _EMERGENCY_STOP_TIMEOUT: float = 5.0  # Sekunder per operation
     _EMERGENCY_STOP_MAX_RETRIES: int = 2
 
-    async def _lock_room_with_timeout(
-        self,
-        room_id: int,
-        timeout: float
-    ) -> Dict[str, Any]:
+    async def _lock_room_with_timeout(self, room_id: int, timeout: float) -> Dict[str, Any]:
         """
         Lås et enkelt rum med timeout.
 
@@ -574,11 +577,7 @@ class CKCTerminal:
         except Exception:
             return False
 
-    async def _rollback_locked_rooms(
-        self,
-        locked_rooms: Set[int],
-        reason: str
-    ) -> Dict[str, Any]:
+    async def _rollback_locked_rooms(self, locked_rooms: Set[int], reason: str) -> Dict[str, Any]:
         """
         Rollback alle låste rum ved partial failure.
 
@@ -589,11 +588,7 @@ class CKCTerminal:
         Returns:
             Dict med rollback status
         """
-        rollback_results = {
-            "attempted": len(locked_rooms),
-            "success": 0,
-            "failed": []
-        }
+        rollback_results = {"attempted": len(locked_rooms), "success": 0, "failed": []}
 
         for room_id in locked_rooms:
             if await self._unlock_room(room_id):
@@ -606,7 +601,7 @@ class CKCTerminal:
             HistoricalEventType.ERROR_OCCURRED,
             f"Emergency stop ROLLBACK: {reason}. Unlocked {rollback_results['success']}/{rollback_results['attempted']} rooms",
             "emergency_stop_rollback",
-            importance=5
+            importance=5,
         )
 
         return rollback_results
@@ -638,7 +633,7 @@ class CKCTerminal:
             "initiated_by": self.user_id,
             "actions_taken": [],
             "partial_failures": [],
-            "rollback_performed": False
+            "rollback_performed": False,
         }
 
         # Track locked rooms for potential rollback
@@ -653,15 +648,16 @@ class CKCTerminal:
             # 2. Lås hvert rum med timeout og tracking
             for room in rooms:
                 lock_result = await self._lock_room_with_timeout(
-                    room.room_id,
-                    self._EMERGENCY_STOP_TIMEOUT
+                    room.room_id, self._EMERGENCY_STOP_TIMEOUT
                 )
 
                 if lock_result["success"]:
                     locked_rooms.add(room.room_id)
                 else:
                     partial_failures.append(lock_result)
-                    print_error(f"  ✗ Rum {room.room_id} fejlede: {lock_result.get('error', 'unknown')}")
+                    print_error(
+                        f"  ✗ Rum {room.room_id} fejlede: {lock_result.get('error', 'unknown')}"
+                    )
 
             # 3. Check for partial failures - trigger rollback
             if partial_failures and len(locked_rooms) < total_rooms:
@@ -670,18 +666,22 @@ class CKCTerminal:
 
                 rollback_result = await self._rollback_locked_rooms(
                     locked_rooms,
-                    f"Partial failure during emergency stop: {len(partial_failures)} rooms failed"
+                    f"Partial failure during emergency stop: {len(partial_failures)} rooms failed",
                 )
 
                 results["rollback_performed"] = True
                 results["rollback_result"] = rollback_result
                 results["partial_failures"] = partial_failures
                 results["success"] = False
-                results["error"] = f"Emergency stop partial failure - {len(partial_failures)} rooms failed to lock"
+                results["error"] = (
+                    f"Emergency stop partial failure - {len(partial_failures)} rooms failed to lock"
+                )
 
                 print_error(f"\n{'═' * 50}")
                 print_error("  NØDSTOP FEJLET - ROLLBACK UDFØRT")
-                print_error(f"  Låste rum genåbnet: {rollback_result['success']}/{rollback_result['attempted']}")
+                print_error(
+                    f"  Låste rum genåbnet: {rollback_result['success']}/{rollback_result['attempted']}"
+                )
                 print_error(f"{'═' * 50}")
 
                 return results
@@ -697,7 +697,9 @@ class CKCTerminal:
                     active_tasks = orch_status.get("tasks", {}).get("active", 0)
 
                     if active_tasks > 0:
-                        cancelled = await self.orchestrator.cancel_all_tasks(reason="Emergency stop")
+                        cancelled = await self.orchestrator.cancel_all_tasks(
+                            reason="Emergency stop"
+                        )
                         results["actions_taken"].append(f"Afbrød {cancelled} aktive opgaver")
                         print_warning(f"  → {cancelled} opgaver afbrudt")
             except TimeoutError:
@@ -709,7 +711,7 @@ class CKCTerminal:
                 HistoricalEventType.ERROR_OCCURRED,
                 f"EMERGENCY STOP: {reason}",
                 "emergency_stop_system",
-                importance=5  # Højeste prioritet
+                importance=5,  # Højeste prioritet
             )
             results["actions_taken"].append("Logget til audit trail")
 
@@ -719,7 +721,7 @@ class CKCTerminal:
                     entity_id="system",
                     command="emergency_stop_notification",
                     params={"reason": reason, "timestamp": results["timestamp"]},
-                    require_hitl=True
+                    require_hitl=True,
                 )
 
                 if hitl_result.get("pending_hitl"):
@@ -732,9 +734,7 @@ class CKCTerminal:
 
             # 7. Opdater dashboard
             await self.dashboard.set_component_status(
-                "system_emergency",
-                StatusLevel.RED,
-                f"NØDSTOP: {reason}"
+                "system_emergency", StatusLevel.RED, f"NØDSTOP: {reason}"
             )
             results["actions_taken"].append("Dashboard opdateret til RED")
 
@@ -756,8 +756,7 @@ class CKCTerminal:
                 print_warning("Starter nød-rollback...")
 
                 rollback_result = await self._rollback_locked_rooms(
-                    locked_rooms,
-                    f"Critical error during emergency stop: {e}"
+                    locked_rooms, f"Critical error during emergency stop: {e}"
                 )
                 results["rollback_performed"] = True
                 results["rollback_result"] = rollback_result
@@ -786,8 +785,7 @@ class CKCTerminal:
         # Sikkerhedstjek med constant-time comparison
         # Undgår timing attacks ved at bruge secrets.compare_digest
         if not secrets.compare_digest(
-            confirmation_code.encode('utf-8'),
-            self.session_id.encode('utf-8')
+            confirmation_code.encode("utf-8"), self.session_id.encode("utf-8")
         ):
             print_error("AFVIST: Ugyldig bekræftelseskode")
             # Log failed attempt
@@ -795,15 +793,11 @@ class CKCTerminal:
                 HistoricalEventType.USER_INTERVENTION,
                 f"Failed resume attempt with invalid code by {self.user_id}",
                 "emergency_stop_system",
-                importance=4
+                importance=4,
             )
             return {"success": False, "error": "Invalid confirmation code"}
 
-        results: Dict[str, Any] = {
-            "actions_taken": [],
-            "rooms_resumed": 0,
-            "partial_failures": []
-        }
+        results: Dict[str, Any] = {"actions_taken": [], "rooms_resumed": 0, "partial_failures": []}
 
         try:
             # Genåbn læringsrum med timeout per rum
@@ -815,31 +809,27 @@ class CKCTerminal:
                         await self.room_manager.set_room_status(room.room_id, RoomStatus.BLUE)
                         results["rooms_resumed"] += 1
                 except TimeoutError:
-                    results["partial_failures"].append({
-                        "room_id": room.room_id,
-                        "error": "timeout"
-                    })
+                    results["partial_failures"].append(
+                        {"room_id": room.room_id, "error": "timeout"}
+                    )
                 except Exception as e:
-                    results["partial_failures"].append({
-                        "room_id": room.room_id,
-                        "error": str(e)
-                    })
+                    results["partial_failures"].append({"room_id": room.room_id, "error": str(e)})
 
-            results["actions_taken"].append(f"Genåbnede {results['rooms_resumed']}/{len(rooms)} læringsrum")
+            results["actions_taken"].append(
+                f"Genåbnede {results['rooms_resumed']}/{len(rooms)} læringsrum"
+            )
 
             # Log genoptagelse
             await self.historiker.record_event(
                 HistoricalEventType.SYSTEM_START,
                 f"Operations resumed by {self.user_id}. Rooms: {results['rooms_resumed']}/{len(rooms)}",
                 "emergency_stop_system",
-                importance=4
+                importance=4,
             )
 
             # Opdater dashboard
             await self.dashboard.set_component_status(
-                "system_emergency",
-                StatusLevel.GREEN,
-                "System genoptaget"
+                "system_emergency", StatusLevel.GREEN, "System genoptaget"
             )
 
             # Clear emergency state
@@ -930,10 +920,14 @@ class CKCTerminal:
                 current_marker = f"{Colors.GREEN}→ {Colors.RESET}" if is_current else "  "
                 fav_marker = f" {Colors.YELLOW}★{Colors.RESET}" if is_fav else ""
                 print(f"{current_marker}{status} {folder.display_name}{fav_marker}")
-                print(f"      {Colors.DIM}ID: {folder.folder_id} | {folder.python_files_count} .py filer{Colors.RESET}")
+                print(
+                    f"      {Colors.DIM}ID: {folder.folder_id} | {folder.python_files_count} .py filer{Colors.RESET}"
+                )
 
         # Sammenfatning
-        print(f"\n{Colors.DIM}Total: {len(folders)} folders | Current: {context.current_folder_id or 'Ingen'}{Colors.RESET}")
+        print(
+            f"\n{Colors.DIM}Total: {len(folders)} folders | Current: {context.current_folder_id or 'Ingen'}{Colors.RESET}"
+        )
 
     async def switch_folder(self, folder_id: str) -> Dict[str, Any]:
         """
@@ -1045,10 +1039,12 @@ class CKCTerminal:
         if contents.get("python_files"):
             print_section("PYTHON FILER")
             for pf in contents["python_files"][:20]:  # Max 20
-                size_kb = pf.get('size', 0) / 1024
+                size_kb = pf.get("size", 0) / 1024
                 print(f"  🐍 {pf['name']} ({size_kb:.1f} KB)")
             if len(contents["python_files"]) > 20:
-                print(f"  {Colors.DIM}... og {len(contents['python_files']) - 20} mere{Colors.RESET}")
+                print(
+                    f"  {Colors.DIM}... og {len(contents['python_files']) - 20} mere{Colors.RESET}"
+                )
 
         # Andre filer
         if contents.get("other_files"):
@@ -1056,9 +1052,13 @@ class CKCTerminal:
             for of in contents["other_files"][:10]:
                 print(f"  📄 {of['name']}")
             if len(contents["other_files"]) > 10:
-                print(f"  {Colors.DIM}... og {len(contents['other_files']) - 10} mere{Colors.RESET}")
+                print(
+                    f"  {Colors.DIM}... og {len(contents['other_files']) - 10} mere{Colors.RESET}"
+                )
 
-        print(f"\n{Colors.DIM}Total: {contents.get('total_files', 0)} filer | {len(contents.get('subfolders', []))} subfolders{Colors.RESET}")
+        print(
+            f"\n{Colors.DIM}Total: {contents.get('total_files', 0)} filer | {len(contents.get('subfolders', []))} subfolders{Colors.RESET}"
+        )
         return contents
 
     async def add_custom_folder(self, path: str, name: str) -> Dict[str, Any]:
@@ -1187,7 +1187,9 @@ class CKCTerminal:
         favorites = await self.folder_switcher.get_favorites()
 
         if not favorites:
-            print(f"  {Colors.DIM}Ingen favorites - brug ckc.toggle_favorite(folder_id){Colors.RESET}")
+            print(
+                f"  {Colors.DIM}Ingen favorites - brug ckc.toggle_favorite(folder_id){Colors.RESET}"
+            )
             return
 
         for folder in favorites:
@@ -1296,6 +1298,7 @@ class CKCTerminal:
 # INTERAKTIV TERMINAL
 # ═══════════════════════════════════════════════════════════════
 
+
 async def run_interactive_terminal(user_id: str = "rasmus") -> None:
     """Kør interaktiv terminal session."""
 
@@ -1329,35 +1332,36 @@ async def run_interactive_terminal(user_id: str = "rasmus") -> None:
             if not cmd:
                 continue
 
-            if cmd.lower() in ['exit', 'quit', 'q']:
+            if cmd.lower() in ["exit", "quit", "q"]:
                 print_info("Afslutter CKC Terminal...")
                 break
 
-            if cmd.lower() == 'help':
+            if cmd.lower() == "help":
                 ckc.help()
                 continue
 
-            if cmd.lower() == 'status':
+            if cmd.lower() == "status":
                 await ckc.show_status()
                 continue
 
-            if cmd.lower() == 'hitl':
+            if cmd.lower() == "hitl":
                 await ckc.show_pending_hitl()
                 continue
 
             # Evaluer kommando
-            if cmd.startswith('await '):
+            if cmd.startswith("await "):
                 cmd = cmd[6:]
 
             # Erstatte ckc. med ckc.
-            cmd = cmd.replace('ckc.', 'ckc.')
+            cmd = cmd.replace("ckc.", "ckc.")
 
             try:
                 # Safe method dispatch — NO eval()
-                if 'ckc.' in cmd:
+                if "ckc." in cmd:
                     # Parse method name and args from "ckc.method_name(args)"
                     import re as _re
-                    _match = _re.match(r'ckc\.(\w+)\((.*)\)', cmd)
+
+                    _match = _re.match(r"ckc\.(\w+)\((.*)\)", cmd)
                     if _match:
                         _method_name = _match.group(1)
                         _method = getattr(ckc, _method_name, None)
@@ -1373,7 +1377,9 @@ async def run_interactive_terminal(user_id: str = "rasmus") -> None:
                         print_warning(f"Ugyldigt format: {cmd}")
                 else:
                     print_warning(f"Ukendt kommando: {cmd}")
-                    print(f"{Colors.DIM}Skriv 'help' for at se tilgængelige kommandoer{Colors.RESET}")
+                    print(
+                        f"{Colors.DIM}Skriv 'help' for at se tilgængelige kommandoer{Colors.RESET}"
+                    )
             except Exception as e:
                 print_error(f"Kommando fejlede: {e}")
 
@@ -1390,16 +1396,18 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="CKC Kommandør Terminal")
-    parser.add_argument('--user-id', default='rasmus', help='Bruger ID')
-    parser.add_argument('--status-only', action='store_true', help='Vis kun status')
+    parser.add_argument("--user-id", default="rasmus", help="Bruger ID")
+    parser.add_argument("--status-only", action="store_true", help="Vis kun status")
 
     args = parser.parse_args()
 
     if args.status_only:
+
         async def show_only():
             ckc = CKCTerminal(user_id=args.user_id)
             await ckc.initialize()
             await ckc.show_status()
+
         asyncio.run(show_only())
     else:
         asyncio.run(run_interactive_terminal(args.user_id))

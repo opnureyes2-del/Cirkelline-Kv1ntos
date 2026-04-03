@@ -437,7 +437,15 @@ class CirkellineCalendarTools(Toolkit):
 
                 updates.append("updated_at = NOW()")
 
-                _ALLOWED_COLS = {"title", "description", "location", "start_time", "end_time", "all_day", "updated_at"}
+                _ALLOWED_COLS = {
+                    "title",
+                    "description",
+                    "location",
+                    "start_time",
+                    "end_time",
+                    "all_day",
+                    "updated_at",
+                }
                 for u in updates:
                     col = u.split("=")[0].strip()
                     if col not in _ALLOWED_COLS:

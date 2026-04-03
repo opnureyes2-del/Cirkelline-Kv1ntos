@@ -532,7 +532,15 @@ class CirkellineTasksTools(Toolkit):
 
                 updates.append("updated_at = NOW()")
 
-                _ALLOWED_COLS = {"title", "notes", "due_date", "priority", "completed", "completed_at", "updated_at"}
+                _ALLOWED_COLS = {
+                    "title",
+                    "notes",
+                    "due_date",
+                    "priority",
+                    "completed",
+                    "completed_at",
+                    "updated_at",
+                }
                 for u in updates:
                     col = u.split("=")[0].strip()
                     if col not in _ALLOWED_COLS:
