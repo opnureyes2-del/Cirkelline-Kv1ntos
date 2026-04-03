@@ -28,8 +28,10 @@ logger = logging.getLogger(__name__)
 # TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class AuditLevel(Enum):
     """Severity levels for audit events."""
+
     DEBUG = "debug"
     INFO = "info"
     WARNING = "warning"
@@ -39,6 +41,7 @@ class AuditLevel(Enum):
 
 class AuditCategory(Enum):
     """Categories of audit events."""
+
     AUTHENTICATION = "authentication"
     AUTHORIZATION = "authorization"
     DATA_ACCESS = "data_access"
@@ -54,6 +57,7 @@ class AuditCategory(Enum):
 @dataclass
 class AuditEvent:
     """A single audit event."""
+
     event_id: str
     timestamp: str
     level: AuditLevel
@@ -97,7 +101,7 @@ class AuditEvent:
         return json.dumps(self.to_dict(), default=str)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'AuditEvent':
+    def from_dict(cls, data: Dict[str, Any]) -> "AuditEvent":
         return cls(
             event_id=data["event_id"],
             timestamp=data["timestamp"],
@@ -122,6 +126,7 @@ class AuditEvent:
 # ═══════════════════════════════════════════════════════════════════════════════
 # AUDIT STORAGE
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class AuditStorage:
     """Base class for audit storage backends."""
@@ -153,7 +158,7 @@ class MemoryAuditStorage(AuditStorage):
             self._events.append(event)
             # Trim if over limit
             if len(self._events) > self.max_events:
-                self._events = self._events[-self.max_events:]
+                self._events = self._events[-self.max_events :]
             return True
 
     def query(
@@ -168,11 +173,19 @@ class MemoryAuditStorage(AuditStorage):
         # Apply filters
         if filters:
             if "level" in filters:
-                level = AuditLevel(filters["level"]) if isinstance(filters["level"], str) else filters["level"]
+                level = (
+                    AuditLevel(filters["level"])
+                    if isinstance(filters["level"], str)
+                    else filters["level"]
+                )
                 events = [e for e in events if e.level == level]
 
             if "category" in filters:
-                category = AuditCategory(filters["category"]) if isinstance(filters["category"], str) else filters["category"]
+                category = (
+                    AuditCategory(filters["category"])
+                    if isinstance(filters["category"], str)
+                    else filters["category"]
+                )
                 events = [e for e in events if e.category == category]
 
             if "actor_id" in filters:
@@ -194,7 +207,7 @@ class MemoryAuditStorage(AuditStorage):
         events.sort(key=lambda e: e.timestamp, reverse=True)
 
         # Apply pagination
-        return events[offset:offset + limit]
+        return events[offset : offset + limit]
 
     def count(self, filters: Optional[Dict[str, Any]] = None) -> int:
         """Count matching events."""
@@ -219,13 +232,15 @@ class FileAuditStorage(AuditStorage):
     def _get_current_file(self) -> Path:
         """Get current log file, rotating if needed."""
         if self._current_file is None:
-            self._current_file = self.log_dir / f"audit-{datetime.utcnow().strftime('%Y%m%d')}.jsonl"
+            self._current_file = (
+                self.log_dir / f"audit-{datetime.utcnow().strftime('%Y%m%d')}.jsonl"
+            )
 
         # Check for rotation
         if self._current_file.exists():
             size_mb = self._current_file.stat().st_size / (1024 * 1024)
             if size_mb >= self.rotate_size_mb:
-                timestamp = datetime.utcnow().strftime('%Y%m%d-%H%M%S')
+                timestamp = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
                 self._current_file = self.log_dir / f"audit-{timestamp}.jsonl"
 
         return self._current_file
@@ -234,8 +249,8 @@ class FileAuditStorage(AuditStorage):
         with self._lock:
             try:
                 log_file = self._get_current_file()
-                with open(log_file, 'a') as f:
-                    f.write(event.to_json() + '\n')
+                with open(log_file, "a") as f:
+                    f.write(event.to_json() + "\n")
                 return True
             except Exception as e:
                 logger.error(f"Failed to store audit event: {e}")
@@ -266,11 +281,19 @@ class FileAuditStorage(AuditStorage):
         # Apply filters (same as memory storage)
         if filters:
             if "level" in filters:
-                level = AuditLevel(filters["level"]) if isinstance(filters["level"], str) else filters["level"]
+                level = (
+                    AuditLevel(filters["level"])
+                    if isinstance(filters["level"], str)
+                    else filters["level"]
+                )
                 events = [e for e in events if e.level == level]
 
             if "category" in filters:
-                category = AuditCategory(filters["category"]) if isinstance(filters["category"], str) else filters["category"]
+                category = (
+                    AuditCategory(filters["category"])
+                    if isinstance(filters["category"], str)
+                    else filters["category"]
+                )
                 events = [e for e in events if e.category == category]
 
             if "actor_id" in filters:
@@ -284,12 +307,13 @@ class FileAuditStorage(AuditStorage):
 
         # Sort and paginate
         events.sort(key=lambda e: e.timestamp, reverse=True)
-        return events[offset:offset + limit]
+        return events[offset : offset + limit]
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # AUDIT LOGGER
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class AuditLogger:
     """
@@ -414,10 +438,14 @@ class AuditLogger:
             self._stats["total_events"] += 1
 
             level_key = event.level.value
-            self._stats["events_by_level"][level_key] = self._stats["events_by_level"].get(level_key, 0) + 1
+            self._stats["events_by_level"][level_key] = (
+                self._stats["events_by_level"].get(level_key, 0) + 1
+            )
 
             category_key = event.category.value
-            self._stats["events_by_category"][category_key] = self._stats["events_by_category"].get(category_key, 0) + 1
+            self._stats["events_by_category"][category_key] = (
+                self._stats["events_by_category"].get(category_key, 0) + 1
+            )
 
             if not stored:
                 self._stats["failed_events"] += 1
@@ -609,23 +637,27 @@ class AuditLogger:
 
         for event in events:
             if event.previous_hash != previous_hash:
-                broken_links.append({
-                    "event_id": event.event_id,
-                    "timestamp": event.timestamp,
-                    "expected_previous": previous_hash,
-                    "actual_previous": event.previous_hash,
-                })
+                broken_links.append(
+                    {
+                        "event_id": event.event_id,
+                        "timestamp": event.timestamp,
+                        "expected_previous": previous_hash,
+                        "actual_previous": event.previous_hash,
+                    }
+                )
 
             # Verify event hash
             computed_hash = self._compute_hash(event)
             if event.event_hash != computed_hash:
-                broken_links.append({
-                    "event_id": event.event_id,
-                    "timestamp": event.timestamp,
-                    "issue": "hash_mismatch",
-                    "expected": computed_hash,
-                    "actual": event.event_hash,
-                })
+                broken_links.append(
+                    {
+                        "event_id": event.event_id,
+                        "timestamp": event.timestamp,
+                        "issue": "hash_mismatch",
+                        "expected": computed_hash,
+                        "actual": event.event_hash,
+                    }
+                )
 
             previous_hash = event.event_hash
 

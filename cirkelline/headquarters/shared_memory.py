@@ -36,8 +36,10 @@ logger = logging.getLogger(__name__)
 # MISSION STATUS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class MissionStatus(str, Enum):
     """Status states for missions."""
+
     PENDING = "pending"
     ASSIGNED = "assigned"
     IN_PROGRESS = "in_progress"
@@ -49,6 +51,7 @@ class MissionStatus(str, Enum):
 
 class MissionPriority(str, Enum):
     """Priority levels for missions."""
+
     LOW = "low"
     NORMAL = "normal"
     HIGH = "high"
@@ -59,6 +62,7 @@ class MissionPriority(str, Enum):
 # DATA MODELS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class Mission:
     """
@@ -67,6 +71,7 @@ class Mission:
     Missions are multi-step tasks that may involve multiple agents
     and require state tracking and coordination.
     """
+
     mission_id: str
     title: str
     description: str
@@ -92,7 +97,9 @@ class Mission:
             "title": self.title,
             "description": self.description,
             "status": self.status.value if isinstance(self.status, MissionStatus) else self.status,
-            "priority": self.priority.value if isinstance(self.priority, MissionPriority) else self.priority,
+            "priority": (
+                self.priority.value if isinstance(self.priority, MissionPriority) else self.priority
+            ),
             "assigned_agents": self.assigned_agents,
             "created_by": self.created_by,
             "created_at": self.created_at,
@@ -118,7 +125,11 @@ class Mission:
             title=data["title"],
             description=data.get("description", ""),
             status=MissionStatus(status) if status in [s.value for s in MissionStatus] else status,
-            priority=MissionPriority(priority) if priority in [p.value for p in MissionPriority] else priority,
+            priority=(
+                MissionPriority(priority)
+                if priority in [p.value for p in MissionPriority]
+                else priority
+            ),
             assigned_agents=data.get("assigned_agents", []),
             created_by=data.get("created_by"),
             created_at=data.get("created_at", datetime.utcnow().isoformat()),
@@ -142,6 +153,7 @@ class Roadmap:
     Roadmaps define the sequence of actions and milestones
     required to complete a complex task.
     """
+
     roadmap_id: str
     name: str
     description: str
@@ -188,6 +200,7 @@ class Roadmap:
 @dataclass
 class AgentState:
     """Real-time state of an agent."""
+
     agent_id: str
     status: str = "idle"
     current_mission: Optional[str] = None
@@ -210,6 +223,7 @@ class AgentState:
 # ═══════════════════════════════════════════════════════════════════════════════
 # SHARED MEMORY
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class SharedMemory:
     """
@@ -295,9 +309,12 @@ class SharedMemory:
         key = f"{self.MISSIONS_KEY}:{mission.mission_id}"
 
         if self.is_connected:
-            await self._redis.hset(key, mapping={
-                "data": json.dumps(mission.to_dict()),
-            })
+            await self._redis.hset(
+                key,
+                mapping={
+                    "data": json.dumps(mission.to_dict()),
+                },
+            )
             await self._redis.sadd(f"{self.MISSIONS_KEY}:index", mission.mission_id)
         else:
             self._local_cache[key] = mission.to_dict()
@@ -346,9 +363,12 @@ class SharedMemory:
         key = f"{self.MISSIONS_KEY}:{mission_id}"
 
         if self.is_connected:
-            await self._redis.hset(key, mapping={
-                "data": json.dumps(mission_dict),
-            })
+            await self._redis.hset(
+                key,
+                mapping={
+                    "data": json.dumps(mission_dict),
+                },
+            )
         else:
             self._local_cache[key] = mission_dict
 
@@ -373,14 +393,22 @@ class SharedMemory:
         valid_transitions = {
             MissionStatus.PENDING: [MissionStatus.ASSIGNED, MissionStatus.CANCELLED],
             MissionStatus.ASSIGNED: [MissionStatus.IN_PROGRESS, MissionStatus.CANCELLED],
-            MissionStatus.IN_PROGRESS: [MissionStatus.BLOCKED, MissionStatus.COMPLETED, MissionStatus.FAILED],
+            MissionStatus.IN_PROGRESS: [
+                MissionStatus.BLOCKED,
+                MissionStatus.COMPLETED,
+                MissionStatus.FAILED,
+            ],
             MissionStatus.BLOCKED: [MissionStatus.IN_PROGRESS, MissionStatus.CANCELLED],
             MissionStatus.COMPLETED: [],
             MissionStatus.FAILED: [MissionStatus.PENDING],  # Allow retry
             MissionStatus.CANCELLED: [],
         }
 
-        current = mission.status if isinstance(mission.status, MissionStatus) else MissionStatus(mission.status)
+        current = (
+            mission.status
+            if isinstance(mission.status, MissionStatus)
+            else MissionStatus(mission.status)
+        )
 
         if new_status not in valid_transitions.get(current, []):
             logger.warning(f"Invalid transition: {current} -> {new_status}")
@@ -411,7 +439,11 @@ class SharedMemory:
             for mid in mission_ids:
                 mission = await self.get_mission(mid)
                 if mission:
-                    current = mission.status if isinstance(mission.status, MissionStatus) else MissionStatus(mission.status)
+                    current = (
+                        mission.status
+                        if isinstance(mission.status, MissionStatus)
+                        else MissionStatus(mission.status)
+                    )
                     if current == status:
                         missions.append(mission)
 
@@ -465,9 +497,12 @@ class SharedMemory:
         key = f"{self.ROADMAPS_KEY}:{roadmap.roadmap_id}"
 
         if self.is_connected:
-            await self._redis.hset(key, mapping={
-                "data": json.dumps(roadmap.to_dict()),
-            })
+            await self._redis.hset(
+                key,
+                mapping={
+                    "data": json.dumps(roadmap.to_dict()),
+                },
+            )
             await self._redis.sadd(f"{self.ROADMAPS_KEY}:index", roadmap.roadmap_id)
         else:
             self._local_cache[key] = roadmap.to_dict()
@@ -505,9 +540,12 @@ class SharedMemory:
         key = f"{self.ROADMAPS_KEY}:{roadmap_id}"
 
         if self.is_connected:
-            await self._redis.hset(key, mapping={
-                "data": json.dumps(roadmap_dict),
-            })
+            await self._redis.hset(
+                key,
+                mapping={
+                    "data": json.dumps(roadmap_dict),
+                },
+            )
         else:
             self._local_cache[key] = roadmap_dict
 
@@ -529,10 +567,13 @@ class SharedMemory:
             return None
 
         next_step = roadmap.steps[roadmap.current_step]
-        await self.update_roadmap(roadmap_id, {
-            "current_step": roadmap.current_step + 1,
-            "status": "in_progress",
-        })
+        await self.update_roadmap(
+            roadmap_id,
+            {
+                "current_step": roadmap.current_step + 1,
+                "status": "in_progress",
+            },
+        )
 
         return next_step
 
@@ -545,9 +586,12 @@ class SharedMemory:
         key = f"{self.AGENTS_KEY}:{state.agent_id}"
 
         if self.is_connected:
-            await self._redis.hset(key, mapping={
-                "data": json.dumps(state.to_dict()),
-            })
+            await self._redis.hset(
+                key,
+                mapping={
+                    "data": json.dumps(state.to_dict()),
+                },
+            )
             # Set TTL for auto-cleanup of stale agents
             await self._redis.expire(key, 300)  # 5 minutes
         else:
@@ -610,14 +654,16 @@ class SharedMemory:
                     d = json.loads(data)
                     last_hb = datetime.fromisoformat(d.get("last_heartbeat", "2000-01-01"))
                     if last_hb > cutoff:
-                        agents.append(AgentState(
-                            agent_id=d["agent_id"],
-                            status=d.get("status", "idle"),
-                            current_mission=d.get("current_mission"),
-                            workload=d.get("workload", 0.0),
-                            last_heartbeat=d.get("last_heartbeat", ""),
-                            metrics=d.get("metrics", {}),
-                        ))
+                        agents.append(
+                            AgentState(
+                                agent_id=d["agent_id"],
+                                status=d.get("status", "idle"),
+                                current_mission=d.get("current_mission"),
+                                workload=d.get("workload", 0.0),
+                                last_heartbeat=d.get("last_heartbeat", ""),
+                                metrics=d.get("metrics", {}),
+                            )
+                        )
 
         return agents
 

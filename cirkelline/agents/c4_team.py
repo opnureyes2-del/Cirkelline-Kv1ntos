@@ -38,6 +38,7 @@ try:
     from cirkelline.marketplace.quota import QuotaTier, get_user_quota
     from cirkelline.marketplace.registry import get_registry, list_apis
     from cirkelline.marketplace.usage import get_usage_stats, track_usage
+
     FASE_6_AVAILABLE = True
     logger.info("FASE 6 modules available - C4-Team enabled")
 except ImportError as e:
@@ -48,6 +49,7 @@ except ImportError as e:
 # ═══════════════════════════════════════════════════════════════
 # CUSTOM TOOLS FOR FASE 6 INTEGRATION
 # ═══════════════════════════════════════════════════════════════
+
 
 class AgentLearningTools:
     """
@@ -63,10 +65,7 @@ class AgentLearningTools:
         self.description = "Agent Learning Database integration tools"
 
     async def query_learning_content(
-        self,
-        domain: str = "all",
-        content_type: Optional[str] = None,
-        limit: int = 10
+        self, domain: str = "all", content_type: Optional[str] = None, limit: int = 10
     ) -> Dict[str, Any]:
         """
         Forespørg learning_content fra Agent Learning DB.
@@ -82,11 +81,7 @@ class AgentLearningTools:
         # Simuleret query - i produktion ville dette gå mod PostgreSQL
         return {
             "success": True,
-            "query": {
-                "domain": domain,
-                "content_type": content_type,
-                "limit": limit
-            },
+            "query": {"domain": domain, "content_type": content_type, "limit": limit},
             "results": [
                 {
                     "id": "lc-001",
@@ -94,7 +89,7 @@ class AgentLearningTools:
                     "domain": "technical",
                     "content_type": "article",
                     "created_at": datetime.utcnow().isoformat(),
-                    "relevance_score": 0.95
+                    "relevance_score": 0.95,
                 },
                 {
                     "id": "lc-002",
@@ -102,11 +97,11 @@ class AgentLearningTools:
                     "domain": "legal",
                     "content_type": "document",
                     "created_at": datetime.utcnow().isoformat(),
-                    "relevance_score": 0.88
-                }
+                    "relevance_score": 0.88,
+                },
             ],
             "total_count": 2,
-            "source": "agent_learning_db"
+            "source": "agent_learning_db",
         }
 
     async def track_learning_event(
@@ -115,7 +110,7 @@ class AgentLearningTools:
         agent_id: str,
         content_id: str,
         outcome: str,
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """
         Log en læringsbegivenhed.
@@ -137,7 +132,7 @@ class AgentLearningTools:
             "content_id": content_id,
             "outcome": outcome,
             "metadata": metadata or {},
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
         logger.info(f"Learning event tracked: {event_type} by {agent_id}")
@@ -145,7 +140,7 @@ class AgentLearningTools:
         return {
             "success": True,
             "event": event,
-            "message": "Learning event logged to Agent Learning Database"
+            "message": "Learning event logged to Agent Learning Database",
         }
 
 
@@ -163,10 +158,7 @@ class MultiBibliotekTools:
         self.description = "Multi-Bibliotek integration tools"
 
     async def search_bibliotek(
-        self,
-        query: str,
-        sources: Optional[List[str]] = None,
-        limit: int = 10
+        self, query: str, sources: Optional[List[str]] = None, limit: int = 10
     ) -> Dict[str, Any]:
         """
         Søg på tværs af alle biblioteks-kilder.
@@ -192,7 +184,7 @@ class MultiBibliotekTools:
                         "id": "cl-001",
                         "title": f"Cosmic Library: {query} Guide",
                         "type": "documentation",
-                        "relevance": 0.92
+                        "relevance": 0.92,
                     }
                 ],
                 "notion": [
@@ -200,7 +192,7 @@ class MultiBibliotekTools:
                         "id": "n-001",
                         "title": f"Team Notes: {query}",
                         "type": "workspace_document",
-                        "relevance": 0.85
+                        "relevance": 0.85,
                     }
                 ],
                 "agent_learning": [
@@ -208,23 +200,19 @@ class MultiBibliotekTools:
                         "id": "al-001",
                         "title": f"Learning Pattern: {query}",
                         "type": "pattern",
-                        "relevance": 0.88
+                        "relevance": 0.88,
                     }
-                ]
+                ],
             },
             "total_results": 3,
-            "aggregation_method": "multi_source_federation"
+            "aggregation_method": "multi_source_federation",
         }
 
         logger.info(f"Multi-Bibliotek search: '{query}' across {len(sources)} sources")
 
         return results
 
-    async def get_content(
-        self,
-        content_id: str,
-        source: str
-    ) -> Dict[str, Any]:
+    async def get_content(self, content_id: str, source: str) -> Dict[str, Any]:
         """
         Hent specifikt indhold fra en biblioteks-kilde.
 
@@ -245,9 +233,9 @@ class MultiBibliotekTools:
                 "metadata": {
                     "created_at": datetime.utcnow().isoformat(),
                     "last_modified": datetime.utcnow().isoformat(),
-                    "author": "System"
-                }
-            }
+                    "author": "System",
+                },
+            },
         }
 
 
@@ -264,10 +252,7 @@ class MarketplaceTools:
     def __init__(self):
         self.description = "API Marketplace integration tools"
 
-    async def list_marketplace_apis(
-        self,
-        category: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def list_marketplace_apis(self, category: Optional[str] = None) -> Dict[str, Any]:
         """
         List tilgængelige API'er i marketplace.
 
@@ -284,7 +269,7 @@ class MarketplaceTools:
                 "category": "research",
                 "version": "1.0.0",
                 "rate_limit": 100,
-                "status": "active"
+                "status": "active",
             },
             {
                 "name": "legal-compliance",
@@ -292,7 +277,7 @@ class MarketplaceTools:
                 "category": "legal",
                 "version": "1.0.0",
                 "rate_limit": 50,
-                "status": "active"
+                "status": "active",
             },
             {
                 "name": "content-generator",
@@ -300,8 +285,8 @@ class MarketplaceTools:
                 "category": "content",
                 "version": "2.0.0",
                 "rate_limit": 200,
-                "status": "active"
-            }
+                "status": "active",
+            },
         ]
 
         if category:
@@ -311,7 +296,7 @@ class MarketplaceTools:
             "success": True,
             "apis": apis,
             "total": len(apis),
-            "categories": ["research", "legal", "content", "analytics"]
+            "categories": ["research", "legal", "content", "analytics"],
         }
 
     async def register_api(
@@ -321,7 +306,7 @@ class MarketplaceTools:
         description: str,
         category: str,
         endpoints: List[Dict],
-        rate_limit: int = 100
+        rate_limit: int = 100,
     ) -> Dict[str, Any]:
         """
         Registrer en ny API i marketplace.
@@ -347,14 +332,10 @@ class MarketplaceTools:
             "name": name,
             "display_name": display_name,
             "status": "registered",
-            "message": f"API '{display_name}' registered successfully in marketplace"
+            "message": f"API '{display_name}' registered successfully in marketplace",
         }
 
-    async def check_quota(
-        self,
-        user_id: str,
-        api_name: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def check_quota(self, user_id: str, api_name: Optional[str] = None) -> Dict[str, Any]:
         """
         Tjek quota status for en bruger.
 
@@ -373,10 +354,7 @@ class MarketplaceTools:
             "remaining_today": 9850,
             "rate_limited": False,
             "quota_exceeded": False,
-            "limits": {
-                "requests_per_day": 10000,
-                "requests_per_minute": 100
-            }
+            "limits": {"requests_per_day": 10000, "requests_per_minute": 100},
         }
 
 
@@ -777,6 +755,7 @@ c4_team = Team(
 # VALIDATION HELPER FUNCTIONS
 # ═══════════════════════════════════════════════════════════════
 
+
 async def run_fase_6_validation() -> Dict[str, Any]:
     """
     Kør en komplet FASE 6 validering.
@@ -790,13 +769,13 @@ async def run_fase_6_validation() -> Dict[str, Any]:
         "systems": {
             "agent_learning_db": {"status": "pending"},
             "multi_bibliotek": {"status": "pending"},
-            "api_marketplace": {"status": "pending"}
+            "api_marketplace": {"status": "pending"},
         },
         "patterns": {
             "historiker_kommandant": {"status": "pending"},
-            "bibliotekar_kommandant": {"status": "pending"}
+            "bibliotekar_kommandant": {"status": "pending"},
         },
-        "team_validation": {"status": "pending"}
+        "team_validation": {"status": "pending"},
     }
 
     # Test Agent Learning DB
@@ -805,13 +784,10 @@ async def run_fase_6_validation() -> Dict[str, Any]:
         validation_results["systems"]["agent_learning_db"] = {
             "status": "✓ operational",
             "test": "query_learning_content",
-            "results": result.get("total_count", 0)
+            "results": result.get("total_count", 0),
         }
     except Exception as e:
-        validation_results["systems"]["agent_learning_db"] = {
-            "status": "✗ error",
-            "error": str(e)
-        }
+        validation_results["systems"]["agent_learning_db"] = {"status": "✗ error", "error": str(e)}
 
     # Test Multi-Bibliotek
     try:
@@ -820,13 +796,10 @@ async def run_fase_6_validation() -> Dict[str, Any]:
             "status": "✓ operational",
             "test": "search_bibliotek",
             "sources": result.get("sources_searched", []),
-            "results": result.get("total_results", 0)
+            "results": result.get("total_results", 0),
         }
     except Exception as e:
-        validation_results["systems"]["multi_bibliotek"] = {
-            "status": "✗ error",
-            "error": str(e)
-        }
+        validation_results["systems"]["multi_bibliotek"] = {"status": "✗ error", "error": str(e)}
 
     # Test API Marketplace
     try:
@@ -835,13 +808,10 @@ async def run_fase_6_validation() -> Dict[str, Any]:
             "status": "✓ operational",
             "test": "list_marketplace_apis",
             "apis": result.get("total", 0),
-            "categories": result.get("categories", [])
+            "categories": result.get("categories", []),
         }
     except Exception as e:
-        validation_results["systems"]["api_marketplace"] = {
-            "status": "✗ error",
-            "error": str(e)
-        }
+        validation_results["systems"]["api_marketplace"] = {"status": "✗ error", "error": str(e)}
 
     # Test Historiker-Kommandant Pattern
     try:
@@ -850,17 +820,17 @@ async def run_fase_6_validation() -> Dict[str, Any]:
             agent_id="c4-team",
             content_id="test-001",
             outcome="success",
-            metadata={"fase": "6", "test": "historiker_kommandant"}
+            metadata={"fase": "6", "test": "historiker_kommandant"},
         )
         validation_results["patterns"]["historiker_kommandant"] = {
             "status": "✓ functional",
             "test": "track_learning_event",
-            "event_id": event_result.get("event", {}).get("id")
+            "event_id": event_result.get("event", {}).get("id"),
         }
     except Exception as e:
         validation_results["patterns"]["historiker_kommandant"] = {
             "status": "✗ error",
-            "error": str(e)
+            "error": str(e),
         }
 
     # Test Bibliotekar-Kommandant Pattern
@@ -869,29 +839,25 @@ async def run_fase_6_validation() -> Dict[str, Any]:
         validation_results["patterns"]["bibliotekar_kommandant"] = {
             "status": "✓ functional",
             "test": "get_content",
-            "source": content_result.get("source")
+            "source": content_result.get("source"),
         }
     except Exception as e:
         validation_results["patterns"]["bibliotekar_kommandant"] = {
             "status": "✗ error",
-            "error": str(e)
+            "error": str(e),
         }
 
     # Set overall team validation status
-    all_systems_ok = all(
-        "✓" in s.get("status", "")
-        for s in validation_results["systems"].values()
-    )
+    all_systems_ok = all("✓" in s.get("status", "") for s in validation_results["systems"].values())
     all_patterns_ok = all(
-        "✓" in p.get("status", "")
-        for p in validation_results["patterns"].values()
+        "✓" in p.get("status", "") for p in validation_results["patterns"].values()
     )
 
     validation_results["team_validation"] = {
         "status": "✓ PASSED" if (all_systems_ok and all_patterns_ok) else "⚠ PARTIAL",
         "systems_ok": all_systems_ok,
         "patterns_ok": all_patterns_ok,
-        "c4_team_ready": FASE_6_AVAILABLE
+        "c4_team_ready": FASE_6_AVAILABLE,
     }
 
     return validation_results

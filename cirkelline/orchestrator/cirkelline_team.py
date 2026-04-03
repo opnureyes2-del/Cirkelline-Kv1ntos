@@ -49,9 +49,7 @@ from cirkelline.tools.notion_tools import NotionTools
 
 # Create custom knowledge search tool with permission filtering
 filtered_search_tool = FilteredKnowledgeSearchTool(
-    knowledge_base=knowledge,
-    database=db,
-    admin_ids=ADMIN_USER_IDS
+    knowledge_base=knowledge, database=db, admin_ids=ADMIN_USER_IDS
 )
 
 # Create Notion workspace integration tools
@@ -71,13 +69,37 @@ ckc_tools = get_ckc_tools()
 # v1.2.34.6: Added additional_instructions for aggressive memory capture
 # v1.3.0: Added STANDARD_TOPICS and topic rules for consistency (Memory Optimization Workflow prep)
 STANDARD_TOPICS = [
-    "preferences", "goals", "relationships", "family", "identity",
-    "emotional state", "communication style", "behavioral patterns",
-    "work", "projects", "deadlines", "skills", "expertise",
-    "interests", "hobbies", "sports", "music", "travel",
-    "programming", "ai", "technology", "software", "hardware",
-    "location", "events", "calendar", "history",
-    "legal", "research", "news", "finance",
+    "preferences",
+    "goals",
+    "relationships",
+    "family",
+    "identity",
+    "emotional state",
+    "communication style",
+    "behavioral patterns",
+    "work",
+    "projects",
+    "deadlines",
+    "skills",
+    "expertise",
+    "interests",
+    "hobbies",
+    "sports",
+    "music",
+    "travel",
+    "programming",
+    "ai",
+    "technology",
+    "software",
+    "hardware",
+    "location",
+    "events",
+    "calendar",
+    "history",
+    "legal",
+    "research",
+    "news",
+    "finance",
 ]
 
 memory_manager = MemoryManager(
@@ -128,7 +150,7 @@ TOPIC RULES (CRITICAL - follow these exactly):
 - NEVER use specific details as topics (BAD: "Apollo 11", "Benfica", "pasta carbonara")
 - Use broad categories instead (GOOD: "history", "sports", "cooking")
 - Maximum 3 topics per memory
-"""
+""",
 )
 
 # KERNEMANDAT: Byg tools liste dynamisk baseret på tilgængelige API keys
@@ -140,7 +162,7 @@ _available_tools = [
     UserControlFlowTools(
         instructions="Use get_user_input when you need to gather structured information or clarify requirements before taking action. This allows you to pause execution and ask the user specific questions.",
         add_instructions=True,
-        enable_get_user_input=True
+        enable_get_user_input=True,
     ),
     filtered_search_tool,  # ← Custom knowledge search with permission filtering
     notion_tools,  # ← Notion workspace integration tools
@@ -155,7 +177,9 @@ else:
     logger.warning("⚠️ ExaTools ikke tilgængelig - EXA_API_KEY ikke sat (kun DuckDuckGo)")
 
 if TAVILY_AVAILABLE:
-    _available_tools.insert(3 if EXA_AVAILABLE else 2, TavilyTools(add_instructions=True))  # Deep search
+    _available_tools.insert(
+        3 if EXA_AVAILABLE else 2, TavilyTools(add_instructions=True)
+    )  # Deep search
     logger.info("✅ TavilyTools tilføjet til Cirkelline (TAVILY_API_KEY fundet)")
 else:
     logger.warning("⚠️ TavilyTools ikke tilgængelig - TAVILY_API_KEY ikke sat (kun DuckDuckGo)")
@@ -174,16 +198,14 @@ cirkelline = Team(
         law_team,
     ],
     model=Gemini(id="gemini-2.5-flash"),  # v1.2.24: Using search tools instead of native search
-
     # ═══ CRITICAL AGNO TEAM COORDINATION SETTINGS ═══
     # Note: mode="coordinate" removed - deprecated in AGNO v2 (coordinate is now default)
     # Note: enable_agentic_context removed - deprecated in AGNO v2
-    add_session_state_to_context=True,    # ← 🔥 FIX v1.2.26: Make session_state visible to model
-    share_member_interactions=True,       # ← See nested team outputs
-    show_members_responses=True,          # ← 🔥 CRITICAL: Include specialist responses
-    store_member_responses=True,          # ← 🔥 CRITICAL: Capture all outputs
+    add_session_state_to_context=True,  # ← 🔥 FIX v1.2.26: Make session_state visible to model
+    share_member_interactions=True,  # ← See nested team outputs
+    show_members_responses=True,  # ← 🔥 CRITICAL: Include specialist responses
+    store_member_responses=True,  # ← 🔥 CRITICAL: Capture all outputs
     # ═══════════════════════════════════════════════
-
     tools=_available_tools,  # ✅ KERNEMANDAT: Dynamisk baseret på tilgængelige API keys
     tool_choice="auto",  # ✅ Allow autonomous tool usage including think()
     tool_call_limit=25,  # ✅ v1.2.33: Prevent runaway loops, control costs
@@ -197,29 +219,29 @@ cirkelline = Team(
     # ═══════════════════════════════════════
     # KNOWLEDGE CONFIGURATION - USING CUSTOM TOOL INSTEAD
     # ═══════════════════════════════════════
-    knowledge=knowledge,                              # ← Knowledge base (for document uploads)
-    search_knowledge=False,                          # ← Disable built-in search (use custom tool instead!)
+    knowledge=knowledge,  # ← Knowledge base (for document uploads)
+    search_knowledge=False,  # ← Disable built-in search (use custom tool instead!)
     # v1.2.34.4: Intelligent memory configuration
     # - add_memories_to_context=False: DON'T auto-load all 194 memories
     # - enable_user_memories=True: Still CREATE memories at end of runs
     # - enable_agentic_memory=True: Agent can update memories via tool
     # Agent uses search_memories() tool for intelligent retrieval instead
-    add_memories_to_context=False,        # ✅ v1.2.34.4: DON'T auto-load all memories
-    enable_user_memories=True,            # ✅ v1.2.34.4: Still create memories
-    enable_agentic_memory=True,           # ✅ v1.2.34.4: Agent can update memories
-    enable_session_summaries=True,        # Prevent context overflow
+    add_memories_to_context=False,  # ✅ v1.2.34.4: DON'T auto-load all memories
+    enable_user_memories=True,  # ✅ v1.2.34.4: Still create memories
+    enable_agentic_memory=True,  # ✅ v1.2.34.4: Agent can update memories
+    enable_session_summaries=True,  # Prevent context overflow
     # Note: add_datetime_to_context removed in v1.2.33 - callable instructions already handle user timezone via session_state
     add_history_to_context=True,
-    num_history_runs=3,                   # ✅ v1.2.34: Reduced from 5 (saves ~500 tokens)
+    num_history_runs=3,  # ✅ v1.2.34: Reduced from 5 (saves ~500 tokens)
     search_session_history=True,
-    num_history_sessions=1,               # ✅ v1.2.34: Reduced from 3 (saves ~300 tokens)
-    read_chat_history=True,               # ✅ v1.2.33: Access ANY message from ANY session via get_chat_history() tool
-    compress_tool_results=True,           # ✅ v1.2.34: Compress old tool results after 3 calls (saves context tokens)
+    num_history_sessions=1,  # ✅ v1.2.34: Reduced from 3 (saves ~300 tokens)
+    read_chat_history=True,  # ✅ v1.2.33: Access ANY message from ANY session via get_chat_history() tool
+    compress_tool_results=True,  # ✅ v1.2.34: Compress old tool results after 3 calls (saves context tokens)
     markdown=True,
     # Note: show_members_responses and store_member_responses already defined above in AGNO configuration block
-    store_events=True,                    # ✅ AGNO Official: Retain all run events
-    debug_mode=True,   # Enable detailed logging
-    debug_level=2,     # Verbose debug output
+    store_events=True,  # ✅ AGNO Official: Retain all run events
+    debug_mode=True,  # Enable detailed logging
+    debug_level=2,  # Verbose debug output
 )
 
 # ═══ CRITICAL: Resolve forward reference in session_naming.py ═══

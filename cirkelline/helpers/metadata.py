@@ -15,7 +15,7 @@ def create_document_metadata(
     user_type: str,
     access_level: str = "private",
     shared_by_name: Optional[str] = None,
-    additional_meta: Optional[Dict] = None
+    additional_meta: Optional[Dict] = None,
 ) -> Dict:
     """
     Create metadata for documents uploaded via frontend chat.
@@ -50,11 +50,10 @@ def create_document_metadata(
 
     return metadata
 
+
 # Backward compatibility alias for Phase 1 code
 def create_private_document_metadata(
-    user_id: str,
-    user_type: str,
-    additional_meta: Optional[Dict] = None
+    user_id: str, user_type: str, additional_meta: Optional[Dict] = None
 ) -> Dict:
     """
     Legacy function for backward compatibility.
@@ -64,8 +63,9 @@ def create_private_document_metadata(
         user_id=user_id,
         user_type=user_type,
         access_level="private",
-        additional_meta=additional_meta
+        additional_meta=additional_meta,
     )
+
 
 def get_private_knowledge_filters(user_id: str) -> Dict:
     """
@@ -79,5 +79,6 @@ def get_private_knowledge_filters(user_id: str) -> Dict:
         Filter dict that returns only user's private documents
     """
     return {"user_id": user_id}
+
 
 logger.info("✅ Document metadata helpers loaded")

@@ -22,15 +22,17 @@ from typing import Any, Callable, Dict, List, Optional, TypeVar
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class CacheStrategy(Enum):
     """Cache eviction strategies."""
+
     LRU = "lru"  # Least Recently Used
     LFU = "lfu"  # Least Frequently Used
     FIFO = "fifo"  # First In First Out
@@ -40,6 +42,7 @@ class CacheStrategy(Enum):
 @dataclass
 class CacheEntry:
     """A single cache entry."""
+
     key: str
     value: Any
     created_at: float
@@ -64,6 +67,7 @@ class CacheEntry:
 @dataclass
 class CacheStats:
     """Cache statistics."""
+
     hits: int = 0
     misses: int = 0
     evictions: int = 0
@@ -91,6 +95,7 @@ class CacheStats:
 # ═══════════════════════════════════════════════════════════════════════════════
 # LRU CACHE
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class LRUCache:
     """
@@ -181,10 +186,7 @@ class LRUCache:
     def cleanup_expired(self) -> int:
         """Remove all expired entries."""
         with self._lock:
-            expired_keys = [
-                k for k, v in self._cache.items()
-                if v.is_expired
-            ]
+            expired_keys = [k for k, v in self._cache.items() if v.is_expired]
             for key in expired_keys:
                 del self._cache[key]
                 self._stats.expired += 1
@@ -201,6 +203,7 @@ class LRUCache:
 # ═══════════════════════════════════════════════════════════════════════════════
 # CACHE MANAGER
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class CacheManager:
     """
@@ -337,9 +340,7 @@ class CacheManager:
     ) -> Dict[str, Any]:
         """Get multiple values from cache."""
         return {
-            key: self.get(key, namespace)
-            for key in keys
-            if self.get(key, namespace) is not None
+            key: self.get(key, namespace) for key in keys if self.get(key, namespace) is not None
         }
 
     def mset(
@@ -386,10 +387,7 @@ class CacheManager:
         """Get cache statistics."""
         main_stats = self._cache.stats
 
-        namespace_stats = {
-            name: cache.stats.to_dict()
-            for name, cache in self._namespaces.items()
-        }
+        namespace_stats = {name: cache.stats.to_dict() for name, cache in self._namespaces.items()}
 
         return {
             "main": main_stats.to_dict(),
@@ -403,6 +401,7 @@ class CacheManager:
 # ═══════════════════════════════════════════════════════════════════════════════
 # DECORATOR
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def cached(
     ttl: int = 300,
@@ -422,6 +421,7 @@ def cached(
         def expensive_function(arg1, arg2):
             ...
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -450,6 +450,7 @@ def cached(
             return result
 
         return wrapper
+
     return decorator
 
 
@@ -466,6 +467,7 @@ def cached_async(
         async def expensive_async_function(arg1, arg2):
             ...
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
@@ -493,6 +495,7 @@ def cached_async(
             return result
 
         return wrapper
+
     return decorator
 
 

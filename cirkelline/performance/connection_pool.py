@@ -21,15 +21,17 @@ from typing import Any, Dict, Generic, Optional, TypeVar
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class ConnectionState(Enum):
     """Connection states."""
+
     AVAILABLE = "available"
     IN_USE = "in_use"
     STALE = "stale"
@@ -39,6 +41,7 @@ class ConnectionState(Enum):
 @dataclass
 class PoolConfig:
     """Connection pool configuration."""
+
     min_size: int = 2
     max_size: int = 10
     max_idle_seconds: int = 300  # 5 minutes
@@ -51,6 +54,7 @@ class PoolConfig:
 @dataclass
 class PoolStats:
     """Connection pool statistics."""
+
     total_connections: int = 0
     available_connections: int = 0
     in_use_connections: int = 0
@@ -80,6 +84,7 @@ class PoolStats:
 @dataclass
 class PooledConnection(Generic[T]):
     """A pooled connection wrapper."""
+
     connection: T
     created_at: float = field(default_factory=time.time)
     last_used: float = field(default_factory=time.time)
@@ -109,6 +114,7 @@ class PooledConnection(Generic[T]):
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONNECTION FACTORY
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class ConnectionFactory(ABC, Generic[T]):
     """Abstract factory for creating connections."""
@@ -153,6 +159,7 @@ class DummyConnectionFactory(ConnectionFactory[Dict[str, Any]]):
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONNECTION POOL
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class ConnectionPool(Generic[T]):
     """
@@ -206,14 +213,10 @@ class ConnectionPool(Generic[T]):
                     logger.error(f"Failed to create initial connection: {e}")
 
             # Start health check task
-            self._health_check_task = asyncio.create_task(
-                self._health_check_loop()
-            )
+            self._health_check_task = asyncio.create_task(self._health_check_loop())
 
             self._initialized = True
-            logger.info(
-                f"Connection pool initialized with {self._available.qsize()} connections"
-            )
+            logger.info(f"Connection pool initialized with {self._available.qsize()} connections")
 
     async def close(self) -> None:
         """Close the pool and all connections."""

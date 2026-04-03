@@ -28,8 +28,10 @@ logger = logging.getLogger(__name__)
 # CONTEXT TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class ContextType(str, Enum):
     """Categories of context information."""
+
     GIT = "git"
     USER = "user"
     SESSION = "session"
@@ -41,6 +43,7 @@ class ContextType(str, Enum):
 
 class ContextSource(str, Enum):
     """Where context originates from."""
+
     CLI = "cli"
     WEB = "web"
     API = "api"
@@ -52,9 +55,11 @@ class ContextSource(str, Enum):
 # CONTEXT DATA CLASSES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class GitContext:
     """Git repository context."""
+
     is_git_repo: bool = False
     repo_name: Optional[str] = None
     current_branch: Optional[str] = None
@@ -90,6 +95,7 @@ class GitContext:
 @dataclass
 class UserContext:
     """User session context."""
+
     user_id: Optional[str] = None
     email: Optional[str] = None
     tier: str = "member"
@@ -113,6 +119,7 @@ class UserContext:
 @dataclass
 class SystemContext:
     """System environment context."""
+
     platform: str = ""
     hostname: str = ""
     working_directory: str = ""
@@ -134,6 +141,7 @@ class SystemContext:
 @dataclass
 class AggregatedContext:
     """Combined context from all sources."""
+
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
     source: ContextSource = ContextSource.INTERNAL
     git: Optional[GitContext] = None
@@ -164,7 +172,9 @@ class AggregatedContext:
         if self.git and self.git.is_git_repo:
             git_info = f"Repository: {self.git.repo_name} @ {self.git.current_branch}"
             if self.git.has_changes:
-                git_info += f" (+{self.git.staged_count} staged, ~{self.git.modified_count} modified)"
+                git_info += (
+                    f" (+{self.git.staged_count} staged, ~{self.git.modified_count} modified)"
+                )
             parts.append(git_info)
 
         if self.system:
@@ -181,6 +191,7 @@ class AggregatedContext:
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONTEXT COLLECTOR
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class ContextCollector:
     """
@@ -267,8 +278,7 @@ class ContextCollector:
 
         # Ahead/behind
         upstream = self._run_git_command(
-            ["rev-list", "--left-right", "--count", "@{upstream}...HEAD"],
-            path
+            ["rev-list", "--left-right", "--count", "@{upstream}...HEAD"], path
         )
         if upstream:
             parts = upstream.split()
@@ -327,6 +337,7 @@ class ContextCollector:
                 return []
 
             from cirkelline.headquarters.shared_memory import MissionStatus
+
             missions = await memory.get_missions_by_status(
                 MissionStatus.IN_PROGRESS,
                 limit=limit,

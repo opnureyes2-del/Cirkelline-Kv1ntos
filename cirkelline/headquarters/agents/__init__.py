@@ -30,12 +30,12 @@ from cirkelline.headquarters.agents.scheduler import (
 )
 
 __all__ = [
-    'CoordinatorAgent',
-    'get_coordinator',
-    'MonitorAgent',
-    'get_monitor',
-    'SchedulerAgent',
-    'get_scheduler',
-    'DispatcherAgent',
-    'get_dispatcher',
+    "CoordinatorAgent",
+    "get_coordinator",
+    "MonitorAgent",
+    "get_monitor",
+    "SchedulerAgent",
+    "get_scheduler",
+    "DispatcherAgent",
+    "get_dispatcher",
 ]

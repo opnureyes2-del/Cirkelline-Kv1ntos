@@ -41,6 +41,7 @@ def test_room_creation():
 
     try:
         from cirkelline.ckc.monitors import get_memory_evolution_room
+
         room = get_memory_evolution_room()
 
         print(f"  Room ID: {room.ROOM_ID}")
@@ -65,6 +66,7 @@ def test_room_status():
 
     try:
         from cirkelline.ckc.monitors import get_memory_evolution_room
+
         room = get_memory_evolution_room()
         status = room.get_status()
 
@@ -87,6 +89,7 @@ async def test_room_start_stop():
 
     try:
         from cirkelline.ckc.monitors import get_memory_evolution_room
+
         room = get_memory_evolution_room()
 
         # Start room

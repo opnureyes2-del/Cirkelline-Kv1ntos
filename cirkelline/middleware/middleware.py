@@ -44,8 +44,8 @@ _shared_engine = create_engine(
     pool_size=15,
     max_overflow=25,
     pool_pre_ping=True,  # Verify connections before use
-    pool_recycle=3600,   # Recycle connections after 1 hour
-    echo=False
+    pool_recycle=3600,  # Recycle connections after 1 hour
+    echo=False,
 )
 
 logger.info("Shared database engine created for activity logging")
@@ -53,6 +53,7 @@ logger.info("Shared database engine created for activity logging")
 # ═══════════════════════════════════════════════════════════════
 # UNIVERSAL ACTIVITY LOGGING FUNCTION
 # ═══════════════════════════════════════════════════════════════
+
 
 async def log_activity(
     request: Request,
@@ -68,7 +69,7 @@ async def log_activity(
     target_resource_id: Optional[str] = None,
     resource_type: Optional[str] = None,
     details: Optional[Dict[str, Any]] = None,
-    is_admin: bool = False
+    is_admin: bool = False,
 ):
     """
     Universal activity logging function.
@@ -94,27 +95,27 @@ async def log_activity(
         # Extract request information
         endpoint = endpoint or str(request.url.path)
         ip_address = request.client.host if request.client else None
-        user_agent = request.headers.get('user-agent', '')
+        user_agent = request.headers.get("user-agent", "")
 
         # Prepare log entry
         log_entry = {
-            'user_id': user_id,
-            'action_type': action_type,
-            'endpoint': endpoint,
-            'http_method': request.method,
-            'status_code': status_code,
-            'success': success,
-            'error_message': error_message,
-            'error_type': error_type,
-            'target_user_id': target_user_id,
-            'target_resource_id': target_resource_id,
-            'resource_type': resource_type,
-            'details': json.dumps(details) if details else None,
-            'duration_ms': duration_ms,
-            'ip_address': ip_address,
-            'user_agent': user_agent[:500] if user_agent else None,  # Truncate long user agents
-            'is_admin': is_admin,
-            'timestamp': datetime.utcnow()
+            "user_id": user_id,
+            "action_type": action_type,
+            "endpoint": endpoint,
+            "http_method": request.method,
+            "status_code": status_code,
+            "success": success,
+            "error_message": error_message,
+            "error_type": error_type,
+            "target_user_id": target_user_id,
+            "target_resource_id": target_resource_id,
+            "resource_type": resource_type,
+            "details": json.dumps(details) if details else None,
+            "duration_ms": duration_ms,
+            "ip_address": ip_address,
+            "user_agent": user_agent[:500] if user_agent else None,  # Truncate long user agents
+            "is_admin": is_admin,
+            "timestamp": datetime.utcnow(),
         }
 
         # Insert to database (synchronous operations in async function - not ideal but works)
@@ -133,7 +134,7 @@ async def log_activity(
                      :user_agent, :is_admin, :timestamp)
                     RETURNING id, timestamp
                 """),
-                log_entry
+                log_entry,
             )
             session.commit()
 
@@ -150,20 +151,24 @@ async def log_activity(
                 from my_os import broadcast_activity_log
 
                 # Broadcast to all connected SSE clients (don't wait for it)
-                asyncio.create_task(broadcast_activity_log({
-                    'id': log_id,
-                    'timestamp': int(log_timestamp.timestamp()),
-                    'user_id': user_id,
-                    'action_type': action_type,
-                    'endpoint': endpoint or str(request.url.path),
-                    'http_method': request.method,
-                    'status_code': status_code,
-                    'success': success,
-                    'error_message': error_message,
-                    'duration_ms': duration_ms,
-                    'ip_address': ip_address,
-                    'is_admin': is_admin
-                }))
+                asyncio.create_task(
+                    broadcast_activity_log(
+                        {
+                            "id": log_id,
+                            "timestamp": int(log_timestamp.timestamp()),
+                            "user_id": user_id,
+                            "action_type": action_type,
+                            "endpoint": endpoint or str(request.url.path),
+                            "http_method": request.method,
+                            "status_code": status_code,
+                            "success": success,
+                            "error_message": error_message,
+                            "duration_ms": duration_ms,
+                            "ip_address": ip_address,
+                            "is_admin": is_admin,
+                        }
+                    )
+                )
             except ImportError:
                 # broadcast_activity_log not available yet - skip broadcasting
                 pass
@@ -172,20 +177,24 @@ async def log_activity(
         # Don't let logging errors break the application
         logger.error(f"Failed to log activity: {e}")
         import traceback
+
         logger.error(f"Traceback: {traceback.format_exc()}")
+
 
 # ═══════════════════════════════════════════════════════════════
 # ANONYMOUS USER MIDDLEWARE
 # ═══════════════════════════════════════════════════════════════
+
 
 class AnonymousUserMiddleware(BaseHTTPMiddleware):
     """
     Ensures anonymous users get default profile values.
     Sets defaults in request.state.dependencies dict before JWT Middleware runs.
     """
+
     async def dispatch(self, request: StarletteRequest, call_next):
         # Initialize dependencies dict if it doesn't exist
-        if not hasattr(request.state, 'dependencies'):
+        if not hasattr(request.state, "dependencies"):
             request.state.dependencies = {}
 
         # Set default values for anonymous users
@@ -198,15 +207,18 @@ class AnonymousUserMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
+
 # ═══════════════════════════════════════════════════════════════
 # SESSION LOGGING MIDDLEWARE
 # ═══════════════════════════════════════════════════════════════
+
 
 class SessionLoggingMiddleware(BaseHTTPMiddleware):
     """
     Intercepts session-related AGNO requests and logs them as activity.
     Handles: DELETE /sessions/{session_id}, POST /sessions/{session_id}/rename
     """
+
     async def dispatch(self, request: StarletteRequest, call_next):
         import json
         import re
@@ -222,13 +234,13 @@ class SessionLoggingMiddleware(BaseHTTPMiddleware):
 
         # Pattern 1: DELETE /sessions/{session_id}
         if request.method == "DELETE":
-            match1 = re.match(r'^/sessions/([^/]+)$', path)
+            match1 = re.match(r"^/sessions/([^/]+)$", path)
             if match1:
                 is_session_delete = True
                 session_id = match1.group(1)
 
             # Pattern 2: DELETE /v1/teams/{team_id}/sessions/{session_id}
-            match2 = re.match(r'^/v1/teams/([^/]+)/sessions/([^/]+)$', path)
+            match2 = re.match(r"^/v1/teams/([^/]+)/sessions/([^/]+)$", path)
             if match2:
                 is_session_delete = True
                 team_id = match2.group(1)
@@ -236,7 +248,7 @@ class SessionLoggingMiddleware(BaseHTTPMiddleware):
 
         # Pattern 3: POST /sessions/{session_id}/rename
         elif request.method == "POST":
-            match3 = re.match(r'^/sessions/([^/]+)/rename$', path)
+            match3 = re.match(r"^/sessions/([^/]+)/rename$", path)
             if match3:
                 is_session_rename = True
                 session_id = match3.group(1)
@@ -248,10 +260,11 @@ class SessionLoggingMiddleware(BaseHTTPMiddleware):
                         # Store body for the actual endpoint to use
                         async def receive():
                             return {"type": "http.request", "body": body}
+
                         request._receive = receive
 
                         body_json = json.loads(body.decode())
-                        new_name = body_json.get('name') or body_json.get('title')
+                        new_name = body_json.get("name") or body_json.get("title")
                 except Exception as e:
                     logger.warning(f"Could not extract session name from request body: {e}")
 
@@ -261,19 +274,19 @@ class SessionLoggingMiddleware(BaseHTTPMiddleware):
         # Log activity AFTER response completes
         try:
             if (is_session_delete or is_session_rename) and session_id:
-                user_id = getattr(request.state, 'user_id', 'anonymous')
-                is_admin = getattr(request.state, 'is_admin', False)
+                user_id = getattr(request.state, "user_id", "anonymous")
+                is_admin = getattr(request.state, "is_admin", False)
 
                 if is_session_delete:
                     # Extract db_id from query parameters if present
                     query_params = dict(request.query_params)
-                    db_id = query_params.get('db_id')
+                    db_id = query_params.get("db_id")
 
                     details = {}
                     if db_id:
-                        details['db_id'] = db_id
+                        details["db_id"] = db_id
                     if team_id:
-                        details['team_id'] = team_id
+                        details["team_id"] = team_id
 
                     await log_activity(
                         request=request,
@@ -284,14 +297,16 @@ class SessionLoggingMiddleware(BaseHTTPMiddleware):
                         target_resource_id=session_id,
                         resource_type="session",
                         details=details if details else None,
-                        is_admin=is_admin
+                        is_admin=is_admin,
                     )
-                    logger.info(f"✅ Session delete logged: {session_id} (user: {user_id[:20]}..., status: {response.status_code})")
+                    logger.info(
+                        f"✅ Session delete logged: {session_id} (user: {user_id[:20]}..., status: {response.status_code})"
+                    )
 
                 elif is_session_rename:
                     details = {}
                     if new_name:
-                        details['new_name'] = new_name
+                        details["new_name"] = new_name
 
                     await log_activity(
                         request=request,
@@ -302,24 +317,29 @@ class SessionLoggingMiddleware(BaseHTTPMiddleware):
                         target_resource_id=session_id,
                         resource_type="session",
                         details=details if details else None,
-                        is_admin=is_admin
+                        is_admin=is_admin,
                     )
-                    logger.info(f"✅ Session rename logged: {session_id} (user: {user_id[:20]}..., status: {response.status_code})")
+                    logger.info(
+                        f"✅ Session rename logged: {session_id} (user: {user_id[:20]}..., status: {response.status_code})"
+                    )
 
         except Exception as e:
             logger.error(f"❌ Error logging session activity: {e}")
 
         return response
 
+
 # ═══════════════════════════════════════════════════════════════
 # SESSIONS DATE FILTER MIDDLEWARE
 # ═══════════════════════════════════════════════════════════════
+
 
 class SessionsDateFilterMiddleware(BaseHTTPMiddleware):
     """
     Intercepts GET /sessions requests with created_after/created_before parameters
     and executes custom date filtering logic before AGNO's endpoint is reached.
     """
+
     async def dispatch(self, request: StarletteRequest, call_next):
 
         # Only intercept GET /sessions with date filters
@@ -328,7 +348,9 @@ class SessionsDateFilterMiddleware(BaseHTTPMiddleware):
 
             # Check if date filters are present
             if "created_after" in query_params or "created_before" in query_params:
-                logger.info(f"🚀 SessionsDateFilterMiddleware: Intercepting /sessions with date filters: {query_params}")
+                logger.info(
+                    f"🚀 SessionsDateFilterMiddleware: Intercepting /sessions with date filters: {query_params}"
+                )
 
                 try:
                     import math
@@ -337,39 +359,35 @@ class SessionsDateFilterMiddleware(BaseHTTPMiddleware):
                     from sqlalchemy.orm import Session
 
                     # Get user_id from JWT token in Authorization header
-                    auth_header = request.headers.get('Authorization')
+                    auth_header = request.headers.get("Authorization")
 
-                    if not auth_header or not auth_header.startswith('Bearer '):
+                    if not auth_header or not auth_header.startswith("Bearer "):
                         return JSONResponse(
-                            status_code=401,
-                            content={"error": "Unauthorized - No JWT token"}
+                            status_code=401, content={"error": "Unauthorized - No JWT token"}
                         )
 
-                    jwt_token = auth_header.replace('Bearer ', '')
+                    jwt_token = auth_header.replace("Bearer ", "")
 
                     try:
                         # Decode JWT token to get user_id
                         decoded = pyjwt.decode(
-                            jwt_token,
-                            os.getenv('JWT_SECRET_KEY'),
-                            algorithms=['HS256']
+                            jwt_token, os.getenv("JWT_SECRET_KEY"), algorithms=["HS256"]
                         )
-                        user_id = decoded.get('user_id')
+                        user_id = decoded.get("user_id")
 
                         if not user_id:
                             return JSONResponse(
                                 status_code=401,
-                                content={"error": "Unauthorized - No user_id in token"}
+                                content={"error": "Unauthorized - No user_id in token"},
                             )
                     except Exception as e:
                         logger.error(f"❌ JWT decode error: {str(e)}")
                         return JSONResponse(
-                            status_code=401,
-                            content={"error": "Unauthorized - Invalid token"}
+                            status_code=401, content={"error": "Unauthorized - Invalid token"}
                         )
 
                     # Database connection
-                    database_url = os.getenv('DATABASE_URL')
+                    database_url = os.getenv("DATABASE_URL")
                     engine = create_engine(database_url)
 
                     with Session(engine) as session:
@@ -439,45 +457,49 @@ class SessionsDateFilterMiddleware(BaseHTTPMiddleware):
                         result = session.execute(text(query), params)
                         sessions = []
                         for row in result:
-                            sessions.append({
-                                "session_id": row[0],
-                                "session_type": row[1],
-                                "agent_id": row[2],
-                                "team_id": row[3],
-                                "workflow_id": row[4],
-                                "user_id": row[5],
-                                "session_data": row[6],
-                                "agent_data": row[7],
-                                "team_data": row[8],
-                                "workflow_data": row[9],
-                                "metadata": row[10],
-                                "runs": row[11],
-                                "summary": row[12],
-                                "created_at": row[13],
-                                "updated_at": row[14]
-                            })
+                            sessions.append(
+                                {
+                                    "session_id": row[0],
+                                    "session_type": row[1],
+                                    "agent_id": row[2],
+                                    "team_id": row[3],
+                                    "workflow_id": row[4],
+                                    "user_id": row[5],
+                                    "session_data": row[6],
+                                    "agent_data": row[7],
+                                    "team_data": row[8],
+                                    "workflow_data": row[9],
+                                    "metadata": row[10],
+                                    "runs": row[11],
+                                    "summary": row[12],
+                                    "created_at": row[13],
+                                    "updated_at": row[14],
+                                }
+                            )
 
                         total_pages = math.ceil(total_count / limit)
 
                         logger.info(f"✅ Filtered sessions: {len(sessions)} results")
 
-                        return JSONResponse({
-                            "data": sessions,
-                            "meta": {
-                                "page": page,
-                                "limit": limit,
-                                "total_count": total_count,
-                                "total_pages": total_pages
+                        return JSONResponse(
+                            {
+                                "data": sessions,
+                                "meta": {
+                                    "page": page,
+                                    "limit": limit,
+                                    "total_count": total_count,
+                                    "total_pages": total_pages,
+                                },
                             }
-                        })
+                        )
 
                 except Exception as e:
                     logger.error(f"❌ Error in SessionsDateFilterMiddleware: {str(e)}")
                     import traceback
+
                     traceback.print_exc()
                     return JSONResponse(
-                        status_code=500,
-                        content={"error": f"Failed to filter sessions: {str(e)}"}
+                        status_code=500, content={"error": f"Failed to filter sessions: {str(e)}"}
                     )
 
         # Pass through to next middleware/handler
@@ -489,6 +511,7 @@ logger.info("✅ Middleware module loaded")
 # ═══════════════════════════════════════════════════════════════
 # RBAC GATEWAY MIDDLEWARE
 # ═══════════════════════════════════════════════════════════════
+
 
 class RBACGatewayMiddleware(BaseHTTPMiddleware):
     """
@@ -510,15 +533,12 @@ class RBACGatewayMiddleware(BaseHTTPMiddleware):
         "/teams/cirkelline/runs": "chat:basic",
         "/teams/research-team/runs": "team:research",
         "/teams/law-team/runs": "team:legal",
-
         # Deep research endpoints
         "/api/deep-research": "deep_research:enable",
-
         # Premium features
         "/api/export/data": "data:export",
         "/api/custom/agents": "agent:custom",
         "/api/custom/teams": "team:custom",
-
         # Search tool endpoints (if direct access)
         "/api/search/exa": "search:exa",
         "/api/search/tavily": "search:tavily",
@@ -552,9 +572,9 @@ class RBACGatewayMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         # Get user context from request state
-        user_id = getattr(request.state, 'user_id', None)
-        tier_slug = getattr(request.state, 'tier_slug', 'member')
-        is_admin = getattr(request.state, 'is_admin', False)
+        user_id = getattr(request.state, "user_id", None)
+        tier_slug = getattr(request.state, "tier_slug", "member")
+        is_admin = getattr(request.state, "is_admin", False)
 
         # Anonymous users default to member tier for public endpoints
         if not user_id:
@@ -610,7 +630,7 @@ class RBACGatewayMiddleware(BaseHTTPMiddleware):
                                 "user_tier": tier_slug,
                                 "required_tier": min_tier,
                             },
-                            is_admin=is_admin
+                            is_admin=is_admin,
                         )
 
                         return JSONResponse(
@@ -620,14 +640,13 @@ class RBACGatewayMiddleware(BaseHTTPMiddleware):
                                 "message": f"This feature requires {TIER_NAMES.get(min_tier, min_tier)} tier or higher",
                                 "required_tier": min_tier,
                                 "current_tier": tier_slug,
-                                "upgrade_url": "https://cirkelline.com/pricing"
-                            }
+                                "upgrade_url": "https://cirkelline.com/pricing",
+                            },
                         )
 
                     # Access granted - log success
                     logger.debug(
-                        f"RBAC ALLOW: user={user_id[:20]}... tier={tier_slug} "
-                        f"endpoint={path}"
+                        f"RBAC ALLOW: user={user_id[:20]}... tier={tier_slug} " f"endpoint={path}"
                     )
 
             except ImportError as e:
@@ -643,6 +662,7 @@ class RBACGatewayMiddleware(BaseHTTPMiddleware):
 # ═══════════════════════════════════════════════════════════════
 # AUDIT TRAIL MIDDLEWARE (LAW TEAM COMPLIANCE)
 # ═══════════════════════════════════════════════════════════════
+
 
 class AuditTrailMiddleware(BaseHTTPMiddleware):
     """
@@ -680,26 +700,20 @@ class AuditTrailMiddleware(BaseHTTPMiddleware):
         ("/api/auth/login", "auth_login"),
         ("/api/auth/logout", "auth_logout"),
         ("/api/auth/signup", "auth_signup"),
-
         # User data operations
         ("/api/user/profile", "user_profile_access"),
         ("/api/user/preferences", "user_preferences_access"),
         ("/api/user/delete", "user_delete"),
-
         # Document/Knowledge operations
         ("/api/knowledge/upload", "document_upload"),
         ("/api/knowledge/delete", "document_delete"),
-
         # Memory operations (personal data)
         ("/api/memories", "memories_access"),
-
         # Admin operations
         ("/admin/users", "admin_users"),
         ("/admin/subscriptions", "admin_subscriptions"),
-
         # Data export (GDPR right to portability)
         ("/api/export", "data_export"),
-
         # Legal team operations
         ("/teams/law-team/runs", "legal_consultation"),
     ]
@@ -721,7 +735,7 @@ class AuditTrailMiddleware(BaseHTTPMiddleware):
         request_id = str(uuid.uuid4())[:12]
 
         # Store request_id in state for downstream use
-        if not hasattr(request.state, 'request_id'):
+        if not hasattr(request.state, "request_id"):
             request.state.request_id = request_id
 
         # Check if this endpoint requires audit trail
@@ -743,11 +757,11 @@ class AuditTrailMiddleware(BaseHTTPMiddleware):
         # Log audit trail if required
         if audit_action:
             try:
-                user_id = getattr(request.state, 'user_id', 'anonymous')
-                is_admin = getattr(request.state, 'is_admin', False)
-                tier_slug = getattr(request.state, 'tier_slug', 'unknown')
-                ip_address = request.client.host if request.client else 'unknown'
-                user_agent = request.headers.get('user-agent', '')[:200]
+                user_id = getattr(request.state, "user_id", "anonymous")
+                is_admin = getattr(request.state, "is_admin", False)
+                tier_slug = getattr(request.state, "tier_slug", "unknown")
+                ip_address = request.client.host if request.client else "unknown"
+                user_agent = request.headers.get("user-agent", "")[:200]
 
                 # Build audit log entry
                 audit_entry = {
@@ -768,7 +782,9 @@ class AuditTrailMiddleware(BaseHTTPMiddleware):
                     duration_ms=duration_ms,
                     details=audit_entry,
                     is_admin=is_admin,
-                    resource_type=audit_action.split('_')[0] if '_' in audit_action else audit_action,
+                    resource_type=(
+                        audit_action.split("_")[0] if "_" in audit_action else audit_action
+                    ),
                 )
 
                 # Also log to separate audit table for compliance
@@ -777,7 +793,9 @@ class AuditTrailMiddleware(BaseHTTPMiddleware):
                     timestamp=datetime.utcnow(),
                     user_id=user_id,
                     action=audit_action,
-                    resource_type=audit_action.split('_')[0] if '_' in audit_action else audit_action,
+                    resource_type=(
+                        audit_action.split("_")[0] if "_" in audit_action else audit_action
+                    ),
                     endpoint=path,
                     method=method,
                     status_code=response.status_code,
@@ -822,15 +840,13 @@ class AuditTrailMiddleware(BaseHTTPMiddleware):
             with Session(_shared_engine) as session:
                 # Check if audit_compliance_logs table exists
                 # If not, log to activity_logs with audit flag
-                result = session.execute(
-                    text("""
+                result = session.execute(text("""
                         SELECT EXISTS (
                             SELECT FROM information_schema.tables
                             WHERE table_schema = 'ai'
                             AND table_name = 'audit_compliance_logs'
                         )
-                    """)
-                )
+                    """))
                 table_exists = result.scalar()
 
                 if table_exists:
@@ -859,7 +875,7 @@ class AuditTrailMiddleware(BaseHTTPMiddleware):
                             "duration_ms": duration_ms,
                             "tier": tier,
                             "is_admin": is_admin,
-                        }
+                        },
                     )
                     session.commit()
                 else:
@@ -921,11 +937,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     # Stricter limits for expensive endpoints (requests per minute)
     EXPENSIVE_ENDPOINTS = {
-        "/teams/cirkelline/runs": 20,      # Chat - expensive
-        "/teams/research-team/runs": 10,   # Deep research - very expensive
-        "/teams/law-team/runs": 10,        # Legal team - expensive
-        "/api/knowledge/upload": 10,       # File upload
-        "/api/deep-research": 5,           # Deep research toggle
+        "/teams/cirkelline/runs": 20,  # Chat - expensive
+        "/teams/research-team/runs": 10,  # Deep research - very expensive
+        "/teams/law-team/runs": 10,  # Legal team - expensive
+        "/api/knowledge/upload": 10,  # File upload
+        "/api/deep-research": 5,  # Deep research toggle
     }
 
     def __init__(self, app, window_seconds: int = 60):
@@ -970,8 +986,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         with self.lock:
             # Clean old requests
             self.request_counts[client_key] = [
-                t for t in self.request_counts[client_key]
-                if t > window_start
+                t for t in self.request_counts[client_key] if t > window_start
             ]
 
             request_count = len(self.request_counts[client_key])
@@ -979,7 +994,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
             if request_count >= limit:
                 # Calculate reset time
-                oldest_request = min(self.request_counts[client_key]) if self.request_counts[client_key] else current_time
+                oldest_request = (
+                    min(self.request_counts[client_key])
+                    if self.request_counts[client_key]
+                    else current_time
+                )
                 reset_seconds = int(oldest_request + self.window_seconds - current_time)
                 return True, 0, max(1, reset_seconds)
 
@@ -1001,9 +1020,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         # Get user context
-        user_id = getattr(request.state, 'user_id', None)
-        tier_slug = getattr(request.state, 'tier_slug', 'anonymous')
-        is_admin = getattr(request.state, 'is_admin', False)
+        user_id = getattr(request.state, "user_id", None)
+        tier_slug = getattr(request.state, "tier_slug", "anonymous")
+        is_admin = getattr(request.state, "is_admin", False)
 
         # Get client key and rate limit
         client_key = self._get_client_key(request, user_id)
@@ -1013,9 +1032,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         is_limited, remaining, reset_seconds = self._is_rate_limited(client_key, rate_limit)
 
         if is_limited:
-            logger.warning(
-                f"RATE LIMIT: {client_key} exceeded {rate_limit}/min on {path}"
-            )
+            logger.warning(f"RATE LIMIT: {client_key} exceeded {rate_limit}/min on {path}")
 
             # Log the rate limit event
             if user_id:
@@ -1031,7 +1048,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                         "window_seconds": self.window_seconds,
                         "tier": tier_slug,
                     },
-                    is_admin=is_admin
+                    is_admin=is_admin,
                 )
 
             return JSONResponse(
@@ -1048,7 +1065,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "X-RateLimit-Remaining": "0",
                     "X-RateLimit-Reset": str(reset_seconds),
                     "Retry-After": str(reset_seconds),
-                }
+                },
             )
 
         # Process request and add rate limit headers

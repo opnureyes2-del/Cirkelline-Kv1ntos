@@ -38,9 +38,7 @@ async def get_landing_stats():
     try:
         with db.get_session() as session:
             # User counts
-            row = session.execute(
-                db.text("SELECT COUNT(*) as total FROM users")
-            ).fetchone()
+            row = session.execute(db.text("SELECT COUNT(*) as total FROM users")).fetchone()
             if row:
                 stats["users"]["total"] = row[0]
 
@@ -59,16 +57,12 @@ async def get_landing_stats():
     try:
         with db.get_session() as session:
             # Agent counts
-            row = session.execute(
-                db.text("SELECT COUNT(*) FROM agents")
-            ).fetchone()
+            row = session.execute(db.text("SELECT COUNT(*) FROM agents")).fetchone()
             if row:
                 stats["agents"]["total"] = row[0]
 
             row = session.execute(
-                db.text(
-                    "SELECT COUNT(*) FROM agents WHERE status = 'graduated'"
-                )
+                db.text("SELECT COUNT(*) FROM agents WHERE status = 'graduated'")
             ).fetchone()
             if row:
                 stats["agents"]["graduated"] = row[0]
@@ -80,6 +74,7 @@ async def get_landing_stats():
         # Training room stats from Cosmic (port 7778)
         import json
         import urllib.request
+
         req = urllib.request.Request(
             "http://localhost:7778/api/training-rooms",
             headers={"Accept": "application/json"},
@@ -99,9 +94,7 @@ async def get_landing_stats():
             # Knowledge
             for table in ["documents", "knowledge_domains"]:
                 try:
-                    row = session.execute(
-                        db.text(f"SELECT COUNT(*) FROM {table}")
-                    ).fetchone()
+                    row = session.execute(db.text(f"SELECT COUNT(*) FROM {table}")).fetchone()
                     if row:
                         key = "documents" if table == "documents" else "domains"
                         stats["knowledge"][key] = row[0]

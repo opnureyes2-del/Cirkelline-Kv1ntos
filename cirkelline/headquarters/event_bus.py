@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 # EVENT TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class EventType(str, Enum):
     """Categories of events in the system."""
 
@@ -75,6 +76,7 @@ class EventType(str, Enum):
 # EVENT DATA CLASS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class Event:
     """
@@ -89,6 +91,7 @@ class Event:
         correlation_id: For tracking related events
         priority: 0=low, 1=normal, 2=high, 3=critical
     """
+
     event_type: EventType
     source: str
     payload: Dict[str, Any] = field(default_factory=dict)
@@ -100,7 +103,9 @@ class Event:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for Redis storage."""
         return {
-            "event_type": self.event_type.value if isinstance(self.event_type, EventType) else self.event_type,
+            "event_type": (
+                self.event_type.value if isinstance(self.event_type, EventType) else self.event_type
+            ),
             "source": self.source,
             "payload": json.dumps(self.payload),
             "event_id": self.event_id,
@@ -113,9 +118,15 @@ class Event:
     def from_dict(cls, data: Dict[str, Any]) -> "Event":
         """Reconstruct from Redis data."""
         return cls(
-            event_type=EventType(data["event_type"]) if data["event_type"] in [e.value for e in EventType] else data["event_type"],
+            event_type=(
+                EventType(data["event_type"])
+                if data["event_type"] in [e.value for e in EventType]
+                else data["event_type"]
+            ),
             source=data["source"],
-            payload=json.loads(data["payload"]) if isinstance(data["payload"], str) else data["payload"],
+            payload=(
+                json.loads(data["payload"]) if isinstance(data["payload"], str) else data["payload"]
+            ),
             event_id=data["event_id"],
             timestamp=data["timestamp"],
             correlation_id=data["correlation_id"] if data.get("correlation_id") else None,
@@ -133,6 +144,7 @@ EventHandler = Callable[[Event], Awaitable[None]]
 # ═══════════════════════════════════════════════════════════════════════════════
 # EVENT BUS
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class EventBus:
     """
@@ -362,7 +374,9 @@ class EventBus:
 
     async def _dispatch(self, event: Event) -> None:
         """Dispatch event to matching handlers."""
-        event_key = event.event_type.value if isinstance(event.event_type, EventType) else event.event_type
+        event_key = (
+            event.event_type.value if isinstance(event.event_type, EventType) else event.event_type
+        )
 
         # Direct type match
         handlers = self._handlers.get(event_key, [])

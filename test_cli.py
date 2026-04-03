@@ -35,10 +35,15 @@ from datetime import datetime
 parser = argparse.ArgumentParser(description="Cirkelline CLI Testing Tool")
 parser.add_argument("--deep-research", action="store_true", help="Enable Deep Research mode")
 parser.add_argument("--debug", action="store_true", help="Enable debug output")
-parser.add_argument("--user-id", type=str, default="ee461076-8cbb-4626-947b-956f293cf7bf",
-                    help="User ID for knowledge filtering (default: Ivo's ID)")
-parser.add_argument("--session-id", type=str, default=None,
-                    help="Session ID to continue a previous conversation")
+parser.add_argument(
+    "--user-id",
+    type=str,
+    default="ee461076-8cbb-4626-947b-956f293cf7bf",
+    help="User ID for knowledge filtering (default: Ivo's ID)",
+)
+parser.add_argument(
+    "--session-id", type=str, default=None, help="Session ID to continue a previous conversation"
+)
 args = parser.parse_args()
 
 # Now import Cirkelline (this loads all the heavy stuff)
@@ -64,7 +69,7 @@ def get_user_info(user_id: str) -> dict:
                     LEFT JOIN admin_profiles ap ON u.id = ap.user_id
                     WHERE u.id = :user_id
                 """),
-                {"user_id": user_id}
+                {"user_id": user_id},
             ).fetchone()
 
             if result:
@@ -77,7 +82,7 @@ def get_user_info(user_id: str) -> dict:
                     "name": name,
                     "role": role,
                     "email": email,
-                    "is_admin": result[2] is not None
+                    "is_admin": result[2] is not None,
                 }
     except Exception as e:
         logger.warning(f"Failed to load user info: {e}")
@@ -112,13 +117,13 @@ def main():
     # - Callable instructions (reads from agent.session_state)
     session_state = {
         "current_user_id": args.user_id,
-        "current_user_type": "Admin" if user_info['is_admin'] else "Regular",
-        "current_user_name": user_info['name'],
-        "current_tier_slug": "elite" if user_info['is_admin'] else "member",
-        "current_tier_level": 5 if user_info['is_admin'] else 1,
+        "current_user_type": "Admin" if user_info["is_admin"] else "Regular",
+        "current_user_name": user_info["name"],
+        "current_tier_slug": "elite" if user_info["is_admin"] else "member",
+        "current_tier_level": 5 if user_info["is_admin"] else 1,
         "deep_research": args.deep_research,
         "current_user_timezone": "UTC",
-        "current_user_datetime": datetime.now().strftime('%A, %B %d, %Y at %H:%M'),
+        "current_user_datetime": datetime.now().strftime("%A, %B %d, %Y at %H:%M"),
     }
 
     # CRITICAL WORKAROUND: Manually set session_state on the team
@@ -138,8 +143,9 @@ def main():
     if args.deep_research:
         original_tools = cirkelline.tools.copy() if cirkelline.tools else []
         cirkelline.tools = [
-            tool for tool in cirkelline.tools
-            if tool.__class__.__name__ not in ['ExaTools', 'TavilyTools']
+            tool
+            for tool in cirkelline.tools
+            if tool.__class__.__name__ not in ["ExaTools", "TavilyTools"]
         ]
         print("Deep Research Mode: Removed ExaTools and TavilyTools")
         print(f"Remaining tools: {[tool.__class__.__name__ for tool in cirkelline.tools]}")
@@ -149,8 +155,8 @@ def main():
     cli_kwargs = {
         "stream": True,
         "markdown": True,
-        "user": user_info['name'],
-        "emoji": "👨‍💻" if user_info['is_admin'] else "👤",
+        "user": user_info["name"],
+        "emoji": "👨‍💻" if user_info["is_admin"] else "👤",
         "exit_on": ["exit", "quit", "bye", "q"],
     }
 

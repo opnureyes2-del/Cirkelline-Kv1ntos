@@ -42,9 +42,11 @@ logger = logging.getLogger(__name__)
 # SCHEDULING STRUCTURES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class ScheduledTask:
     """A task in the scheduling queue."""
+
     task_id: str
     mission_id: str
     priority: int  # Lower = higher priority
@@ -61,6 +63,7 @@ class ScheduledTask:
 @dataclass
 class AgentWorkload:
     """Tracks workload for an agent."""
+
     agent_id: str
     current_tasks: int = 0
     max_tasks: int = 1
@@ -83,6 +86,7 @@ class AgentWorkload:
 # ═══════════════════════════════════════════════════════════════════════════════
 # SCHEDULER AGENT
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class SchedulerAgent:
     """
@@ -128,13 +132,15 @@ class SchedulerAgent:
 
             # Register self
             registry = get_capability_registry()
-            registry.register(AgentDescriptor(
-                agent_id=self.AGENT_ID,
-                name=self.AGENT_NAME,
-                role="Task scheduling and workload balancing",
-                capabilities=[],
-                max_concurrent_tasks=1,
-            ))
+            registry.register(
+                AgentDescriptor(
+                    agent_id=self.AGENT_ID,
+                    name=self.AGENT_NAME,
+                    role="Task scheduling and workload balancing",
+                    capabilities=[],
+                    max_concurrent_tasks=1,
+                )
+            )
 
             # Subscribe to events
             self._event_bus.subscribe(EventType.MISSION_CREATED, self._handle_mission_created)
@@ -256,10 +262,7 @@ class SchedulerAgent:
 
     def get_available_agents(self) -> List[str]:
         """Get list of agents that can accept tasks."""
-        return [
-            agent_id for agent_id, workload in self._workloads.items()
-            if workload.is_available
-        ]
+        return [agent_id for agent_id, workload in self._workloads.items() if workload.is_available]
 
     def get_least_loaded_agent(self) -> Optional[str]:
         """Get the agent with lowest utilization."""
@@ -303,15 +306,17 @@ class SchedulerAgent:
 
             # Assign to agent
             if self.assign_to_agent(agent_id):
-                await self._event_bus.publish(Event(
-                    event_type=EventType.MISSION_ASSIGNED,
-                    source=self.AGENT_ID,
-                    payload={
-                        "task_id": task.task_id,
-                        "mission_id": task.mission_id,
-                        "agent_id": agent_id,
-                    },
-                ))
+                await self._event_bus.publish(
+                    Event(
+                        event_type=EventType.MISSION_ASSIGNED,
+                        source=self.AGENT_ID,
+                        payload={
+                            "task_id": task.task_id,
+                            "mission_id": task.mission_id,
+                            "agent_id": agent_id,
+                        },
+                    )
+                )
                 scheduled_count += 1
                 logger.info(f"Scheduled task {task.task_id} to {agent_id}")
             else:
@@ -381,7 +386,11 @@ class SchedulerAgent:
         mission_id = mission_data.get("mission_id")
         priority_str = mission_data.get("priority", "normal")
 
-        priority = MissionPriority(priority_str) if priority_str in [p.value for p in MissionPriority] else MissionPriority.NORMAL
+        priority = (
+            MissionPriority(priority_str)
+            if priority_str in [p.value for p in MissionPriority]
+            else MissionPriority.NORMAL
+        )
 
         self.enqueue_task(
             mission_id=mission_id,
@@ -425,7 +434,11 @@ class SchedulerAgent:
             "retry_queue_length": len(self._retry_queue),
             "agents_tracked": len(self._workloads),
             "available_agents": len(self.get_available_agents()),
-            "total_utilization": sum(w.utilization for w in self._workloads.values()) / len(self._workloads) if self._workloads else 0,
+            "total_utilization": (
+                sum(w.utilization for w in self._workloads.values()) / len(self._workloads)
+                if self._workloads
+                else 0
+            ),
             "workloads": {
                 aid: {
                     "current": w.current_tasks,

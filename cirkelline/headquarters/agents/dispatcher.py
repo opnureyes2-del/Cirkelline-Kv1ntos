@@ -44,9 +44,11 @@ logger = logging.getLogger(__name__)
 # ROUTING STRUCTURES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class RoutingRequest:
     """A request waiting to be routed."""
+
     request_id: str
     capability: AgentCapability
     payload: Dict[str, Any]
@@ -76,6 +78,7 @@ class RoutingRequest:
 @dataclass
 class RoutingResult:
     """Result of a routing decision."""
+
     success: bool
     request_id: str
     agent_id: Optional[str] = None
@@ -97,6 +100,7 @@ class RoutingResult:
 @dataclass
 class AgentScore:
     """Scoring for agent selection."""
+
     agent_id: str
     capability_match: float = 0.0  # 0-1
     availability_score: float = 0.0  # 0-1
@@ -113,16 +117,17 @@ class AgentScore:
             "load": 0.1,
         }
         return (
-            self.capability_match * weights["capability"] +
-            self.availability_score * weights["availability"] +
-            self.performance_score * weights["performance"] +
-            self.load_score * weights["load"]
+            self.capability_match * weights["capability"]
+            + self.availability_score * weights["availability"]
+            + self.performance_score * weights["performance"]
+            + self.load_score * weights["load"]
         )
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DISPATCHER AGENT
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class DispatcherAgent:
     """
@@ -173,13 +178,15 @@ class DispatcherAgent:
 
             # Register self
             registry = get_capability_registry()
-            registry.register(AgentDescriptor(
-                agent_id=self.AGENT_ID,
-                name=self.AGENT_NAME,
-                role="Request routing and capability matching",
-                capabilities=[],
-                max_concurrent_tasks=100,  # High concurrency for routing
-            ))
+            registry.register(
+                AgentDescriptor(
+                    agent_id=self.AGENT_ID,
+                    name=self.AGENT_NAME,
+                    role="Request routing and capability matching",
+                    capabilities=[],
+                    max_concurrent_tasks=100,  # High concurrency for routing
+                )
+            )
 
             # Subscribe to events
             self._event_bus.subscribe(EventType.TERMINAL_REQUEST, self._handle_terminal_request)
@@ -407,12 +414,14 @@ class DispatcherAgent:
             },
         )
 
-        await self._event_bus.publish(Event(
-            event_type=EventType.AGENT_REQUEST,
-            source=self.AGENT_ID,
-            payload=message.to_dict(),
-            priority=request.priority,
-        ))
+        await self._event_bus.publish(
+            Event(
+                event_type=EventType.AGENT_REQUEST,
+                source=self.AGENT_ID,
+                payload=message.to_dict(),
+                priority=request.priority,
+            )
+        )
 
     # ═══════════════════════════════════════════════════════════════════════════
     # QUEUE MANAGEMENT
@@ -449,18 +458,22 @@ class DispatcherAgent:
                 else:
                     # Give up
                     del self._pending_requests[request_id]
-                    logger.warning(f"Request {request_id} expired after {request.max_retries} retries")
+                    logger.warning(
+                        f"Request {request_id} expired after {request.max_retries} retries"
+                    )
 
                     # Notify failure
-                    await self._event_bus.publish(Event(
-                        event_type=EventType.SYSTEM_ERROR,
-                        source=self.AGENT_ID,
-                        payload={
-                            "request_id": request_id,
-                            "error": "Request routing timeout",
-                            "capability": request.capability.value,
-                        },
-                    ))
+                    await self._event_bus.publish(
+                        Event(
+                            event_type=EventType.SYSTEM_ERROR,
+                            source=self.AGENT_ID,
+                            payload={
+                                "request_id": request_id,
+                                "error": "Request routing timeout",
+                                "capability": request.capability.value,
+                            },
+                        )
+                    )
 
     # ═══════════════════════════════════════════════════════════════════════════
     # EVENT HANDLERS
@@ -511,13 +524,11 @@ class DispatcherAgent:
 
         # Update running averages
         if total > 0:
-            perf["success_rate"] = (
-                (perf["success_rate"] * total + (1.0 if success else 0.0)) /
-                (total + 1)
+            perf["success_rate"] = (perf["success_rate"] * total + (1.0 if success else 0.0)) / (
+                total + 1
             )
-            perf["avg_response_ms"] = (
-                (perf["avg_response_ms"] * total + response_time) /
-                (total + 1)
+            perf["avg_response_ms"] = (perf["avg_response_ms"] * total + response_time) / (
+                total + 1
             )
         else:
             perf["success_rate"] = 1.0 if success else 0.0
@@ -571,8 +582,7 @@ class DispatcherAgent:
             "recent_success_rate": f"{success_count / len(recent):.0%}" if recent else "N/A",
             "fallback_rate": f"{fallback_count / len(recent):.0%}" if recent else "N/A",
             "avg_routing_time_ms": (
-                sum(r.routing_time_ms for r in recent) / len(recent)
-                if recent else 0
+                sum(r.routing_time_ms for r in recent) / len(recent) if recent else 0
             ),
             "agents_tracked": len(self._agent_performance),
             "agent_performance": {

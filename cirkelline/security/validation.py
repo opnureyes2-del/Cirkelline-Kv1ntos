@@ -24,8 +24,10 @@ logger = logging.getLogger(__name__)
 # TYPES AND ERRORS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class SanitizationLevel(Enum):
     """Levels of input sanitization."""
+
     NONE = "none"  # No sanitization
     BASIC = "basic"  # HTML escape only
     STRICT = "strict"  # Full sanitization
@@ -52,6 +54,7 @@ class ValidationError(Exception):
 @dataclass
 class ValidationResult:
     """Result of a validation check."""
+
     valid: bool
     value: Any = None
     errors: List[str] = field(default_factory=list)
@@ -71,9 +74,11 @@ class ValidationResult:
 # VALIDATION RULES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class ValidationRule:
     """A single validation rule."""
+
     name: str
     validator: Callable[[Any], bool]
     message: str
@@ -82,24 +87,26 @@ class ValidationRule:
 
 # Common patterns
 PATTERNS = {
-    "email": re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'),
-    "uuid": re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', re.I),
-    "slug": re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$'),
-    "alphanumeric": re.compile(r'^[a-zA-Z0-9]+$'),
-    "phone": re.compile(r'^\+?[0-9]{8,15}$'),
+    "email": re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"),
+    "uuid": re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I),
+    "slug": re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$"),
+    "alphanumeric": re.compile(r"^[a-zA-Z0-9]+$"),
+    "phone": re.compile(r"^\+?[0-9]{8,15}$"),
     "url": re.compile(r'^https?://[^\s<>"{}|\\^`\[\]]+$'),
-    "ip_v4": re.compile(r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'),
+    "ip_v4": re.compile(
+        r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+    ),
     "safe_string": re.compile(r'^[a-zA-Z0-9\s\-_.,!?@#$%&*()+=:;\'"]+$'),
 }
 
 # Dangerous patterns to detect
 DANGEROUS_PATTERNS = [
-    re.compile(r'<script[^>]*>.*?</script>', re.I | re.S),
-    re.compile(r'javascript:', re.I),
-    re.compile(r'on\w+\s*=', re.I),
-    re.compile(r'eval\s*\(', re.I),
-    re.compile(r'expression\s*\(', re.I),
-    re.compile(r'data:\s*text/html', re.I),
+    re.compile(r"<script[^>]*>.*?</script>", re.I | re.S),
+    re.compile(r"javascript:", re.I),
+    re.compile(r"on\w+\s*=", re.I),
+    re.compile(r"eval\s*\(", re.I),
+    re.compile(r"expression\s*\(", re.I),
+    re.compile(r"data:\s*text/html", re.I),
 ]
 
 # SQL injection patterns
@@ -116,6 +123,7 @@ SQL_PATTERNS = [
 # ═══════════════════════════════════════════════════════════════════════════════
 # SANITIZATION FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def sanitize_string(
     value: str,
@@ -149,21 +157,21 @@ def sanitize_string(
         # HTML escape
         result = html.escape(result)
         # Remove null bytes
-        result = result.replace('\x00', '')
+        result = result.replace("\x00", "")
         # Normalize whitespace
-        result = ' '.join(result.split())
+        result = " ".join(result.split())
 
     elif level == SanitizationLevel.PARANOID:
         # HTML escape
         result = html.escape(result)
         # Remove null bytes
-        result = result.replace('\x00', '')
+        result = result.replace("\x00", "")
         # Remove control characters
-        result = ''.join(c for c in result if ord(c) >= 32 or c in '\n\r\t')
+        result = "".join(c for c in result if ord(c) >= 32 or c in "\n\r\t")
         # Normalize whitespace
-        result = ' '.join(result.split())
+        result = " ".join(result.split())
         # Only allow safe characters
-        result = ''.join(c for c in result if PATTERNS['safe_string'].match(c) or c.isspace())
+        result = "".join(c for c in result if PATTERNS["safe_string"].match(c) or c.isspace())
 
     # Apply max length
     if max_length and len(result) > max_length:
@@ -177,7 +185,7 @@ def remove_dangerous_content(value: str) -> str:
     result = value
 
     for pattern in DANGEROUS_PATTERNS:
-        result = pattern.sub('', result)
+        result = pattern.sub("", result)
 
     return result
 
@@ -193,6 +201,7 @@ def detect_sql_injection(value: str) -> bool:
 # ═══════════════════════════════════════════════════════════════════════════════
 # INPUT VALIDATOR
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class InputValidator:
     """
@@ -273,7 +282,7 @@ class InputValidator:
             value = data.get(field_name)
 
             # Required check
-            if rules.get('required', False) and value is None:
+            if rules.get("required", False) and value is None:
                 errors.append(f"Field '{field_name}' is required")
                 continue
 
@@ -281,45 +290,49 @@ class InputValidator:
                 continue
 
             # Type validation
-            field_type = rules.get('type', 'string')
+            field_type = rules.get("type", "string")
             type_result = self._validate_type(value, field_type, field_name)
             if not type_result.valid:
                 errors.extend(type_result.errors)
                 continue
 
             # Apply sanitization
-            sanitize_level = rules.get('sanitize', self._default_level.value)
+            sanitize_level = rules.get("sanitize", self._default_level.value)
             if isinstance(sanitize_level, str):
                 sanitize_level = SanitizationLevel(sanitize_level)
 
             if isinstance(value, str) and sanitize_level != SanitizationLevel.NONE:
                 original = value
-                value = sanitize_string(value, sanitize_level, rules.get('max_length'))
+                value = sanitize_string(value, sanitize_level, rules.get("max_length"))
                 if value != original:
                     was_sanitized = True
 
             # Length validation
-            if 'min_length' in rules and len(str(value)) < rules['min_length']:
-                errors.append(f"Field '{field_name}' must be at least {rules['min_length']} characters")
+            if "min_length" in rules and len(str(value)) < rules["min_length"]:
+                errors.append(
+                    f"Field '{field_name}' must be at least {rules['min_length']} characters"
+                )
 
-            if 'max_length' in rules and len(str(value)) > rules['max_length']:
-                errors.append(f"Field '{field_name}' must be at most {rules['max_length']} characters")
+            if "max_length" in rules and len(str(value)) > rules["max_length"]:
+                errors.append(
+                    f"Field '{field_name}' must be at most {rules['max_length']} characters"
+                )
 
             # Value range validation
-            if 'min_value' in rules and value < rules['min_value']:
+            if "min_value" in rules and value < rules["min_value"]:
                 errors.append(f"Field '{field_name}' must be at least {rules['min_value']}")
 
-            if 'max_value' in rules and value > rules['max_value']:
+            if "max_value" in rules and value > rules["max_value"]:
                 errors.append(f"Field '{field_name}' must be at most {rules['max_value']}")
 
             # Pattern validation
-            if 'pattern' in rules:
-                pattern = re.compile(rules['pattern'])
+            if "pattern" in rules:
+                pattern = re.compile(rules["pattern"])
                 if not pattern.match(str(value)):
                     errors.append(f"Field '{field_name}' does not match required pattern")
 
             # Choices validation
-            if 'choices' in rules and value not in rules['choices']:
+            if "choices" in rules and value not in rules["choices"]:
                 errors.append(f"Field '{field_name}' must be one of: {rules['choices']}")
 
             # SQL injection check
@@ -344,26 +357,25 @@ class InputValidator:
     ) -> ValidationResult:
         """Validate value type."""
         type_validators = {
-            'string': lambda v: isinstance(v, str),
-            'int': lambda v: isinstance(v, int) and not isinstance(v, bool),
-            'float': lambda v: isinstance(v, (int, float)) and not isinstance(v, bool),
-            'bool': lambda v: isinstance(v, bool),
-            'list': lambda v: isinstance(v, list),
-            'dict': lambda v: isinstance(v, dict),
-            'email': lambda v: isinstance(v, str) and PATTERNS['email'].match(v),
-            'uuid': lambda v: isinstance(v, str) and PATTERNS['uuid'].match(v),
-            'url': lambda v: isinstance(v, str) and PATTERNS['url'].match(v),
-            'slug': lambda v: isinstance(v, str) and PATTERNS['slug'].match(v),
-            'phone': lambda v: isinstance(v, str) and PATTERNS['phone'].match(v),
-            'ip': lambda v: isinstance(v, str) and PATTERNS['ip_v4'].match(v),
+            "string": lambda v: isinstance(v, str),
+            "int": lambda v: isinstance(v, int) and not isinstance(v, bool),
+            "float": lambda v: isinstance(v, (int, float)) and not isinstance(v, bool),
+            "bool": lambda v: isinstance(v, bool),
+            "list": lambda v: isinstance(v, list),
+            "dict": lambda v: isinstance(v, dict),
+            "email": lambda v: isinstance(v, str) and PATTERNS["email"].match(v),
+            "uuid": lambda v: isinstance(v, str) and PATTERNS["uuid"].match(v),
+            "url": lambda v: isinstance(v, str) and PATTERNS["url"].match(v),
+            "slug": lambda v: isinstance(v, str) and PATTERNS["slug"].match(v),
+            "phone": lambda v: isinstance(v, str) and PATTERNS["phone"].match(v),
+            "ip": lambda v: isinstance(v, str) and PATTERNS["ip_v4"].match(v),
         }
 
         validator = type_validators.get(expected_type, lambda v: True)
 
         if not validator(value):
             return ValidationResult(
-                valid=False,
-                errors=[f"Field '{field_name}' must be of type {expected_type}"]
+                valid=False, errors=[f"Field '{field_name}' must be of type {expected_type}"]
             )
 
         return ValidationResult(valid=True, value=value)
@@ -420,7 +432,7 @@ class InputValidator:
 
         value = value.strip().lower()
 
-        if not PATTERNS['email'].match(value):
+        if not PATTERNS["email"].match(value):
             return ValidationResult(valid=False, errors=["Invalid email format"])
 
         return ValidationResult(valid=True, value=value)
@@ -432,7 +444,7 @@ class InputValidator:
 
         value = value.strip().lower()
 
-        if not PATTERNS['uuid'].match(value):
+        if not PATTERNS["uuid"].match(value):
             return ValidationResult(valid=False, errors=["Invalid UUID format"])
 
         return ValidationResult(valid=True, value=value)
@@ -444,7 +456,7 @@ class InputValidator:
 
         value = value.strip()
 
-        if not PATTERNS['url'].match(value):
+        if not PATTERNS["url"].match(value):
             return ValidationResult(valid=False, errors=["Invalid URL format"])
 
         # Check for dangerous content
@@ -471,6 +483,7 @@ class InputValidator:
 # CONVENIENCE FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def validate_input(
     data: Dict[str, Any],
     schema: Dict[str, Any],
@@ -495,44 +508,50 @@ def get_validator() -> InputValidator:
         _validator_instance = InputValidator()
 
         # Register common schemas
-        _validator_instance.register_schema("user_input", {
-            "message": {
-                "type": "string",
-                "required": True,
-                "min_length": 1,
-                "max_length": 10000,
-                "sanitize": "basic",
+        _validator_instance.register_schema(
+            "user_input",
+            {
+                "message": {
+                    "type": "string",
+                    "required": True,
+                    "min_length": 1,
+                    "max_length": 10000,
+                    "sanitize": "basic",
+                },
+                "session_id": {
+                    "type": "uuid",
+                    "required": False,
+                },
+                "user_id": {
+                    "type": "uuid",
+                    "required": True,
+                },
             },
-            "session_id": {
-                "type": "uuid",
-                "required": False,
-            },
-            "user_id": {
-                "type": "uuid",
-                "required": True,
-            },
-        })
+        )
 
-        _validator_instance.register_schema("agent_request", {
-            "agent_id": {
-                "type": "slug",
-                "required": True,
-                "min_length": 1,
-                "max_length": 100,
+        _validator_instance.register_schema(
+            "agent_request",
+            {
+                "agent_id": {
+                    "type": "slug",
+                    "required": True,
+                    "min_length": 1,
+                    "max_length": 100,
+                },
+                "task": {
+                    "type": "string",
+                    "required": True,
+                    "min_length": 1,
+                    "max_length": 50000,
+                    "sanitize": "basic",
+                },
+                "priority": {
+                    "type": "int",
+                    "required": False,
+                    "min_value": 0,
+                    "max_value": 10,
+                },
             },
-            "task": {
-                "type": "string",
-                "required": True,
-                "min_length": 1,
-                "max_length": 50000,
-                "sanitize": "basic",
-            },
-            "priority": {
-                "type": "int",
-                "required": False,
-                "min_value": 0,
-                "max_value": 10,
-            },
-        })
+        )
 
     return _validator_instance

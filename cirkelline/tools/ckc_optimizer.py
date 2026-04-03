@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 
 class ToolCallStatus(str, Enum):
     """Status of a tool call."""
+
     SUCCESS = "success"
     FAILURE = "failure"
     TIMEOUT = "timeout"
@@ -45,6 +46,7 @@ class ToolCallStatus(str, Enum):
 @dataclass
 class ToolCallMetrics:
     """Metrics for a single tool call."""
+
     tool_name: str
     start_time: datetime
     end_time: Optional[datetime] = None
@@ -59,13 +61,14 @@ class ToolCallMetrics:
 @dataclass
 class ToolPerformanceStats:
     """Aggregated performance statistics for a tool."""
+
     tool_name: str
     call_count: int = 0
     success_count: int = 0
     failure_count: int = 0
     total_duration_ms: float = 0
     avg_duration_ms: float = 0
-    min_duration_ms: float = float('inf')
+    min_duration_ms: float = float("inf")
     max_duration_ms: float = 0
     p95_duration_ms: float = 0
     error_rate: float = 0
@@ -170,9 +173,7 @@ class CKCOptimizer:
             )
 
         if status == ToolCallStatus.FAILURE:
-            logger.warning(
-                f"CKC tool '{tool_name}' failed: {error_message}"
-            )
+            logger.warning(f"CKC tool '{tool_name}' failed: {error_message}")
 
     def _update_tool_stats(self, metrics: ToolCallMetrics) -> None:
         """Update aggregated statistics for a tool."""
@@ -232,8 +233,9 @@ class CKCOptimizer:
             List of improvement suggestions with priority and details.
         """
         # Use cache if recent
-        if (self._cache_timestamp and
-            datetime.utcnow() - self._cache_timestamp < timedelta(minutes=5)):
+        if self._cache_timestamp and datetime.utcnow() - self._cache_timestamp < timedelta(
+            minutes=5
+        ):
             return self._improvement_cache
 
         suggestions = []
@@ -245,46 +247,52 @@ class CKCOptimizer:
 
             # High latency suggestion
             if stats.avg_duration_ms > self.LATENCY_THRESHOLD_MS:
-                suggestions.append({
-                    "priority": "high",
-                    "tool": tool_name,
-                    "issue": "high_latency",
-                    "message": f"Average latency of {stats.avg_duration_ms:.0f}ms exceeds threshold",
-                    "recommendation": "Consider implementing caching or async processing",
-                    "metrics": {
-                        "avg_ms": stats.avg_duration_ms,
-                        "max_ms": stats.max_duration_ms,
-                        "threshold_ms": self.LATENCY_THRESHOLD_MS,
+                suggestions.append(
+                    {
+                        "priority": "high",
+                        "tool": tool_name,
+                        "issue": "high_latency",
+                        "message": f"Average latency of {stats.avg_duration_ms:.0f}ms exceeds threshold",
+                        "recommendation": "Consider implementing caching or async processing",
+                        "metrics": {
+                            "avg_ms": stats.avg_duration_ms,
+                            "max_ms": stats.max_duration_ms,
+                            "threshold_ms": self.LATENCY_THRESHOLD_MS,
+                        },
                     }
-                })
+                )
 
             # High error rate suggestion
             if stats.error_rate > self.ERROR_RATE_THRESHOLD:
-                suggestions.append({
-                    "priority": "critical",
-                    "tool": tool_name,
-                    "issue": "high_error_rate",
-                    "message": f"Error rate of {stats.error_rate:.1%} exceeds threshold",
-                    "recommendation": "Investigate error patterns and add retry logic",
-                    "metrics": {
-                        "error_rate": stats.error_rate,
-                        "failure_count": stats.failure_count,
-                        "threshold": self.ERROR_RATE_THRESHOLD,
-                        "top_errors": dict(list(stats.error_patterns.items())[:3]),
+                suggestions.append(
+                    {
+                        "priority": "critical",
+                        "tool": tool_name,
+                        "issue": "high_error_rate",
+                        "message": f"Error rate of {stats.error_rate:.1%} exceeds threshold",
+                        "recommendation": "Investigate error patterns and add retry logic",
+                        "metrics": {
+                            "error_rate": stats.error_rate,
+                            "failure_count": stats.failure_count,
+                            "threshold": self.ERROR_RATE_THRESHOLD,
+                            "top_errors": dict(list(stats.error_patterns.items())[:3]),
+                        },
                     }
-                })
+                )
 
             # Tool-specific hints
             if tool_name in self._optimization_hints:
                 for hint in self._optimization_hints[tool_name]:
-                    suggestions.append({
-                        "priority": "low",
-                        "tool": tool_name,
-                        "issue": "optimization_hint",
-                        "message": hint,
-                        "recommendation": hint,
-                        "metrics": {},
-                    })
+                    suggestions.append(
+                        {
+                            "priority": "low",
+                            "tool": tool_name,
+                            "issue": "optimization_hint",
+                            "message": hint,
+                            "recommendation": hint,
+                            "metrics": {},
+                        }
+                    )
 
         # Sort by priority
         priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
@@ -334,7 +342,7 @@ class CKCOptimizer:
                     "last_call": stats.last_call.isoformat() if stats.last_call else None,
                 }
                 for name, stats in self._tool_stats.items()
-            }
+            },
         }
 
     def reset_stats(self) -> None:
@@ -408,6 +416,7 @@ class CKCOptimizer:
 
             # Return appropriate wrapper based on function type
             import asyncio
+
             if asyncio.iscoroutinefunction(func):
                 return async_wrapper
             return sync_wrapper

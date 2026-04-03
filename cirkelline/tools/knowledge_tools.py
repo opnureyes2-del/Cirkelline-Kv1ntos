@@ -28,17 +28,13 @@ class PrivateKnowledgeTools(Toolkit):
             When a user uploads a document and asks to save it, use save_to_my_knowledge.
             The saved documents become searchable for that user only.
             """,
-            add_instructions=True
+            add_instructions=True,
         )
         self.knowledge = knowledge_base
         self.register(self.save_to_my_knowledge)
 
     def save_to_my_knowledge(
-        self,
-        file_path: str,
-        user_id: str,
-        user_type: str,
-        description: Optional[str] = None
+        self, file_path: str, user_id: str, user_type: str, description: Optional[str] = None
     ) -> str:
         """
         Save a file to user's private knowledge base.
@@ -56,17 +52,11 @@ class PrivateKnowledgeTools(Toolkit):
             filename = os.path.basename(file_path)
 
             # Create private metadata
-            metadata = create_private_document_metadata(
-                user_id=user_id,
-                user_type=user_type
-            )
+            metadata = create_private_document_metadata(user_id=user_id, user_type=user_type)
 
             # Save to knowledge base synchronously
             self.knowledge.add_content(
-                name=filename,
-                path=file_path,
-                metadata=metadata,
-                description=description
+                name=filename, path=file_path, metadata=metadata, description=description
             )
 
             logger.info(f"✅ Saved {filename} to private knowledge for user {user_id}")
@@ -76,6 +66,7 @@ class PrivateKnowledgeTools(Toolkit):
         except Exception as e:
             logger.error(f"❌ Error saving to knowledge: {e}")
             import traceback
+
             logger.error(traceback.format_exc())
             return f"❌ Error saving file: {str(e)}"
 
@@ -100,7 +91,7 @@ class FilteredKnowledgeSearchTool(Toolkit):
             Use search_my_documents when the user asks about their files or needs information from saved documents.
             Results are automatically filtered by user permissions.
             """,
-            add_instructions=True
+            add_instructions=True,
         )
         self.knowledge = knowledge_base
         self.db = database
@@ -123,29 +114,44 @@ class FilteredKnowledgeSearchTool(Toolkit):
         """
 
         # Step 1: Get user context from session_state (passed by endpoint)
-        user_id = session_state.get('current_user_id')
-        user_type = session_state.get('current_user_type', 'Regular')
+        user_id = session_state.get("current_user_id")
+        user_type = session_state.get("current_user_type", "Regular")
 
         if not user_id:
             logger.error("❌ No user_id in session_state!")
             return "Error: User context not available. Please sign in to search documents."
 
-        is_admin = user_id in self.admin_ids or user_type.lower() == 'admin'
+        is_admin = user_id in self.admin_ids or user_type.lower() == "admin"
 
-        logger.info(f"🔍 Searching knowledge for user_id={user_id[:20]}..., user_type={user_type}, is_admin={is_admin}, query={query[:50]}...")
+        logger.info(
+            f"🔍 Searching knowledge for user_id={user_id[:20]}..., user_type={user_type}, is_admin={is_admin}, query={query[:50]}..."
+        )
 
         # Step 2: Detect if user wants to LIST ALL documents (not search)
-        list_keywords = ['list', 'all', 'show', 'my documents', 'what documents', 'files i have', 'available']
+        list_keywords = [
+            "list",
+            "all",
+            "show",
+            "my documents",
+            "what documents",
+            "files i have",
+            "available",
+        ]
         # ALSO treat generic "documents" query as LIST ALL (not content search)
         query_lower = query.lower().strip()
-        is_listing = any(keyword in query_lower for keyword in list_keywords) or query_lower in ['documents', 'files', 'my files', 'uploads']
+        is_listing = any(keyword in query_lower for keyword in list_keywords) or query_lower in [
+            "documents",
+            "files",
+            "my files",
+            "uploads",
+        ]
 
         # Step 3: Get document names
         if is_listing:
             # LIST ALL mode: Query database directly for ALL user's documents
             logger.info("📋 LIST ALL mode detected - querying database for all documents")
 
-            db_url = self.db.db_url if hasattr(self.db, 'db_url') else os.getenv("DATABASE_URL")
+            db_url = self.db.db_url if hasattr(self.db, "db_url") else os.getenv("DATABASE_URL")
             engine = create_engine(db_url)
 
             try:
@@ -161,7 +167,7 @@ class FilteredKnowledgeSearchTool(Toolkit):
                                 ORDER BY created_at DESC
                                 LIMIT 20
                             """),
-                            {"user_id": user_id}
+                            {"user_id": user_id},
                         )
                     else:
                         # Regular users see only their own documents
@@ -173,7 +179,7 @@ class FilteredKnowledgeSearchTool(Toolkit):
                                 ORDER BY created_at DESC
                                 LIMIT 20
                             """),
-                            {"user_id": user_id}
+                            {"user_id": user_id},
                         )
 
                     rows = result.fetchall()
@@ -201,21 +207,27 @@ class FilteredKnowledgeSearchTool(Toolkit):
                 return "No documents found matching your query."
 
             # Get document names from search results
-            doc_names = list(set([result.name for result in search_results if hasattr(result, 'name')]))
+            doc_names = list(
+                set([result.name for result in search_results if hasattr(result, "name")])
+            )
 
             if not doc_names:
                 logger.info("No document names in search results")
                 return "No documents found."
 
         # Step 4: Query database for REAL metadata (vector search doesn't return it properly)
-        db_url = self.db.db_url if hasattr(self.db, 'db_url') else os.getenv("DATABASE_URL")
+        db_url = self.db.db_url if hasattr(self.db, "db_url") else os.getenv("DATABASE_URL")
         engine = create_engine(db_url)
 
         metadata_map = {}
         # Map doc names to their search results for content (only in SEARCH mode)
         content_map = {}
-        if not is_listing and 'search_results' in locals():
-            content_map = {result.name: result.content for result in search_results if hasattr(result, 'content')}
+        if not is_listing and "search_results" in locals():
+            content_map = {
+                result.name: result.content
+                for result in search_results
+                if hasattr(result, "content")
+            }
 
         try:
             with Session(engine) as session:
@@ -225,7 +237,7 @@ class FilteredKnowledgeSearchTool(Toolkit):
                         FROM ai.agno_knowledge
                         WHERE name = ANY(:doc_names)
                     """),
-                    {"doc_names": doc_names}
+                    {"doc_names": doc_names},
                 )
 
                 rows = result.fetchall()
@@ -237,6 +249,7 @@ class FilteredKnowledgeSearchTool(Toolkit):
                     # Parse JSON if it's a string
                     if isinstance(doc_metadata, str):
                         import json as json_lib
+
                         doc_metadata = json_lib.loads(doc_metadata)
 
                     metadata_map[doc_name] = doc_metadata
@@ -251,9 +264,9 @@ class FilteredKnowledgeSearchTool(Toolkit):
 
         for doc_name in doc_names:
             doc_metadata = metadata_map.get(doc_name, {})
-            doc_owner = doc_metadata.get('user_id')
-            doc_access = doc_metadata.get('access_level', 'private')
-            doc_content = content_map.get(doc_name, '')
+            doc_owner = doc_metadata.get("user_id")
+            doc_access = doc_metadata.get("access_level", "private")
+            doc_content = content_map.get(doc_name, "")
 
             # Permission logic
             is_accessible = False
@@ -266,13 +279,13 @@ class FilteredKnowledgeSearchTool(Toolkit):
                 logger.info(f"  ✅ {doc_name} - User owns this document")
 
             # Admins can see admin-shared documents
-            elif doc_access == 'admin-shared' and is_admin:
+            elif doc_access == "admin-shared" and is_admin:
                 is_accessible = True
                 access_reason = "admin-shared"
                 logger.info(f"  ✅ {doc_name} - Admin access to shared document")
 
             # Everyone can see public documents
-            elif doc_access == 'public':
+            elif doc_access == "public":
                 is_accessible = True
                 access_reason = "public"
                 logger.info(f"  ✅ {doc_name} - Public document")
@@ -286,11 +299,9 @@ class FilteredKnowledgeSearchTool(Toolkit):
                 if len(doc_content) > 500:
                     truncated_content += "... [truncated]"
 
-                accessible_docs.append({
-                    'name': doc_name,
-                    'content': truncated_content,
-                    'reason': access_reason
-                })
+                accessible_docs.append(
+                    {"name": doc_name, "content": truncated_content, "reason": access_reason}
+                )
 
             # Stop after we have enough documents
             if len(accessible_docs) >= num_documents:
@@ -302,8 +313,7 @@ class FilteredKnowledgeSearchTool(Toolkit):
             return "No documents found that you have access to."
 
         formatted_docs = [
-            f"--- Document: {doc['name']} ---\n{doc['content']}"
-            for doc in accessible_docs
+            f"--- Document: {doc['name']} ---\n{doc['content']}" for doc in accessible_docs
         ]
 
         result = "\n\n".join(formatted_docs)

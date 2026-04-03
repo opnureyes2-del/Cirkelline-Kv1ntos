@@ -20,25 +20,25 @@ from sqlalchemy import create_engine
 
 # Legacy exports (backwards compatibility)
 db = PostgresDb(
-    db_url=os.getenv("DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"),
+    db_url=os.getenv(
+        "DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"
+    ),
     session_table="agno_sessions",
-    memory_table="agno_memories"
+    memory_table="agno_memories",
 )
 
 vector_db = PgVector(
-    db_url=os.getenv("DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"),
+    db_url=os.getenv(
+        "DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"
+    ),
     table_name="cirkelline_knowledge_vectors",
     embedder=OllamaEmbedder(id="nomic-embed-text", dimensions=768),
-    search_type=SearchType.hybrid
+    search_type=SearchType.hybrid,
 )
 
 # Shared SQLAlchemy engine for activity logging
 _shared_engine = create_engine(
-    db.db_url,
-    pool_size=10,
-    max_overflow=20,
-    pool_pre_ping=True,
-    echo=False
+    db.db_url, pool_size=10, max_overflow=20, pool_pre_ping=True, echo=False
 )
 
 from cirkelline.database.read_write_router import (
@@ -62,20 +62,15 @@ __all__ = [
     "db",
     "vector_db",
     "_shared_engine",
-
     # Enums
     "RouteMode",
-
     # Config
     "DatabaseNode",
     "RouterConfig",
-
     # Metrics
     "RouterMetrics",
-
     # Main class
     "DatabaseRouter",
-
     # Global access
     "get_database_router",
     "init_database_router",

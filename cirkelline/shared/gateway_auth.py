@@ -63,7 +63,7 @@ def get_gateway_client() -> GatewayClient:
             gateway_url=GATEWAY_URL,
             platform_code=GATEWAY_PLATFORM_CODE,
             api_key=GATEWAY_API_KEY,
-            timeout=10.0
+            timeout=10.0,
         )
         logger.info(f"✅ GatewayClient initialized: {GATEWAY_URL}")
 
@@ -73,6 +73,7 @@ def get_gateway_client() -> GatewayClient:
 # =============================================================================
 # FASTAPI DEPENDENCIES
 # =============================================================================
+
 
 async def gateway_auth(
     authorization: str = Header(None, alias="Authorization")
@@ -101,11 +102,15 @@ async def gateway_auth(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authorization header required",
-            headers={"WWW-Authenticate": "Bearer"}
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
     # Extract token from Bearer scheme
-    token = authorization.replace("Bearer ", "") if authorization.startswith("Bearer ") else authorization
+    token = (
+        authorization.replace("Bearer ", "")
+        if authorization.startswith("Bearer ")
+        else authorization
+    )
 
     client = get_gateway_client()
     result = await client.validate_token(token)
@@ -114,14 +119,14 @@ async def gateway_auth(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=result.error or "Invalid token",
-            headers={"WWW-Authenticate": "Bearer"}
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
     # Check platform access
     if result.platforms and GATEWAY_PLATFORM_CODE not in result.platforms:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Access to {GATEWAY_PLATFORM_CODE} not permitted"
+            detail=f"Access to {GATEWAY_PLATFORM_CODE} not permitted",
         )
 
     logger.debug(f"✅ Gateway auth: {result.user_email} ({result.tier})")
@@ -173,6 +178,7 @@ def require_tier(min_tier: str):
     Returns:
         FastAPI dependency function
     """
+
     async def dependency(
         authorization: str = Header(None, alias="Authorization")
     ) -> TokenValidationResult:
@@ -182,7 +188,7 @@ def require_tier(min_tier: str):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Requires {min_tier} tier or higher",
-                headers={"X-Upgrade-Required": "true"}
+                headers={"X-Upgrade-Required": "true"},
             )
 
         return result
@@ -205,6 +211,7 @@ def require_feature(feature: str):
     Returns:
         FastAPI dependency function
     """
+
     async def dependency(
         authorization: str = Header(None, alias="Authorization")
     ) -> TokenValidationResult:
@@ -214,7 +221,7 @@ def require_feature(feature: str):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Feature not available: {feature}",
-                headers={"X-Feature-Required": feature}
+                headers={"X-Feature-Required": feature},
             )
 
         return result
@@ -237,6 +244,7 @@ def require_platform(platform: str):
     Returns:
         FastAPI dependency function
     """
+
     async def dependency(
         authorization: str = Header(None, alias="Authorization")
     ) -> TokenValidationResult:
@@ -246,7 +254,7 @@ def require_platform(platform: str):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Platform not accessible: {platform}",
-                headers={"X-Platform-Required": platform}
+                headers={"X-Platform-Required": platform},
             )
 
         return result
@@ -257,6 +265,7 @@ def require_platform(platform: str):
 # =============================================================================
 # UTILITY FUNCTIONS
 # =============================================================================
+
 
 async def validate_token_direct(token: str) -> TokenValidationResult:
     """
@@ -316,9 +325,12 @@ async def get_user_info(token: str) -> dict:
 # INITIALIZATION
 # =============================================================================
 
+
 def is_gateway_configured() -> bool:
     """Check if gateway authentication is properly configured."""
     return bool(GATEWAY_URL and GATEWAY_API_KEY)
 
 
-logger.info(f"✅ Gateway auth module loaded (gateway={'configured' if is_gateway_configured() else 'NOT configured'})")
+logger.info(
+    f"✅ Gateway auth module loaded (gateway={'configured' if is_gateway_configured() else 'NOT configured'})"
+)

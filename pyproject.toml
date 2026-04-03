@@ -113,6 +113,37 @@ exclude = '''
     | __pycache__
     | build
     | dist
+    | cirkelline\/ckc
+    | cirkelline\/web3
+    | cirkelline\/endpoints
+    | cirkelline\/integrations
+    | cirkelline\/deployment
+    | cirkelline\/i18n
+    | cirkelline\/kommandanter
+    | cirkelline\/workflows
+    | cirkelline\/admin
+    | cirkelline\/headquarters\/learning_rooms
+    | CKC-COMPONENTS
+    | cla
+    | alembic
+    | scripts
+    | services
+    | integration
+    | aws_deployment
+    | infrastructure
+    | k8s
+    | loadtest
+    | monitoring
+    | elk
+    | migrations
+    | database_migrations
+    | cli
+    | my_admin_workspace
+    | AUDIT-2025-12-14
+    | AUDIT-2025-12-16
+    | tests
+    | backups
+    | utils
 )/
 '''
 

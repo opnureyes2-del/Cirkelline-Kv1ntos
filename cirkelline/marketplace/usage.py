@@ -39,6 +39,7 @@ class UsageRecord:
         timestamp: Tidspunkt for request
         metadata: Yderligere metadata
     """
+
     user_id: str
     api_name: str
     endpoint: str
@@ -82,6 +83,7 @@ class UsageStats:
         by_endpoint: Breakdown per endpoint
         by_status: Breakdown per status code
     """
+
     period_start: datetime
     period_end: datetime
     total_requests: int = 0
@@ -195,7 +197,7 @@ class UsageTracker:
         user_id: Optional[str] = None,
         api_name: Optional[str] = None,
         start: Optional[datetime] = None,
-        end: Optional[datetime] = None
+        end: Optional[datetime] = None,
     ) -> UsageStats:
         """
         Hent aggregerede statistikker.
@@ -222,16 +224,10 @@ class UsageTracker:
             records = self._records
 
         # Filtrer på tidsperiode
-        filtered = [
-            r for r in records
-            if start <= r.timestamp <= end
-        ]
+        filtered = [r for r in records if start <= r.timestamp <= end]
 
         # Aggreger
-        stats = UsageStats(
-            period_start=start,
-            period_end=end
-        )
+        stats = UsageStats(period_start=start, period_end=end)
 
         for record in filtered:
             stats.total_requests += 1
@@ -263,9 +259,7 @@ class UsageTracker:
         return stats
 
     async def get_recent_records(
-        self,
-        user_id: Optional[str] = None,
-        limit: int = 100
+        self, user_id: Optional[str] = None, limit: int = 100
     ) -> List[UsageRecord]:
         """
         Hent seneste usage records.
@@ -283,17 +277,9 @@ class UsageTracker:
             records = self._records
 
         # Returner nyeste først
-        return sorted(
-            records,
-            key=lambda r: r.timestamp,
-            reverse=True
-        )[:limit]
+        return sorted(records, key=lambda r: r.timestamp, reverse=True)[:limit]
 
-    async def get_user_summary(
-        self,
-        user_id: str,
-        days: int = 30
-    ) -> Dict[str, Any]:
+    async def get_user_summary(self, user_id: str, days: int = 30) -> Dict[str, Any]:
         """
         Hent usage summary for en bruger.
 
@@ -316,16 +302,10 @@ class UsageTracker:
             "avg_requests_per_day": stats.total_requests / days if days > 0 else 0,
             "success_rate": stats.success_rate,
             "avg_latency_ms": stats.avg_latency_ms,
-            "top_apis": sorted(
-                stats.by_api.items(),
-                key=lambda x: x[1],
-                reverse=True
-            )[:5],
-            "top_endpoints": sorted(
-                stats.by_endpoint.items(),
-                key=lambda x: x[1],
-                reverse=True
-            )[:5],
+            "top_apis": sorted(stats.by_api.items(), key=lambda x: x[1], reverse=True)[:5],
+            "top_endpoints": sorted(stats.by_endpoint.items(), key=lambda x: x[1], reverse=True)[
+                :5
+            ],
         }
 
     async def calculate_cost(
@@ -333,7 +313,7 @@ class UsageTracker:
         user_id: str,
         start: datetime,
         end: datetime,
-        pricing: Optional[Dict[str, float]] = None
+        pricing: Optional[Dict[str, float]] = None,
     ) -> Dict[str, Any]:
         """
         Beregn estimeret kostnad for en periode.
@@ -351,10 +331,7 @@ class UsageTracker:
             "default": 0.001,  # $0.001 per request default
         }
 
-        records = [
-            r for r in self._by_user.get(user_id, [])
-            if start <= r.timestamp <= end
-        ]
+        records = [r for r in self._by_user.get(user_id, []) if start <= r.timestamp <= end]
 
         costs_by_api: Dict[str, Dict[str, Any]] = {}
         total_cost = 0.0
@@ -365,11 +342,7 @@ class UsageTracker:
             cost = price_per_1k / 1000  # Cost per request
 
             if api not in costs_by_api:
-                costs_by_api[api] = {
-                    "requests": 0,
-                    "cost": 0.0,
-                    "price_per_1k": price_per_1k
-                }
+                costs_by_api[api] = {"requests": 0, "cost": 0.0, "price_per_1k": price_per_1k}
 
             costs_by_api[api]["requests"] += 1
             costs_by_api[api]["cost"] += cost
@@ -382,7 +355,7 @@ class UsageTracker:
             "total_requests": len(records),
             "total_cost": round(total_cost, 4),
             "by_api": costs_by_api,
-            "currency": "USD"
+            "currency": "USD",
         }
 
     async def _cleanup(self) -> None:
@@ -392,18 +365,12 @@ class UsageTracker:
         self._records = [r for r in self._records if r.timestamp >= cutoff]
 
         for user_id in list(self._by_user.keys()):
-            self._by_user[user_id] = [
-                r for r in self._by_user[user_id]
-                if r.timestamp >= cutoff
-            ]
+            self._by_user[user_id] = [r for r in self._by_user[user_id] if r.timestamp >= cutoff]
             if not self._by_user[user_id]:
                 del self._by_user[user_id]
 
         for api_name in list(self._by_api.keys()):
-            self._by_api[api_name] = [
-                r for r in self._by_api[api_name]
-                if r.timestamp >= cutoff
-            ]
+            self._by_api[api_name] = [r for r in self._by_api[api_name] if r.timestamp >= cutoff]
             if not self._by_api[api_name]:
                 del self._by_api[api_name]
 
@@ -430,7 +397,7 @@ async def track_usage(
     method: str,
     status_code: int,
     latency_ms: float,
-    **kwargs
+    **kwargs,
 ) -> UsageRecord:
     """
     Convenience function til at tracke usage.
@@ -454,7 +421,7 @@ async def track_usage(
         method=method,
         status_code=status_code,
         latency_ms=latency_ms,
-        **kwargs
+        **kwargs,
     )
 
     await get_usage_tracker().log(record)
@@ -462,16 +429,11 @@ async def track_usage(
 
 
 async def get_usage_stats(
-    user_id: Optional[str] = None,
-    api_name: Optional[str] = None,
-    days: int = 1
+    user_id: Optional[str] = None, api_name: Optional[str] = None, days: int = 1
 ) -> UsageStats:
     """Convenience function til at hente usage stats."""
     now = datetime.utcnow()
     start = now - timedelta(days=days)
     return await get_usage_tracker().get_stats(
-        user_id=user_id,
-        api_name=api_name,
-        start=start,
-        end=now
+        user_id=user_id, api_name=api_name, start=start, end=now
     )

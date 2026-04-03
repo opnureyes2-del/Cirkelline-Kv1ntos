@@ -17,11 +17,11 @@ from cirkelline.database import db
 def get_db_engine():
     """
     Get SQLAlchemy engine for database operations.
-    
+
     Returns:
         SQLAlchemy Engine instance
     """
-    db_url = db.db_url if hasattr(db, 'db_url') else os.getenv("DATABASE_URL")
+    db_url = db.db_url if hasattr(db, "db_url") else os.getenv("DATABASE_URL")
     return create_engine(db_url)
 
 
@@ -29,10 +29,10 @@ def get_db_engine():
 def get_db_session():
     """
     Context manager for database sessions.
-    
+
     Yields:
         SQLAlchemy Session instance
-    
+
     Example:
         with get_db_session() as session:
             result = session.execute(...)

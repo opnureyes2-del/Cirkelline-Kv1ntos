@@ -6,20 +6,15 @@ import httpx
 # Phase B: Unified Logging Integration
 try:
     from unified_logging import setup_admiral_logging
-    logger = setup_admiral_logging(
-        service_name="cirkelline-kv1ntos",
-        level=logging.INFO
-    )
+
+    logger = setup_admiral_logging(service_name="cirkelline-kv1ntos", level=logging.INFO)
     logger.info("✅ Unified logging initialized for cirkelline-kv1ntos")
 except (ImportError, Exception) as e:
     # Fallback to basic logging if unified_logging not available or fails
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler('cirkelline.log'),
-            logging.StreamHandler()
-        ]
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.FileHandler("cirkelline.log"), logging.StreamHandler()],
     )
     logger = logging.getLogger(__name__)
     if isinstance(e, ImportError):
@@ -38,7 +33,7 @@ load_dotenv()
 logger.info("Environment variables loaded from .env")
 
 # DEBUG: Print DATABASE_URL to verify it's being set correctly (only in debug mode)
-if os.getenv('AGNO_DEBUG', 'false').lower() == 'true':
+if os.getenv("AGNO_DEBUG", "false").lower() == "true":
     print(f"DEBUG: DATABASE_URL = {os.getenv('DATABASE_URL')}")
     logger.info(f"DEBUG: DATABASE_URL from environment = {os.getenv('DATABASE_URL')}")
 
@@ -65,7 +60,7 @@ from sqlalchemy import text
 app = FastAPI(
     title="Cirkelline AgentOS",
     description="Multi-Agent System with Knowledge Filtering",
-    version="1.3.3"
+    version="1.3.3",
 )
 
 logger.info("✅ Stage 1: FastAPI app created at module level")
@@ -85,9 +80,10 @@ gateway_client = GatewayClient(
     gateway_url=os.getenv("GATEWAY_URL", "http://localhost:7779"),
     platform_code=os.getenv("GATEWAY_PLATFORM_CODE", "cirkelline"),
     api_key=os.getenv("GATEWAY_API_KEY", ""),
-    timeout=5.0
+    timeout=5.0,
 )
 logger.info(f"✅ Gateway client initialized: {gateway_client.gateway_url}")
+
 
 # ════════════════════════════════════════════════════════════════
 # DATABASE MIGRATIONS (v1.3.0 - Workflow Tables)
@@ -114,8 +110,16 @@ def run_migrations():
                     optimization_run_id VARCHAR
                 )
             """))
-            conn.execute(sql_text("CREATE INDEX IF NOT EXISTS idx_archive_user_id ON ai.agno_memories_archive(user_id)"))
-            conn.execute(sql_text("CREATE INDEX IF NOT EXISTS idx_archive_run_id ON ai.agno_memories_archive(optimization_run_id)"))
+            conn.execute(
+                sql_text(
+                    "CREATE INDEX IF NOT EXISTS idx_archive_user_id ON ai.agno_memories_archive(user_id)"
+                )
+            )
+            conn.execute(
+                sql_text(
+                    "CREATE INDEX IF NOT EXISTS idx_archive_run_id ON ai.agno_memories_archive(optimization_run_id)"
+                )
+            )
 
             # Create workflow runs table
             conn.execute(sql_text("""
@@ -135,13 +139,22 @@ def run_migrations():
                     metrics JSONB
                 )
             """))
-            conn.execute(sql_text("CREATE INDEX IF NOT EXISTS idx_workflow_runs_status ON ai.workflow_runs(status)"))
-            conn.execute(sql_text("CREATE INDEX IF NOT EXISTS idx_workflow_runs_user ON ai.workflow_runs(user_id)"))
+            conn.execute(
+                sql_text(
+                    "CREATE INDEX IF NOT EXISTS idx_workflow_runs_status ON ai.workflow_runs(status)"
+                )
+            )
+            conn.execute(
+                sql_text(
+                    "CREATE INDEX IF NOT EXISTS idx_workflow_runs_user ON ai.workflow_runs(user_id)"
+                )
+            )
 
             conn.commit()
             logger.info("✅ Database migrations completed (v1.3.0 workflow tables)")
     except Exception as e:
         logger.warning(f"⚠️ Database migration warning: {e}")
+
 
 # Run migrations on startup
 run_migrations()
@@ -255,6 +268,7 @@ app.include_router(ckc_folder_router, prefix="/api/ckc", tags=["CKC Folder Switc
 # Phase B7: Cross-Platform Navigation
 try:
     from cirkelline.endpoints.cross_platform_auth import router as cross_platform_router
+
     app.include_router(cross_platform_router, prefix="/auth", tags=["Cross-Platform Auth"])
     logger.info("✅ Cross-Platform Auth API loaded (/auth/*)")
 except ImportError as e:
@@ -263,6 +277,7 @@ except ImportError as e:
 # Agent Graduation (Cosmic Library → Cirkelline Pipeline)
 try:
     from cirkelline.endpoints.graduation import router as graduation_router
+
     app.include_router(graduation_router, tags=["Agent Graduation"])
     logger.info("✅ Agent Graduation API loaded (/api/agents/import-from-cosmic)")
 except ImportError as e:
@@ -271,6 +286,7 @@ except ImportError as e:
 # Landing Stats (Public — myaddspace.com)
 try:
     from cirkelline.api.landing_stats import router as landing_stats_router
+
     app.include_router(landing_stats_router, tags=["Landing Stats"])
     logger.info("✅ Landing Stats API loaded (/api/landing/stats)")
 except ImportError as e:
@@ -279,12 +295,14 @@ except ImportError as e:
 # Admiral Integration (ELLE.md ↔ Cirkelline)
 try:
     from cirkelline.endpoints.admiral_integration import router as admiral_router
+
     app.include_router(admiral_router, tags=["Admiral Integration"])
     logger.info("✅ Admiral Integration API loaded (/api/admiral/status + /api/admiral/event)")
 except ImportError as e:
     logger.warning(f"⚠️ Admiral Integration not available: {e}")
 
 logger.info("✅ All extracted routers registered with FastAPI app")
+
 
 # Custom /config endpoint - MUST be before AgentOS creation
 @app.get("/config")
@@ -294,9 +312,12 @@ async def health_check():
         "status": "healthy",
         "service": "cirkelline-system-backend",
         "version": "1.3.3",
-        "gateway": "connected" if gateway_client.is_configured else "not_configured"
+        "gateway": "connected" if gateway_client.is_configured else "not_configured",
     }
+
+
 logger.info("✅ Health check endpoint /config configured")
+
 
 @app.get("/api/gateway/status")
 async def gateway_status():
@@ -310,21 +331,20 @@ async def gateway_status():
                 "platform_code": gateway_client.platform_code,
                 "available_platforms": len(platforms),
                 "platforms": platforms,
-                "status": "operational"
+                "status": "operational",
             }
         else:
             return {
                 "connected": False,
                 "gateway_url": gateway_client.gateway_url,
-                "error": "No platforms returned"
+                "error": "No platforms returned",
             }
     except Exception as e:
-        return {
-            "connected": False,
-            "gateway_url": gateway_client.gateway_url,
-            "error": str(e)
-        }
+        return {"connected": False, "gateway_url": gateway_client.gateway_url, "error": str(e)}
+
+
 logger.info("✅ Gateway status endpoint /api/gateway/status configured")
+
 
 # TEMPORARY: Database migration endpoint to fix agno_memories schema
 @app.post("/admin/fix-memory-schema")
@@ -348,8 +368,10 @@ async def fix_memory_schema():
             before = {row[0]: row[1] for row in result.fetchall()}
 
             # Only fix created_at - it's the problematic one
-            if before.get('created_at') == 'timestamp with time zone':
-                conn.execute(text("ALTER TABLE ai.agno_memories ALTER COLUMN created_at DROP DEFAULT"))
+            if before.get("created_at") == "timestamp with time zone":
+                conn.execute(
+                    text("ALTER TABLE ai.agno_memories ALTER COLUMN created_at DROP DEFAULT")
+                )
                 conn.execute(text("""
                     ALTER TABLE ai.agno_memories
                     ALTER COLUMN created_at TYPE bigint
@@ -362,7 +384,9 @@ async def fix_memory_schema():
 
     except Exception as e:
         import traceback
+
         return {"status": "error", "error": str(e), "trace": traceback.format_exc()}
+
 
 logger.info("✅ Database migration endpoint /admin/fix-memory-schema configured")
 
@@ -373,6 +397,7 @@ knowledge = Knowledge(
     contents_db=db,
     vector_db=vector_db,
 )
+
 
 # Async knowledge loading function (for future use)
 async def load_knowledge_async():
@@ -404,13 +429,13 @@ async def load_knowledge_async():
     except Exception as e:
         logger.error(f"Error loading knowledge: {e}")
 
+
 # Uncomment to load knowledge at startup:
 # import asyncio
 # asyncio.run(load_knowledge_async())
 
 
 # ════════════════════════════════════════════════════════════════
-
 
 
 # STAGE 2: CONFIGURE MIDDLEWARES ON APP (before AgentOS)
@@ -498,9 +523,10 @@ app.add_middleware(
 # Added: 2025-12-14 for scalability to 1M users
 app.add_middleware(RateLimitMiddleware, window_seconds=60)
 
-logger.info("✅ Stage 2: All middleware registered (CORS + Custom + GatewayAuth + JWT + RateLimit configured)")
+logger.info(
+    "✅ Stage 2: All middleware registered (CORS + Custom + GatewayAuth + JWT + RateLimit configured)"
+)
 logger.info("✅ Phase B2: CKC Gateway Authentication Middleware Active")
-
 
 
 # ════════════════════════════════════════════════════════════════
@@ -527,13 +553,13 @@ logger.info("✅ Stage 3: Custom Cirkelline endpoint with dynamic stream handlin
 
 try:
     # DEBUG: AgentOS initialization progress (only shown when AGNO_DEBUG=true)
-    if os.getenv('AGNO_DEBUG', 'false').lower() == 'true':
+    if os.getenv("AGNO_DEBUG", "false").lower() == "true":
         print("=" * 80)
         print("DEBUG: Starting Stage 4 - AgentOS initialization")
         print("=" * 80)
     logger.info("Stage 4: Starting AgentOS initialization...")
 
-    if os.getenv('AGNO_DEBUG', 'false').lower() == 'true':
+    if os.getenv("AGNO_DEBUG", "false").lower() == "true":
         print("DEBUG: Stage 4.1 - Verifying agents exist...")
         print(f"  - audio_agent: {type(audio_agent).__name__}")
         print(f"  - video_agent: {type(video_agent).__name__}")
@@ -541,14 +567,14 @@ try:
         print(f"  - document_agent: {type(document_agent).__name__}")
     logger.info("Stage 4.1: All specialist agents verified")
 
-    if os.getenv('AGNO_DEBUG', 'false').lower() == 'true':
+    if os.getenv("AGNO_DEBUG", "false").lower() == "true":
         print("DEBUG: Stage 4.2 - Verifying teams exist...")
         print(f"  - cirkelline team: {type(cirkelline).__name__}")
         print(f"  - research_team: {type(research_team).__name__}")
         print(f"  - law_team: {type(law_team).__name__}")
     logger.info("Stage 4.2: All teams verified")
 
-    if os.getenv('AGNO_DEBUG', 'false').lower() == 'true':
+    if os.getenv("AGNO_DEBUG", "false").lower() == "true":
         print("DEBUG: Stage 4.3 - Creating AgentOS instance...")
     logger.info("Stage 4.3: Creating AgentOS with base_app...")
 
@@ -570,19 +596,19 @@ try:
         on_route_conflict="preserve_base_app",  # ← Keep our custom endpoint, don't override it
     )
 
-    if os.getenv('AGNO_DEBUG', 'false').lower() == 'true':
+    if os.getenv("AGNO_DEBUG", "false").lower() == "true":
         print("DEBUG: Stage 4.4 - AgentOS instance created successfully")
     logger.info("Stage 4.4: AgentOS instance created")
 
-    if os.getenv('AGNO_DEBUG', 'false').lower() == 'true':
+    if os.getenv("AGNO_DEBUG", "false").lower() == "true":
         print("DEBUG: Stage 4.5 - Getting app from AgentOS...")
     # Get the app (should return the same app instance we created)
     app = agent_os.get_app()
 
-    if os.getenv('AGNO_DEBUG', 'false').lower() == 'true':
+    if os.getenv("AGNO_DEBUG", "false").lower() == "true":
         print("DEBUG: Stage 4.6 - App retrieved successfully")
     logger.info("✅ Stage 4: AgentOS configured with base_app parameter")
-    if os.getenv('AGNO_DEBUG', 'false').lower() == 'true':
+    if os.getenv("AGNO_DEBUG", "false").lower() == "true":
         print("=" * 80)
         print("DEBUG: Stage 4 completed successfully!")
         print("=" * 80)
@@ -593,6 +619,7 @@ except Exception as e:
     print("=" * 80)
     logger.error(f"STAGE 4 CRASH: {type(e).__name__}: {str(e)}")
     import traceback
+
     traceback.print_exc()
     logger.error(traceback.format_exc())
     raise
@@ -602,13 +629,10 @@ except Exception as e:
 # ════════════════════════════════════════════════════════════════
 
 
-
-
-
-
 # ════════════════════════════════════════════════════════════════
 # GOOGLE OAUTH HELPER FUNCTIONS
 # ════════════════════════════════════════════════════════════════
+
 
 async def refresh_google_token(user_id: str) -> bool:
     """
@@ -629,6 +653,7 @@ async def refresh_google_token(user_id: str) -> bool:
     """
     try:
         from utils.encryption import decrypt_token, encrypt_token
+
         # Get current tokens from database
         with Session(_shared_engine) as session:
             result = session.execute(
@@ -637,7 +662,7 @@ async def refresh_google_token(user_id: str) -> bool:
                     FROM google_tokens
                     WHERE user_id = :user_id
                 """),
-                {"user_id": user_id}
+                {"user_id": user_id},
             )
             row = result.fetchone()
 
@@ -659,7 +684,7 @@ async def refresh_google_token(user_id: str) -> bool:
                 "client_id": os.getenv("GOOGLE_CLIENT_ID"),
                 "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
                 "refresh_token": refresh_token,
-                "grant_type": "refresh_token"
+                "grant_type": "refresh_token",
             }
 
             async with httpx.AsyncClient() as client:
@@ -692,8 +717,8 @@ async def refresh_google_token(user_id: str) -> bool:
                         "access_token": encrypted_access,
                         "expiry": new_expiry,
                         "updated_at": datetime.utcnow(),
-                        "user_id": user_id
-                    }
+                        "user_id": user_id,
+                    },
                 )
                 session.commit()
 
@@ -703,6 +728,7 @@ async def refresh_google_token(user_id: str) -> bool:
     except Exception as e:
         logger.error(f"Error refreshing Google token: {e}")
         import traceback
+
         logger.error(traceback.format_exc())
         return False
 
@@ -726,6 +752,7 @@ async def get_user_google_credentials(user_id: str):
     """
     try:
         from utils.encryption import decrypt_token
+
         # Get tokens from database
         with Session(_shared_engine) as session:
             result = session.execute(
@@ -734,7 +761,7 @@ async def get_user_google_credentials(user_id: str):
                     FROM google_tokens
                     WHERE user_id = :user_id
                 """),
-                {"user_id": user_id}
+                {"user_id": user_id},
             )
             row = result.fetchone()
 
@@ -762,7 +789,7 @@ async def get_user_google_credentials(user_id: str):
                                 FROM google_tokens
                                 WHERE user_id = :user_id
                             """),
-                            {"user_id": user_id}
+                            {"user_id": user_id},
                         )
                         row = result.fetchone()
                         encrypted_access = row[0]
@@ -787,7 +814,7 @@ async def get_user_google_credentials(user_id: str):
                 token_uri="https://oauth2.googleapis.com/token",
                 client_id=os.getenv("GOOGLE_CLIENT_ID"),
                 client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-                scopes=scopes_list
+                scopes=scopes_list,
             )
 
             logger.info(f"✅ Retrieved Google credentials for user {user_id}")
@@ -796,8 +823,10 @@ async def get_user_google_credentials(user_id: str):
     except Exception as e:
         logger.error(f"Error getting Google credentials: {e}")
         import traceback
+
         logger.error(traceback.format_exc())
         return None
+
 
 # ════════════════════════════════════════════════════════════════
 # GOOGLE OAUTH ENDPOINTS
@@ -805,6 +834,7 @@ async def get_user_google_credentials(user_id: str):
 
 # NOTION DYNAMIC DATABASE DISCOVERY HELPERS
 # ════════════════════════════════════════════════════════════════
+
 
 def get_database_schema(notion_client, database_id: str) -> dict:
     """
@@ -824,11 +854,7 @@ def get_database_schema(notion_client, database_id: str) -> dict:
     try:
         db = notion_client.data_sources.retrieve(data_source_id=database_id)
 
-        schema = {
-            "id": db["id"],
-            "title": "",
-            "properties": {}
-        }
+        schema = {"id": db["id"], "title": "", "properties": {}}
 
         # Extract database title
         title_list = db.get("title", [])
@@ -838,21 +864,21 @@ def get_database_schema(notion_client, database_id: str) -> dict:
         # Extract property definitions
         for prop_name, prop_config in db.get("properties", {}).items():
             prop_type = prop_config.get("type")
-            property_schema = {
-                "id": prop_config.get("id"),
-                "type": prop_type,
-                "name": prop_name
-            }
+            property_schema = {"id": prop_config.get("id"), "type": prop_type, "name": prop_name}
 
             # Include type-specific configuration
             if prop_type in ["select", "multi_select"]:
                 options = prop_config.get(prop_type, {}).get("options", [])
-                property_schema["options"] = [{"name": opt.get("name"), "color": opt.get("color")} for opt in options]
+                property_schema["options"] = [
+                    {"name": opt.get("name"), "color": opt.get("color")} for opt in options
+                ]
 
             elif prop_type == "status":
                 status_config = prop_config.get("status", {})
                 options = status_config.get("options", [])
-                property_schema["options"] = [{"name": opt.get("name"), "color": opt.get("color")} for opt in options]
+                property_schema["options"] = [
+                    {"name": opt.get("name"), "color": opt.get("color")} for opt in options
+                ]
                 property_schema["groups"] = status_config.get("groups", [])
 
             schema["properties"][prop_name] = property_schema
@@ -862,6 +888,7 @@ def get_database_schema(notion_client, database_id: str) -> dict:
     except Exception as e:
         logger.error(f"Error getting database schema for {database_id}: {e}")
         raise
+
 
 def classify_database_type(schema: dict) -> str:
     """
@@ -888,18 +915,25 @@ def classify_database_type(schema: dict) -> str:
         return "tasks"
 
     # Projects database indicators
-    if any("project" in p for p in props) and any(("timeline" in p or "start" in p or "end" in p) for p in props):
+    if any("project" in p for p in props) and any(
+        ("timeline" in p or "start" in p or "end" in p) for p in props
+    ):
         return "projects"
 
     # Companies database indicators
-    if any(("company" in p or "domain" in p or "website" in p) for p in props) and any("industry" in p or "size" in p for p in props):
+    if any(("company" in p or "domain" in p or "website" in p) for p in props) and any(
+        "industry" in p or "size" in p for p in props
+    ):
         return "companies"
 
     # Documentation database indicators
-    if any(("doc" in p or "article" in p or "page" in p) for p in props) and any("category" in p or "tag" in p for p in props):
+    if any(("doc" in p or "article" in p or "page" in p) for p in props) and any(
+        "category" in p or "tag" in p for p in props
+    ):
         return "documentation"
 
     return "custom"
+
 
 def extract_property_value(prop_data: dict, prop_type: str):
     """
@@ -988,6 +1022,7 @@ def extract_property_value(prop_data: dict, prop_type: str):
 
     return None
 
+
 def discover_and_store_user_databases_sync(user_id: str, access_token: str):
     """
     Discover all Notion databases for a user and store them in notion_user_databases table
@@ -1020,7 +1055,7 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
             try:
                 search_params = {
                     "filter": {"property": "object", "value": "data_source"},
-                    "page_size": 100
+                    "page_size": 100,
                 }
                 if start_cursor:
                     search_params["start_cursor"] = start_cursor
@@ -1031,15 +1066,21 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
                     if result.get("object") == "data_source":
                         db_id = result["id"]
                         title_list = result.get("title", [])
-                        db_title = title_list[0].get("text", {}).get("content", "Untitled") if title_list else "Untitled"
+                        db_title = (
+                            title_list[0].get("text", {}).get("content", "Untitled")
+                            if title_list
+                            else "Untitled"
+                        )
 
-                        databases.append({
-                            "id": db_id,
-                            "title": db_title,
-                            "url": result.get("url", ""),
-                            "created_time": result.get("created_time", ""),
-                            "last_edited_time": result.get("last_edited_time", "")
-                        })
+                        databases.append(
+                            {
+                                "id": db_id,
+                                "title": db_title,
+                                "url": result.get("url", ""),
+                                "created_time": result.get("created_time", ""),
+                                "last_edited_time": result.get("last_edited_time", ""),
+                            }
+                        )
                         discovered_count += 1
 
                 # Handle pagination
@@ -1080,7 +1121,9 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
 
                     # Put title first, then the rest in Notion's original order
                     if title_property and title_property in property_keys:
-                        property_order = [title_property] + [k for k in property_keys if k != title_property]
+                        property_order = [title_property] + [
+                            k for k in property_keys if k != title_property
+                        ]
                     else:
                         property_order = property_keys
 
@@ -1106,8 +1149,8 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
                             "database_title": db["title"],
                             "database_type": db_type,
                             "schema": json.dumps(schema),
-                            "property_order": json.dumps(property_order)
-                        }
+                            "property_order": json.dumps(property_order),
+                        },
                     )
                     stored_count += 1
 
@@ -1123,11 +1166,12 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
     except Exception as e:
         logger.error(f"❌ Error discovering databases for user {user_id[:8]}: {e}")
         import traceback
+
         logger.error(traceback.format_exc())
         return {"success": False, "error": str(e)}
 
-logger.info("✅ Notion dynamic database discovery helpers loaded")
 
+logger.info("✅ Notion dynamic database discovery helpers loaded")
 
 
 async def activity_log_stream(request: Request, token: str = Query(...)):
@@ -1139,11 +1183,7 @@ async def activity_log_stream(request: Request, token: str = Query(...)):
     """
     # Verify admin access
     try:
-        payload = pyjwt.decode(
-            token,
-            os.getenv("JWT_SECRET_KEY"),
-            algorithms=["HS256"]
-        )
+        payload = pyjwt.decode(token, os.getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
         user_id = payload.get("user_id")
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -1152,13 +1192,13 @@ async def activity_log_stream(request: Request, token: str = Query(...)):
         raise HTTPException(status_code=401, detail="Authentication required")
 
     # Check if user is admin
-    db_url = db.db_url if hasattr(db, 'db_url') else os.getenv("DATABASE_URL")
+    db_url = db.db_url if hasattr(db, "db_url") else os.getenv("DATABASE_URL")
     engine = create_engine(db_url)
 
     with Session(engine) as session:
         admin_check = session.execute(
             text("SELECT 1 FROM admin_profiles WHERE user_id = :user_id LIMIT 1"),
-            {"user_id": user_id}
+            {"user_id": user_id},
         )
         is_admin = admin_check.fetchone() is not None
 
@@ -1180,10 +1220,7 @@ async def activity_log_stream(request: Request, token: str = Query(...)):
                 log_data = await client_queue.get()
 
                 # Send to client
-                event_json = json.dumps({
-                    'type': 'new_activity',
-                    'data': log_data
-                })
+                event_json = json.dumps({"type": "new_activity", "data": log_data})
                 yield f"data: {event_json}\n\n"
 
         except asyncio.CancelledError:
@@ -1200,9 +1237,10 @@ async def activity_log_stream(request: Request, token: str = Query(...)):
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
-            "X-Accel-Buffering": "no"  # Disable nginx buffering
-        }
+            "X-Accel-Buffering": "no",  # Disable nginx buffering
+        },
     )
+
 
 logger.info("✅ Activity logs SSE stream endpoint configured")
 
@@ -1246,8 +1284,8 @@ if __name__ == "__main__":
         # Single-process uvicorn (no workers parameter = single process, no master/worker split)
         logger.info("Starting uvicorn in single-process mode...")
         uvicorn.run(
-            app,                  # Pass app object directly for single-process mode
-            host="127.0.0.1",     # Localhost only — exposed via Caddy reverse proxy
+            app,  # Pass app object directly for single-process mode
+            host="127.0.0.1",  # Localhost only — exposed via Caddy reverse proxy
             port=7777,
             log_level="info",
             access_log=True,

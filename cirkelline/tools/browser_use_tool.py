@@ -27,6 +27,7 @@ Controller = None
 try:
     from browser_use import Agent as BrowserAgent
     from browser_use import Controller
+
     BROWSERUSE_AVAILABLE = True
     logger.info("browser-use available - web automation enabled")
 except ImportError:
@@ -68,9 +69,7 @@ class BrowserUseTool:
             headless: Run browser in headless mode (default: True)
         """
         if not BROWSERUSE_AVAILABLE:
-            raise ImportError(
-                "browser-use not installed. Run: pip install browser-use"
-            )
+            raise ImportError("browser-use not installed. Run: pip install browser-use")
 
         self.headless = headless
         self._controller: Optional[Controller] = None
@@ -112,10 +111,12 @@ class BrowserUseTool:
 
             return {
                 "success": True,
-                "result": result.final_result if hasattr(result, 'final_result') else str(result),
-                "extracted_data": result.extracted_data if hasattr(result, 'extracted_data') else None,
-                "history": result.history if hasattr(result, 'history') else [],
-                "steps_taken": len(result.history) if hasattr(result, 'history') else 0,
+                "result": result.final_result if hasattr(result, "final_result") else str(result),
+                "extracted_data": (
+                    result.extracted_data if hasattr(result, "extracted_data") else None
+                ),
+                "history": result.history if hasattr(result, "history") else [],
+                "steps_taken": len(result.history) if hasattr(result, "history") else 0,
             }
 
         except Exception as e:

@@ -28,8 +28,10 @@ logger = logging.getLogger(__name__)
 # HEALTH STATUS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class HealthStatus(str, Enum):
     """Health status levels."""
+
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
@@ -39,6 +41,7 @@ class HealthStatus(str, Enum):
 @dataclass
 class ServiceHealth:
     """Health status of a single service."""
+
     name: str
     status: HealthStatus = HealthStatus.UNKNOWN
     latency_ms: Optional[int] = None
@@ -60,6 +63,7 @@ class ServiceHealth:
 @dataclass
 class CICDStatus:
     """CI/CD pipeline status."""
+
     pipeline: str
     status: str = "unknown"
     last_run: Optional[str] = None
@@ -81,6 +85,7 @@ class CICDStatus:
 # ═══════════════════════════════════════════════════════════════════════════════
 # SYSTEM STATUS
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class SystemStatus:
     """
@@ -105,6 +110,7 @@ class SystemStatus:
     async def check_database(self) -> ServiceHealth:
         """Check PostgreSQL database health."""
         import time
+
         health = ServiceHealth(name="database")
 
         if not self.database_url:
@@ -139,6 +145,7 @@ class SystemStatus:
     async def check_redis(self) -> ServiceHealth:
         """Check Redis health."""
         import time
+
         health = ServiceHealth(name="redis")
 
         try:
@@ -175,6 +182,7 @@ class SystemStatus:
     async def check_vector_db(self) -> ServiceHealth:
         """Check vector database (pgvector) health."""
         import time
+
         health = ServiceHealth(name="vector_db")
 
         if not self.database_url:
@@ -316,12 +324,10 @@ class SystemStatus:
 
         # Determine overall status
         unhealthy_count = sum(
-            1 for s in self._services.values()
-            if s.status == HealthStatus.UNHEALTHY
+            1 for s in self._services.values() if s.status == HealthStatus.UNHEALTHY
         )
         degraded_count = sum(
-            1 for s in self._services.values()
-            if s.status == HealthStatus.DEGRADED
+            1 for s in self._services.values() if s.status == HealthStatus.DEGRADED
         )
 
         if unhealthy_count > 0:
@@ -334,14 +340,8 @@ class SystemStatus:
         return {
             "overall": overall.value,
             "timestamp": datetime.utcnow().isoformat(),
-            "services": {
-                name: service.to_dict()
-                for name, service in self._services.items()
-            },
-            "cicd": {
-                name: cicd.to_dict()
-                for name, cicd in self._cicd.items()
-            },
+            "services": {name: service.to_dict() for name, service in self._services.items()},
+            "cicd": {name: cicd.to_dict() for name, cicd in self._cicd.items()},
         }
 
     def get_service_status(self, name: str) -> Optional[ServiceHealth]:

@@ -44,7 +44,7 @@ class CirkellineTasksTools(Toolkit):
             - delete_task: Delete a task
             - create_task_list: Create a new task list
             """,
-            add_instructions=True
+            add_instructions=True,
         )
         logger.info("✅ CirkellineTasksTools loaded (v1.3.6 - with Google Tasks sync)")
 
@@ -54,7 +54,7 @@ class CirkellineTasksTools(Toolkit):
             # Check for existing default list
             result = conn.execute(
                 text("SELECT id FROM task_lists WHERE user_id = :user_id AND is_default = true"),
-                {"user_id": user_id}
+                {"user_id": user_id},
             )
             row = result.fetchone()
 
@@ -68,7 +68,7 @@ class CirkellineTasksTools(Toolkit):
                     VALUES (:user_id, 'My Tasks', '#8E0B83', true, 'local')
                     RETURNING id
                 """),
-                {"user_id": user_id}
+                {"user_id": user_id},
             )
             row = result.fetchone()
             conn.commit()
@@ -80,14 +80,16 @@ class CirkellineTasksTools(Toolkit):
         with engine.connect() as conn:
             result = conn.execute(
                 text("SELECT external_id FROM task_lists WHERE id = :id AND user_id = :user_id"),
-                {"id": list_id, "user_id": user_id}
+                {"id": list_id, "user_id": user_id},
             )
             row = result.fetchone()
             if row and row.external_id:
                 return row.external_id
         return None
 
-    def _try_google_sync(self, user_id: str, task_id: str, list_id: str, action: str, data: dict) -> str:
+    def _try_google_sync(
+        self, user_id: str, task_id: str, list_id: str, action: str, data: dict
+    ) -> str:
         """
         Try to sync with Google Tasks if connected. Returns status message.
 
@@ -111,7 +113,8 @@ class CirkellineTasksTools(Toolkit):
                 return ""  # Not connected, no message needed
 
             from googleapiclient.discovery import build
-            service = build('tasks', 'v1', credentials=google_creds)
+
+            service = build("tasks", "v1", credentials=google_creds)
 
             # Get or find the Google task list to use
             google_list_id = self._get_list_external_id(list_id, user_id)
@@ -122,26 +125,30 @@ class CirkellineTasksTools(Toolkit):
 
             if action == "create":
                 task = {
-                    'title': data['title'],
-                    'notes': data.get('notes', '') or '',
+                    "title": data["title"],
+                    "notes": data.get("notes", "") or "",
                 }
-                if data.get('due_date'):
+                if data.get("due_date"):
                     # Google Tasks wants RFC 3339 format
-                    task['due'] = data['due_date'].isoformat()
+                    task["due"] = data["due_date"].isoformat()
 
                 created = service.tasks().insert(tasklist=google_list_id, body=task).execute()
 
                 # Update local task with Google ID
                 with engine.connect() as conn:
                     conn.execute(
-                        text("UPDATE tasks SET external_id = :ext_id, sync_status = 'synced' WHERE id = :id"),
-                        {"ext_id": created['id'], "id": task_id}
+                        text(
+                            "UPDATE tasks SET external_id = :ext_id, sync_status = 'synced' WHERE id = :id"
+                        ),
+                        {"ext_id": created["id"], "id": task_id},
                     )
                     # Also update the list to have external_id if it didn't have one
                     if google_list_id == "@default":
                         conn.execute(
-                            text("UPDATE task_lists SET external_id = :ext_id, sync_enabled = true WHERE id = :id"),
-                            {"ext_id": "@default", "id": list_id}
+                            text(
+                                "UPDATE task_lists SET external_id = :ext_id, sync_enabled = true WHERE id = :id"
+                            ),
+                            {"ext_id": "@default", "id": list_id},
                         )
                     conn.commit()
                 return "📤 Synced to Google Tasks"
@@ -152,8 +159,7 @@ class CirkellineTasksTools(Toolkit):
                     # Get external_id from database
                     with engine.connect() as conn:
                         result = conn.execute(
-                            text("SELECT external_id FROM tasks WHERE id = :id"),
-                            {"id": task_id}
+                            text("SELECT external_id FROM tasks WHERE id = :id"), {"id": task_id}
                         )
                         row = result.fetchone()
                         if row:
@@ -162,16 +168,18 @@ class CirkellineTasksTools(Toolkit):
                 if external_id:
                     # Get current task, update it
                     task = service.tasks().get(tasklist=google_list_id, task=external_id).execute()
-                    if 'title' in data and data['title']:
-                        task['title'] = data['title']
-                    if 'notes' in data:
-                        task['notes'] = data['notes'] or ''
-                    if 'due_date' in data:
-                        task['due'] = data['due_date'].isoformat() if data['due_date'] else None
-                    if 'completed' in data:
-                        task['status'] = 'completed' if data['completed'] else 'needsAction'
+                    if "title" in data and data["title"]:
+                        task["title"] = data["title"]
+                    if "notes" in data:
+                        task["notes"] = data["notes"] or ""
+                    if "due_date" in data:
+                        task["due"] = data["due_date"].isoformat() if data["due_date"] else None
+                    if "completed" in data:
+                        task["status"] = "completed" if data["completed"] else "needsAction"
 
-                    service.tasks().update(tasklist=google_list_id, task=external_id, body=task).execute()
+                    service.tasks().update(
+                        tasklist=google_list_id, task=external_id, body=task
+                    ).execute()
                     return "📤 Synced to Google Tasks"
 
             elif action == "delete":
@@ -200,8 +208,8 @@ class CirkellineTasksTools(Toolkit):
             Formatted list of task lists with names and colors.
         """
         try:
-            user_id = session_state.get('current_user_id')
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            user_id = session_state.get("current_user_id")
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "Please log in to access your tasks."
 
             with engine.connect() as conn:
@@ -214,19 +222,21 @@ class CirkellineTasksTools(Toolkit):
                         WHERE user_id = :user_id
                         ORDER BY is_default DESC, name ASC
                     """),
-                    {"user_id": user_id}
+                    {"user_id": user_id},
                 )
 
                 lists = []
                 for row in result:
-                    lists.append({
-                        "id": str(row.id),
-                        "name": row.name,
-                        "color": row.color,
-                        "is_default": row.is_default,
-                        "active": row.active_count,
-                        "completed": row.completed_count
-                    })
+                    lists.append(
+                        {
+                            "id": str(row.id),
+                            "name": row.name,
+                            "color": row.color,
+                            "is_default": row.is_default,
+                            "active": row.active_count,
+                            "completed": row.completed_count,
+                        }
+                    )
 
                 if not lists:
                     return "No task lists found. Create one by saying 'create a task list called Work'."
@@ -234,7 +244,9 @@ class CirkellineTasksTools(Toolkit):
                 result_lines = [f"You have {len(lists)} task list(s):"]
                 for lst in lists:
                     default = " (default)" if lst["is_default"] else ""
-                    result_lines.append(f"- {lst['name']}{default}: {lst['active']} active, {lst['completed']} completed (ID: {lst['id']})")
+                    result_lines.append(
+                        f"- {lst['name']}{default}: {lst['active']} active, {lst['completed']} completed (ID: {lst['id']})"
+                    )
 
                 return "\n".join(result_lines)
 
@@ -243,11 +255,7 @@ class CirkellineTasksTools(Toolkit):
             return f"Error getting task lists: {e}"
 
     def get_tasks(
-        self,
-        session_state: dict,
-        list_id: str = None,
-        completed: bool = None,
-        priority: str = None
+        self, session_state: dict, list_id: str = None, completed: bool = None, priority: str = None
     ) -> str:
         """
         Get tasks for the user, optionally filtered.
@@ -262,8 +270,8 @@ class CirkellineTasksTools(Toolkit):
             Formatted list of tasks with titles, due dates, and priorities.
         """
         try:
-            user_id = session_state.get('current_user_id')
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            user_id = session_state.get("current_user_id")
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "Please log in to access your tasks."
 
             with engine.connect() as conn:
@@ -294,15 +302,17 @@ class CirkellineTasksTools(Toolkit):
 
                 tasks = []
                 for row in result:
-                    tasks.append({
-                        "id": str(row.id),
-                        "title": row.title,
-                        "notes": row.notes,
-                        "due_date": row.due_date,
-                        "completed": row.completed,
-                        "priority": row.priority,
-                        "list_name": row.list_name
-                    })
+                    tasks.append(
+                        {
+                            "id": str(row.id),
+                            "title": row.title,
+                            "notes": row.notes,
+                            "due_date": row.due_date,
+                            "completed": row.completed,
+                            "priority": row.priority,
+                            "list_name": row.list_name,
+                        }
+                    )
 
                 if not tasks:
                     return "No tasks found matching your criteria."
@@ -310,13 +320,23 @@ class CirkellineTasksTools(Toolkit):
                 active = [t for t in tasks if not t["completed"]]
                 done = [t for t in tasks if t["completed"]]
 
-                result_lines = [f"Found {len(tasks)} task(s) ({len(active)} active, {len(done)} completed):"]
+                result_lines = [
+                    f"Found {len(tasks)} task(s) ({len(active)} active, {len(done)} completed):"
+                ]
 
                 for task in tasks:
                     status = "✓" if task["completed"] else "○"
-                    priority_icon = {"urgent": "🔴", "high": "🟠", "medium": "🟡", "low": "🟢"}.get(task["priority"], "")
-                    due = f" (due: {task['due_date'].strftime('%Y-%m-%d')})" if task["due_date"] else ""
-                    result_lines.append(f"{status} {priority_icon} {task['title']}{due} [{task['list_name']}] (ID: {task['id']})")
+                    priority_icon = {"urgent": "🔴", "high": "🟠", "medium": "🟡", "low": "🟢"}.get(
+                        task["priority"], ""
+                    )
+                    due = (
+                        f" (due: {task['due_date'].strftime('%Y-%m-%d')})"
+                        if task["due_date"]
+                        else ""
+                    )
+                    result_lines.append(
+                        f"{status} {priority_icon} {task['title']}{due} [{task['list_name']}] (ID: {task['id']})"
+                    )
 
                 return "\n".join(result_lines)
 
@@ -331,7 +351,7 @@ class CirkellineTasksTools(Toolkit):
         list_id: str = None,
         notes: str = None,
         due_date: str = None,
-        priority: str = "medium"
+        priority: str = "medium",
     ) -> str:
         """
         Create a new task.
@@ -348,8 +368,8 @@ class CirkellineTasksTools(Toolkit):
             Confirmation message with task details.
         """
         try:
-            user_id = session_state.get('current_user_id')
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            user_id = session_state.get("current_user_id")
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "Please log in to create tasks."
 
             # Get or create default list if not provided
@@ -368,7 +388,7 @@ class CirkellineTasksTools(Toolkit):
                 # Verify list ownership
                 check = conn.execute(
                     text("SELECT id, name FROM task_lists WHERE id = :id AND user_id = :user_id"),
-                    {"id": list_id, "user_id": user_id}
+                    {"id": list_id, "user_id": user_id},
                 )
                 list_row = check.fetchone()
                 if not list_row:
@@ -376,8 +396,10 @@ class CirkellineTasksTools(Toolkit):
 
                 # Get next position
                 pos_result = conn.execute(
-                    text("SELECT COALESCE(MAX(position), 0) + 1 FROM tasks WHERE list_id = :list_id"),
-                    {"list_id": list_id}
+                    text(
+                        "SELECT COALESCE(MAX(position), 0) + 1 FROM tasks WHERE list_id = :list_id"
+                    ),
+                    {"list_id": list_id},
                 )
                 position = pos_result.fetchone()[0]
 
@@ -395,8 +417,8 @@ class CirkellineTasksTools(Toolkit):
                         "notes": notes,
                         "due_date": parsed_due,
                         "priority": priority,
-                        "position": position
-                    }
+                        "position": position,
+                    },
                 )
                 task_id = result.fetchone().id
                 conn.commit()
@@ -404,14 +426,17 @@ class CirkellineTasksTools(Toolkit):
                 logger.info(f"✅ Created task '{title}' for user {user_id}")
 
                 # Try to sync to Google (if connected)
-                sync_msg = self._try_google_sync(user_id, str(task_id), list_id, "create", {
-                    "title": title,
-                    "notes": notes,
-                    "due_date": parsed_due,
-                    "priority": priority
-                })
+                sync_msg = self._try_google_sync(
+                    user_id,
+                    str(task_id),
+                    list_id,
+                    "create",
+                    {"title": title, "notes": notes, "due_date": parsed_due, "priority": priority},
+                )
 
-                response = f"✅ Created task: {title}\n📋 List: {list_row.name}\n⚡ Priority: {priority}"
+                response = (
+                    f"✅ Created task: {title}\n📋 List: {list_row.name}\n⚡ Priority: {priority}"
+                )
                 if parsed_due:
                     response += f"\n📅 Due: {due_date}"
                 response += f"\nID: {task_id}"
@@ -432,7 +457,7 @@ class CirkellineTasksTools(Toolkit):
         notes: str = None,
         due_date: str = None,
         priority: str = None,
-        completed: bool = None
+        completed: bool = None,
     ) -> str:
         """
         Update an existing task.
@@ -450,15 +475,17 @@ class CirkellineTasksTools(Toolkit):
             Confirmation of the update.
         """
         try:
-            user_id = session_state.get('current_user_id')
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            user_id = session_state.get("current_user_id")
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "Please log in to update tasks."
 
             with engine.connect() as conn:
                 # Get task info for Google sync
                 check = conn.execute(
-                    text("SELECT list_id, external_id FROM tasks WHERE id = :task_id AND user_id = :user_id"),
-                    {"task_id": task_id, "user_id": user_id}
+                    text(
+                        "SELECT list_id, external_id FROM tasks WHERE id = :task_id AND user_id = :user_id"
+                    ),
+                    {"task_id": task_id, "user_id": user_id},
                 )
                 task_info = check.fetchone()
                 if not task_info:
@@ -519,13 +546,19 @@ class CirkellineTasksTools(Toolkit):
                 # Try to sync to Google (if connected and task has external_id)
                 sync_msg = ""
                 if external_id:
-                    sync_msg = self._try_google_sync(user_id, task_id, list_id, "update", {
-                        "external_id": external_id,
-                        "title": title,
-                        "notes": notes,
-                        "due_date": parsed_due,
-                        "completed": completed
-                    })
+                    sync_msg = self._try_google_sync(
+                        user_id,
+                        task_id,
+                        list_id,
+                        "update",
+                        {
+                            "external_id": external_id,
+                            "title": title,
+                            "notes": notes,
+                            "due_date": parsed_due,
+                            "completed": completed,
+                        },
+                    )
 
                 if completed:
                     response = f"✅ Completed task: {row.title}"
@@ -552,15 +585,17 @@ class CirkellineTasksTools(Toolkit):
             Confirmation of deletion.
         """
         try:
-            user_id = session_state.get('current_user_id')
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            user_id = session_state.get("current_user_id")
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "Please log in to delete tasks."
 
             with engine.connect() as conn:
                 # Get task info for Google sync
                 check = conn.execute(
-                    text("SELECT title, list_id, external_id FROM tasks WHERE id = :id AND user_id = :user_id"),
-                    {"id": task_id, "user_id": user_id}
+                    text(
+                        "SELECT title, list_id, external_id FROM tasks WHERE id = :id AND user_id = :user_id"
+                    ),
+                    {"id": task_id, "user_id": user_id},
                 )
                 row = check.fetchone()
 
@@ -573,7 +608,7 @@ class CirkellineTasksTools(Toolkit):
 
                 conn.execute(
                     text("DELETE FROM tasks WHERE id = :id AND user_id = :user_id"),
-                    {"id": task_id, "user_id": user_id}
+                    {"id": task_id, "user_id": user_id},
                 )
                 conn.commit()
 
@@ -582,9 +617,9 @@ class CirkellineTasksTools(Toolkit):
                 # Try to sync delete to Google
                 sync_msg = ""
                 if external_id:
-                    sync_msg = self._try_google_sync(user_id, task_id, list_id, "delete", {
-                        "external_id": external_id
-                    })
+                    sync_msg = self._try_google_sync(
+                        user_id, task_id, list_id, "delete", {"external_id": external_id}
+                    )
 
                 response = f"✅ Deleted task: {title}"
                 if sync_msg:
@@ -595,12 +630,7 @@ class CirkellineTasksTools(Toolkit):
             logger.error(f"Error deleting task: {e}")
             return f"Error deleting task: {e}"
 
-    def create_task_list(
-        self,
-        session_state: dict,
-        name: str,
-        color: str = "#8E0B83"
-    ) -> str:
+    def create_task_list(self, session_state: dict, name: str, color: str = "#8E0B83") -> str:
         """
         Create a new task list.
 
@@ -613,15 +643,15 @@ class CirkellineTasksTools(Toolkit):
             Confirmation with the new list details.
         """
         try:
-            user_id = session_state.get('current_user_id')
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            user_id = session_state.get("current_user_id")
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "Please log in to create task lists."
 
             with engine.connect() as conn:
                 # Check if first list (make it default)
                 count_result = conn.execute(
                     text("SELECT COUNT(*) FROM task_lists WHERE user_id = :user_id"),
-                    {"user_id": user_id}
+                    {"user_id": user_id},
                 )
                 is_default = count_result.fetchone()[0] == 0
 
@@ -631,7 +661,7 @@ class CirkellineTasksTools(Toolkit):
                         VALUES (:user_id, :name, :color, :is_default, 'local')
                         RETURNING id
                     """),
-                    {"user_id": user_id, "name": name, "color": color, "is_default": is_default}
+                    {"user_id": user_id, "name": name, "color": color, "is_default": is_default},
                 )
                 list_id = result.fetchone().id
                 conn.commit()

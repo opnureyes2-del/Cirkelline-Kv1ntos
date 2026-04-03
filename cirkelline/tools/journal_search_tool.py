@@ -27,11 +27,7 @@ class JournalSearchTool(Toolkit):
         self.register(self.get_journal_by_date)
 
     def search_journals(
-        self,
-        user_id: str,
-        topics: List[str] = None,
-        date_range: str = "7d",
-        limit: int = 10
+        self, user_id: str, topics: List[str] = None, date_range: str = "7d", limit: int = 10
     ) -> str:
         """
         Search journal entries by topics and/or date range.
@@ -50,7 +46,9 @@ class JournalSearchTool(Toolkit):
             start_date = self._parse_date_range(date_range)
 
             # Build query
-            query_parts = ["SELECT journal_date, summary, topics, outcomes FROM ai.user_journals WHERE user_id = :user_id"]
+            query_parts = [
+                "SELECT journal_date, summary, topics, outcomes FROM ai.user_journals WHERE user_id = :user_id"
+            ]
             params = {"user_id": user_id, "limit": limit}
 
             if start_date:
@@ -124,7 +122,7 @@ class JournalSearchTool(Toolkit):
                         ORDER BY journal_date DESC
                         LIMIT :limit
                     """),
-                    {"user_id": user_id, "limit": limit}
+                    {"user_id": user_id, "limit": limit},
                 )
                 rows = result.fetchall()
 
@@ -181,7 +179,7 @@ class JournalSearchTool(Toolkit):
                         WHERE user_id = :user_id
                         AND journal_date = :target_date
                     """),
-                    {"user_id": user_id, "target_date": target_date}
+                    {"user_id": user_id, "target_date": target_date},
                 )
                 row = result.fetchone()
 

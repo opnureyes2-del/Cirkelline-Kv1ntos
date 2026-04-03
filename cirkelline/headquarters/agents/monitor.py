@@ -44,9 +44,11 @@ logger = logging.getLogger(__name__)
 # METRICS & ALERTS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class MetricPoint:
     """A single metric measurement."""
+
     name: str
     value: float
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
@@ -57,6 +59,7 @@ class MetricPoint:
 @dataclass
 class Alert:
     """System alert."""
+
     alert_id: str
     severity: str  # info, warning, error, critical
     title: str
@@ -82,6 +85,7 @@ class Alert:
 # ═══════════════════════════════════════════════════════════════════════════════
 # MONITOR AGENT
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class MonitorAgent:
     """
@@ -127,13 +131,15 @@ class MonitorAgent:
 
             # Register self
             registry = get_capability_registry()
-            registry.register(AgentDescriptor(
-                agent_id=self.AGENT_ID,
-                name=self.AGENT_NAME,
-                role="System health monitoring",
-                capabilities=[],
-                max_concurrent_tasks=1,
-            ))
+            registry.register(
+                AgentDescriptor(
+                    agent_id=self.AGENT_ID,
+                    name=self.AGENT_NAME,
+                    role="System health monitoring",
+                    capabilities=[],
+                    max_concurrent_tasks=1,
+                )
+            )
 
             # Subscribe to events
             self._event_bus.subscribe(EventType.AGENT_HEARTBEAT, self._handle_heartbeat)
@@ -217,11 +223,13 @@ class MonitorAgent:
             )
 
         # Publish health event
-        await self._event_bus.publish(Event(
-            event_type=EventType.SYSTEM_HEALTH,
-            source=self.AGENT_ID,
-            payload=health,
-        ))
+        await self._event_bus.publish(
+            Event(
+                event_type=EventType.SYSTEM_HEALTH,
+                source=self.AGENT_ID,
+                payload=health,
+            )
+        )
 
     async def _check_agent_health(self) -> None:
         """Check health of all registered agents."""
@@ -275,8 +283,7 @@ class MonitorAgent:
         """Get statistics for a metric over a time window."""
         cutoff = datetime.utcnow() - timedelta(minutes=window_minutes)
         points = [
-            p for p in self._metrics.get(name, [])
-            if datetime.fromisoformat(p.timestamp) > cutoff
+            p for p in self._metrics.get(name, []) if datetime.fromisoformat(p.timestamp) > cutoff
         ]
 
         if not points:
@@ -297,8 +304,7 @@ class MonitorAgent:
 
         for name in list(self._metrics.keys()):
             self._metrics[name] = [
-                p for p in self._metrics[name]
-                if datetime.fromisoformat(p.timestamp) > cutoff
+                p for p in self._metrics[name] if datetime.fromisoformat(p.timestamp) > cutoff
             ]
 
     # ═══════════════════════════════════════════════════════════════════════════
@@ -314,6 +320,7 @@ class MonitorAgent:
     ) -> Alert:
         """Create and publish an alert."""
         import uuid
+
         alert_id = f"alert-{uuid.uuid4().hex[:8]}"
 
         alert = Alert(
@@ -327,12 +334,14 @@ class MonitorAgent:
         self._alerts[alert_id] = alert
 
         # Publish alert event
-        await self._event_bus.publish(Event(
-            event_type=EventType.SYSTEM_ALERT,
-            source=self.AGENT_ID,
-            payload=alert.to_dict(),
-            priority=3 if severity == "critical" else 2,
-        ))
+        await self._event_bus.publish(
+            Event(
+                event_type=EventType.SYSTEM_ALERT,
+                source=self.AGENT_ID,
+                payload=alert.to_dict(),
+                priority=3 if severity == "critical" else 2,
+            )
+        )
 
         logger.warning(f"Alert created: [{severity}] {title}")
         return alert
@@ -403,14 +412,34 @@ class MonitorAgent:
         """Get data for admin dashboard."""
         return {
             "timestamp": datetime.utcnow().isoformat(),
-            "last_health_check": self._last_health_check.isoformat() if self._last_health_check else None,
+            "last_health_check": (
+                self._last_health_check.isoformat() if self._last_health_check else None
+            ),
             "alerts": {
                 "total": len(self._alerts),
                 "active": len(self.get_active_alerts()),
                 "by_severity": {
-                    "critical": len([a for a in self._alerts.values() if a.severity == "critical" and not a.resolved]),
-                    "error": len([a for a in self._alerts.values() if a.severity == "error" and not a.resolved]),
-                    "warning": len([a for a in self._alerts.values() if a.severity == "warning" and not a.resolved]),
+                    "critical": len(
+                        [
+                            a
+                            for a in self._alerts.values()
+                            if a.severity == "critical" and not a.resolved
+                        ]
+                    ),
+                    "error": len(
+                        [
+                            a
+                            for a in self._alerts.values()
+                            if a.severity == "error" and not a.resolved
+                        ]
+                    ),
+                    "warning": len(
+                        [
+                            a
+                            for a in self._alerts.values()
+                            if a.severity == "warning" and not a.resolved
+                        ]
+                    ),
                 },
             },
             "metrics_summary": {

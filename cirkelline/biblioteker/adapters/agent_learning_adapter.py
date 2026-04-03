@@ -83,10 +83,7 @@ class AgentLearningAdapter(BibliotekAdapter):
         """
         if not self._connected or not self._db:
             return SearchResult(
-                items=[],
-                total_count=0,
-                query=query.query,
-                sources_searched=[self.source]
+                items=[], total_count=0, query=query.query, sources_searched=[self.source]
             )
 
         try:
@@ -111,9 +108,7 @@ class AgentLearningAdapter(BibliotekAdapter):
                     ItemType.NOTE: "note",
                     ItemType.REFERENCE: "reference",
                 }
-                content_types = [
-                    type_map.get(t, "document") for t in query.item_types
-                ]
+                content_types = [type_map.get(t, "document") for t in query.item_types]
 
             # Søg i database
             results = await self._db.search_content(
@@ -123,29 +118,23 @@ class AgentLearningAdapter(BibliotekAdapter):
                 tags=query.tags,
                 content_types=content_types,
                 limit=query.limit,
-                offset=query.offset
+                offset=query.offset,
             )
 
             # Konverter til LibraryItems
-            items = [
-                self._convert_content_to_library_item(row)
-                for row in results
-            ]
+            items = [self._convert_content_to_library_item(row) for row in results]
 
             return SearchResult(
                 items=items,
                 total_count=len(items),  # TODO: Få total count fra DB
                 query=query.query,
-                sources_searched=[self.source]
+                sources_searched=[self.source],
             )
 
         except Exception as e:
             print(f"Agent Learning søgefejl: {e}")
             return SearchResult(
-                items=[],
-                total_count=0,
-                query=query.query,
-                sources_searched=[self.source]
+                items=[], total_count=0, query=query.query, sources_searched=[self.source]
             )
 
     async def get_item(self, item_id: str) -> Optional[LibraryItem]:
@@ -168,7 +157,7 @@ class AgentLearningAdapter(BibliotekAdapter):
         domain: Optional[str] = None,
         item_type: Optional[ItemType] = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[LibraryItem]:
         """List items fra Agent Learning."""
         query = SearchQuery(
@@ -176,7 +165,7 @@ class AgentLearningAdapter(BibliotekAdapter):
             domains=[domain] if domain else ([self._domain] if self._domain else None),
             item_types=[item_type] if item_type else None,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
         result = await self.search(query)
         return result.items
@@ -206,7 +195,7 @@ class AgentLearningAdapter(BibliotekAdapter):
                 primary_category=item.categories[0] if item.categories else None,
                 secondary_categories=item.categories[1:] if len(item.categories) > 1 else None,
                 tags=item.tags,
-                metadata=item.metadata
+                metadata=item.metadata,
             )
 
             return content_id
@@ -223,17 +212,10 @@ class AgentLearningAdapter(BibliotekAdapter):
     async def sync(self) -> SyncStatus:
         """Synkronisering er ikke nødvendig for lokal DB."""
         self._last_sync = datetime.utcnow()
-        return SyncStatus(
-            source=self.source,
-            last_sync=self._last_sync,
-            status="success"
-        )
+        return SyncStatus(source=self.source, last_sync=self._last_sync, status="success")
 
     async def get_learning_events(
-        self,
-        domain: Optional[str] = None,
-        topic: Optional[str] = None,
-        limit: int = 50
+        self, domain: Optional[str] = None, topic: Optional[str] = None, limit: int = 50
     ) -> List[Dict[str, Any]]:
         """
         Hent knowledge events fra Historiker.
@@ -251,17 +233,12 @@ class AgentLearningAdapter(BibliotekAdapter):
 
         try:
             return await self._db.get_events(
-                domain=domain or self._domain or "web3",
-                topic=topic,
-                limit=limit
+                domain=domain or self._domain or "web3", topic=topic, limit=limit
             )
         except Exception:
             return []
 
-    async def get_patterns(
-        self,
-        domain: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+    async def get_patterns(self, domain: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Hent identificerede patterns.
 
@@ -275,16 +252,11 @@ class AgentLearningAdapter(BibliotekAdapter):
             return []
 
         try:
-            return await self._db.get_patterns(
-                domain=domain or self._domain or "web3"
-            )
+            return await self._db.get_patterns(domain=domain or self._domain or "web3")
         except Exception:
             return []
 
-    async def get_taxonomy(
-        self,
-        domain: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+    async def get_taxonomy(self, domain: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Hent taxonomi for domæne.
 
@@ -298,16 +270,11 @@ class AgentLearningAdapter(BibliotekAdapter):
             return []
 
         try:
-            return await self._db.get_taxonomy(
-                domain=domain or self._domain or "web3"
-            )
+            return await self._db.get_taxonomy(domain=domain or self._domain or "web3")
         except Exception:
             return []
 
-    def _convert_content_to_library_item(
-        self,
-        content: Dict[str, Any]
-    ) -> LibraryItem:
+    def _convert_content_to_library_item(self, content: Dict[str, Any]) -> LibraryItem:
         """Konverter database content til LibraryItem."""
         # Map content_type til ItemType
         type_map = {
@@ -325,6 +292,7 @@ class AgentLearningAdapter(BibliotekAdapter):
 
         # Parse JSON fields
         import json
+
         tags = content.get("tags", [])
         if isinstance(tags, str):
             tags = json.loads(tags)

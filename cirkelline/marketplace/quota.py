@@ -26,9 +26,10 @@ class QuotaTier(Enum):
 
     Værdier svarer til requests per dag.
     """
-    FREE = "free"           # 100 requests/dag
-    STARTER = "starter"     # 1,000 requests/dag
-    PROFESSIONAL = "pro"    # 10,000 requests/dag
+
+    FREE = "free"  # 100 requests/dag
+    STARTER = "starter"  # 1,000 requests/dag
+    PROFESSIONAL = "pro"  # 10,000 requests/dag
     ENTERPRISE = "enterprise"  # 100,000+ requests/dag
     UNLIMITED = "unlimited"  # Ingen grænse
 
@@ -36,6 +37,7 @@ class QuotaTier(Enum):
 @dataclass
 class TierLimits:
     """Limits for et specifikt tier."""
+
     requests_per_day: int
     requests_per_minute: int
     burst_allowance: int  # Extra requests tilladt i burst
@@ -57,7 +59,7 @@ TIER_CONFIGS: Dict[QuotaTier, TierLimits] = {
             "advanced_search": False,
             "export": False,
             "webhooks": False,
-        }
+        },
     ),
     QuotaTier.STARTER: TierLimits(
         requests_per_day=1000,
@@ -70,7 +72,7 @@ TIER_CONFIGS: Dict[QuotaTier, TierLimits] = {
             "advanced_search": True,
             "export": True,
             "webhooks": False,
-        }
+        },
     ),
     QuotaTier.PROFESSIONAL: TierLimits(
         requests_per_day=10000,
@@ -83,7 +85,7 @@ TIER_CONFIGS: Dict[QuotaTier, TierLimits] = {
             "advanced_search": True,
             "export": True,
             "webhooks": True,
-        }
+        },
     ),
     QuotaTier.ENTERPRISE: TierLimits(
         requests_per_day=100000,
@@ -98,7 +100,7 @@ TIER_CONFIGS: Dict[QuotaTier, TierLimits] = {
             "webhooks": True,
             "dedicated_support": True,
             "sla": True,
-        }
+        },
     ),
     QuotaTier.UNLIMITED: TierLimits(
         requests_per_day=-1,  # -1 = unlimited
@@ -114,7 +116,7 @@ TIER_CONFIGS: Dict[QuotaTier, TierLimits] = {
             "dedicated_support": True,
             "sla": True,
             "custom_features": True,
-        }
+        },
     ),
 }
 
@@ -132,6 +134,7 @@ class UserQuota:
         last_request_at: Tidspunkt for sidste request
         reset_at: Tidspunkt for næste daglige reset
     """
+
     user_id: str
     tier: QuotaTier
     requests_today: int = 0
@@ -251,10 +254,7 @@ class QuotaManager:
         async with self._lock:
             if user_id not in self._quotas:
                 # Opret default quota (FREE tier)
-                self._quotas[user_id] = UserQuota(
-                    user_id=user_id,
-                    tier=QuotaTier.FREE
-                )
+                self._quotas[user_id] = UserQuota(user_id=user_id, tier=QuotaTier.FREE)
             return self._quotas[user_id]
 
     async def set_tier(self, user_id: str, tier: QuotaTier) -> UserQuota:
@@ -272,11 +272,7 @@ class QuotaManager:
         quota.tier = tier
         return quota
 
-    async def can_request(
-        self,
-        user_id: str,
-        api_name: Optional[str] = None
-    ) -> bool:
+    async def can_request(self, user_id: str, api_name: Optional[str] = None) -> bool:
         """
         Tjek om en bruger kan lave en request.
 
@@ -294,11 +290,7 @@ class QuotaManager:
 
         return quota.can_make_request()
 
-    async def increment(
-        self,
-        user_id: str,
-        count: int = 1
-    ) -> UserQuota:
+    async def increment(self, user_id: str, count: int = 1) -> UserQuota:
         """
         Inkrementer request count.
 
@@ -370,11 +362,7 @@ class QuotaManager:
 
         return None
 
-    async def check_feature(
-        self,
-        user_id: str,
-        feature: str
-    ) -> bool:
+    async def check_feature(self, user_id: str, feature: str) -> bool:
         """
         Tjek om bruger har adgang til en feature.
 
@@ -409,10 +397,7 @@ async def get_user_quota(user_id: str) -> UserQuota:
     return await get_quota_manager().get_quota(user_id)
 
 
-async def check_quota(
-    user_id: str,
-    api_name: Optional[str] = None
-) -> bool:
+async def check_quota(user_id: str, api_name: Optional[str] = None) -> bool:
     """Convenience function til at tjekke quota."""
     return await get_quota_manager().can_request(user_id, api_name)
 

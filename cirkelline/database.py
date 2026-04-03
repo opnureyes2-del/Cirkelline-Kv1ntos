@@ -18,9 +18,11 @@ from cirkelline.config import logger
 # Uses DATABASE_URL from environment (Secrets Manager in production)
 # AGNO v2 Best Practice: Explicitly specify table names for clarity
 db = PostgresDb(
-    db_url=os.getenv("DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"),
+    db_url=os.getenv(
+        "DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"
+    ),
     session_table="agno_sessions",  # Agent/Team sessions and runs
-    memory_table="agno_memories"    # User memories
+    memory_table="agno_memories",  # User memories
 )
 
 logger.info("Database connection configured with automatic pooling")
@@ -29,10 +31,12 @@ logger.info("Database connection configured with automatic pooling")
 # PERMANENT FIX: No more Gemini API rate limits
 # Uses same DATABASE_URL as above
 vector_db = PgVector(
-    db_url=os.getenv("DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"),
+    db_url=os.getenv(
+        "DATABASE_URL", "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"
+    ),
     table_name="cirkelline_knowledge_vectors",
     embedder=OllamaEmbedder(id="nomic-embed-text", dimensions=768),
-    search_type=SearchType.hybrid  # Combines semantic + keyword search
+    search_type=SearchType.hybrid,  # Combines semantic + keyword search
 )
 
 logger.info("Vector DB connection configured with automatic pooling")
@@ -43,7 +47,7 @@ _shared_engine = create_engine(
     pool_size=10,
     max_overflow=20,
     pool_pre_ping=True,  # Verify connections before use
-    echo=False
+    echo=False,
 )
 
 logger.info("Shared database engine created for activity logging")

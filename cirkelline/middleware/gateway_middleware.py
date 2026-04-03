@@ -72,6 +72,7 @@ PUBLIC_ENDPOINTS = [
 # GATEWAY AUTH MIDDLEWARE
 # =============================================================================
 
+
 class GatewayAuthMiddleware(BaseHTTPMiddleware):
     """
     Middleware that validates tokens against CKC Gateway.
@@ -113,7 +114,7 @@ class GatewayAuthMiddleware(BaseHTTPMiddleware):
                 return await call_next(request)
 
         # Initialize request.state.dependencies if needed
-        if not hasattr(request.state, 'dependencies'):
+        if not hasattr(request.state, "dependencies"):
             request.state.dependencies = {}
 
         # Check if gateway auth is enabled
@@ -142,7 +143,9 @@ class GatewayAuthMiddleware(BaseHTTPMiddleware):
                     return await call_next(request)
                 else:
                     # Gateway validation failed
-                    logger.warning(f"Gateway validation failed: {result.error if result else 'No result'}")
+                    logger.warning(
+                        f"Gateway validation failed: {result.error if result else 'No result'}"
+                    )
 
                     if FALLBACK_TO_LOCAL_JWT:
                         # Try local JWT validation
@@ -188,11 +191,7 @@ class GatewayAuthMiddleware(BaseHTTPMiddleware):
             if not secret_key:
                 return None
 
-            payload = pyjwt.decode(
-                token,
-                secret_key,
-                algorithms=["HS256"]
-            )
+            payload = pyjwt.decode(token, secret_key, algorithms=["HS256"])
             return payload
 
         except Exception as e:
@@ -257,7 +256,9 @@ class GatewayAuthMiddleware(BaseHTTPMiddleware):
         # Also set in dependencies
         request.state.dependencies["user_id"] = user_id
         request.state.dependencies["user_email"] = email
-        request.state.dependencies["user_name"] = payload.get("user_name", payload.get("display_name", "User"))
+        request.state.dependencies["user_name"] = payload.get(
+            "user_name", payload.get("display_name", "User")
+        )
         request.state.dependencies["user_role"] = payload.get("user_role", "User")
         request.state.dependencies["user_type"] = payload.get("user_type", "Regular")
         request.state.dependencies["tier_slug"] = payload.get("tier_slug", "member")
@@ -293,6 +294,7 @@ class GatewayAuthMiddleware(BaseHTTPMiddleware):
 # STRICT GATEWAY AUTH MIDDLEWARE
 # =============================================================================
 
+
 class StrictGatewayAuthMiddleware(BaseHTTPMiddleware):
     """
     Strict gateway authentication middleware.
@@ -327,19 +329,16 @@ class StrictGatewayAuthMiddleware(BaseHTTPMiddleware):
         path = request.url.path
 
         # Check if this is a protected endpoint
-        is_protected = any(
-            path.startswith(pattern)
-            for pattern in self.PROTECTED_ENDPOINT_PATTERNS
-        )
+        is_protected = any(path.startswith(pattern) for pattern in self.PROTECTED_ENDPOINT_PATTERNS)
 
         if not is_protected:
             return await call_next(request)
 
         # Protected endpoint - require valid gateway auth
-        gateway_validated = getattr(request.state, 'gateway_validated', False)
-        user_id = getattr(request.state, 'user_id', 'anonymous')
+        gateway_validated = getattr(request.state, "gateway_validated", False)
+        user_id = getattr(request.state, "user_id", "anonymous")
 
-        if not gateway_validated or user_id == 'anonymous':
+        if not gateway_validated or user_id == "anonymous":
             logger.warning(f"Blocked: {path} - not authenticated via gateway")
 
             return JSONResponse(
@@ -349,7 +348,7 @@ class StrictGatewayAuthMiddleware(BaseHTTPMiddleware):
                     "message": "This endpoint requires authentication via CKC Gateway",
                     "gateway_required": True,
                 },
-                headers={"WWW-Authenticate": "Bearer"}
+                headers={"WWW-Authenticate": "Bearer"},
             )
 
         return await call_next(request)

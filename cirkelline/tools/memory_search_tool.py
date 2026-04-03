@@ -52,7 +52,7 @@ class IntelligentMemoryTool(Toolkit):
             memories = self.database.get_user_memories(
                 user_id=user_id,
                 topics=topics,  # SQL-level filtering - only matching memories returned
-                limit=limit
+                limit=limit,
             )
 
             if not memories:
@@ -86,10 +86,7 @@ class IntelligentMemoryTool(Toolkit):
 
         try:
             # Direct database call - get recent memories without topic filter
-            memories = self.database.get_user_memories(
-                user_id=user_id,
-                limit=limit
-            )
+            memories = self.database.get_user_memories(user_id=user_id, limit=limit)
 
             if not memories:
                 return "No memories found for this user."

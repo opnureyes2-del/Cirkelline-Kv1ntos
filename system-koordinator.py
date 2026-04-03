@@ -42,6 +42,7 @@ VERSION = "2.0.0"
 @dataclass
 class ServiceConfig:
     """Konfiguration for en service"""
+
     name: str
     path: Path
     port: int
@@ -68,7 +69,7 @@ SERVICES: Dict[str, ServiceConfig] = {
         start_cmd=["docker", "start", "cirkelline-postgres"],
         docker_container="cirkelline-postgres",
         tier=1,
-        description="PostgreSQL 17 database med pgvector"
+        description="PostgreSQL 17 database med pgvector",
     ),
     "redis": ServiceConfig(
         name="redis",
@@ -78,9 +79,8 @@ SERVICES: Dict[str, ServiceConfig] = {
         docker_container="cirkelline-redis",
         tier=1,
         required=False,
-        description="Redis cache (optional)"
+        description="Redis cache (optional)",
     ),
-
     # =========================================================================
     # Tier 2: Backend Services
     # =========================================================================
@@ -93,7 +93,7 @@ SERVICES: Dict[str, ServiceConfig] = {
         env_path=PROJECTS_ROOT / "cirkelline-env",
         depends_on=["cirkelline-postgres"],
         tier=2,
-        description="Hovedplatform - AgentOS og API"
+        description="Hovedplatform - AgentOS og API",
     ),
     "lib-admin-backend": ServiceConfig(
         name="lib-admin-backend",
@@ -104,7 +104,7 @@ SERVICES: Dict[str, ServiceConfig] = {
         env_path=PROJECTS_ROOT / "lib-admin-main" / "backend" / "venv",
         depends_on=["cirkelline-postgres"],
         tier=2,
-        description="CKC Admin HUB - HASA agenter"
+        description="CKC Admin HUB - HASA agenter",
     ),
     "cosmic-library": ServiceConfig(
         name="cosmic-library",
@@ -116,7 +116,7 @@ SERVICES: Dict[str, ServiceConfig] = {
         depends_on=["cirkelline-postgres"],
         tier=2,
         required=False,
-        description="Training Academy - Knowledge Orchestrator"
+        description="Training Academy - Knowledge Orchestrator",
     ),
     "commando-center": ServiceConfig(
         name="commando-center",
@@ -128,9 +128,8 @@ SERVICES: Dict[str, ServiceConfig] = {
         depends_on=["cirkelline-backend"],
         tier=2,
         required=False,
-        description="Meta-cognition og task execution"
+        description="Meta-cognition og task execution",
     ),
-
     # =========================================================================
     # Tier 3: Frontend Services
     # =========================================================================
@@ -143,7 +142,7 @@ SERVICES: Dict[str, ServiceConfig] = {
         is_frontend=True,
         depends_on=["cirkelline-backend"],
         tier=3,
-        description="Cirkelline Chat UI"
+        description="Cirkelline Chat UI",
     ),
     "lib-admin-frontend": ServiceConfig(
         name="lib-admin-frontend",
@@ -155,7 +154,7 @@ SERVICES: Dict[str, ServiceConfig] = {
         depends_on=["lib-admin-backend"],
         tier=3,
         required=False,
-        description="CKC Admin Dashboard UI"
+        description="CKC Admin Dashboard UI",
     ),
     "consulting-frontend": ServiceConfig(
         name="consulting-frontend",
@@ -167,9 +166,8 @@ SERVICES: Dict[str, ServiceConfig] = {
         depends_on=["cirkelline-backend"],
         tier=3,
         required=False,
-        description="Cirkelline Consulting website"
+        description="Cirkelline Consulting website",
     ),
-
     # =========================================================================
     # Tier 4: Support Services
     # =========================================================================
@@ -181,7 +179,7 @@ SERVICES: Dict[str, ServiceConfig] = {
         health_endpoint="http://localhost:11434/api/tags",
         tier=4,
         required=False,
-        description="Local LLM inference (optional)"
+        description="Local LLM inference (optional)",
     ),
     "chromadb": ServiceConfig(
         name="chromadb",
@@ -191,7 +189,7 @@ SERVICES: Dict[str, ServiceConfig] = {
         docker_container="chromadb",
         tier=4,
         required=False,
-        description="Vector database (optional)"
+        description="Vector database (optional)",
     ),
 }
 
@@ -225,6 +223,7 @@ class Status(Enum):
 # HJÆLPEFUNKTIONER
 # ============================================================================
 
+
 def print_banner():
     """Vis velkomstbanner"""
     print(f"""
@@ -239,7 +238,7 @@ def print_banner():
 def check_port(port: int) -> bool:
     """Check om en port er i brug"""
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    result = sock.connect_ex(('localhost', port))
+    result = sock.connect_ex(("localhost", port))
     sock.close()
     return result == 0
 
@@ -250,7 +249,7 @@ def check_docker_container(container_name: str) -> bool:
         result = subprocess.run(
             ["docker", "inspect", "-f", "{{.State.Running}}", container_name],
             capture_output=True,
-            text=True
+            text=True,
         )
         return result.stdout.strip() == "true"
     except Exception:
@@ -261,7 +260,8 @@ def check_health_endpoint(url: str, timeout: int = 5) -> Tuple[bool, Optional[di
     """Check om en health endpoint svarer og returner data"""
     try:
         import urllib.request
-        req = urllib.request.Request(url, method='GET')
+
+        req = urllib.request.Request(url, method="GET")
         with urllib.request.urlopen(req, timeout=timeout) as response:
             if response.status == 200:
                 try:
@@ -331,6 +331,7 @@ def load_env_file(env_path: Path) -> Dict[str, str]:
 # KOMMANDOER
 # ============================================================================
 
+
 def cmd_status():
     """Vis status for alle services"""
     print("\n📊 SYSTEM STATUS\n")
@@ -338,7 +339,12 @@ def cmd_status():
     print(f"  {'Service':<25} {'Port':<8} {'Status':<10} {'Info'}")
     print("-" * 70)
 
-    tier_names = {1: "Core Infrastructure", 2: "Backend Services", 3: "Frontend Services", 4: "Support Services"}
+    tier_names = {
+        1: "Core Infrastructure",
+        2: "Backend Services",
+        3: "Frontend Services",
+        4: "Support Services",
+    }
     current_tier = 0
 
     running_count = 0
@@ -374,8 +380,7 @@ def cmd_status():
     print(f"\n  Kørende: {running_count}/{total_required} (påkrævede services)")
 
     all_required_running = all(
-        get_service_status(s)[0] == Status.RUNNING
-        for s in SERVICES.values() if s.required
+        get_service_status(s)[0] == Status.RUNNING for s in SERVICES.values() if s.required
     )
     if all_required_running:
         print("\n✅ Alle påkrævede services kører!")
@@ -426,9 +431,17 @@ def cmd_start():
             if service.docker_container:
                 # Check if container exists
                 check_result = subprocess.run(
-                    ["docker", "ps", "-a", "--filter", f"name={service.docker_container}", "--format", "{{.Names}}"],
+                    [
+                        "docker",
+                        "ps",
+                        "-a",
+                        "--filter",
+                        f"name={service.docker_container}",
+                        "--format",
+                        "{{.Names}}",
+                    ],
                     capture_output=True,
-                    text=True
+                    text=True,
                 )
                 if service.docker_container not in check_result.stdout:
                     print("CONTAINER IKKE FUNDET")
@@ -438,11 +451,7 @@ def cmd_start():
                         skipped.append(name)
                     continue
 
-                subprocess.run(
-                    service.start_cmd,
-                    capture_output=True,
-                    check=True
-                )
+                subprocess.run(service.start_cmd, capture_output=True, check=True)
                 time.sleep(2)
             else:
                 # Start backend/frontend i baggrunden
@@ -463,7 +472,7 @@ def cmd_start():
                     env=env,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
-                    start_new_session=True
+                    start_new_session=True,
                 )
                 time.sleep(3 if not service.is_frontend else 5)
 
@@ -496,7 +505,9 @@ def cmd_start():
         print(f"  Fejlet: {', '.join(failed)}")
     print("=" * 60)
 
-    if not failed or all(f in [s for s, cfg in SERVICES.items() if not cfg.required] for f in failed):
+    if not failed or all(
+        f in [s for s, cfg in SERVICES.items() if not cfg.required] for f in failed
+    ):
         print("\n✅ System klar! Åbn http://localhost:3000 i browseren.")
         print("   Brug 'python system-koordinator.py help' for vejledning.\n")
 
@@ -519,16 +530,13 @@ def cmd_stop():
 
         try:
             if service.docker_container:
-                subprocess.run(
-                    ["docker", "stop", service.docker_container],
-                    capture_output=True
-                )
+                subprocess.run(["docker", "stop", service.docker_container], capture_output=True)
             else:
                 # Find og stop processen baseret på port
                 subprocess.run(
                     ["fuser", "-k", f"{service.port}/tcp"],
                     capture_output=True,
-                    stderr=subprocess.DEVNULL
+                    stderr=subprocess.DEVNULL,
                 )
             print("OK")
         except Exception as e:
@@ -601,25 +609,33 @@ def cmd_migrate():
         alembic_ini = PROJECTS_ROOT / "cirkelline-system" / "alembic.ini"
         if alembic_ini.exists():
             result = subprocess.run(
-                ["bash", "-c", f"""
+                [
+                    "bash",
+                    "-c",
+                    f"""
                     cd {PROJECTS_ROOT / 'cirkelline-system'} &&
                     source {PROJECTS_ROOT / 'cirkelline-env'}/bin/activate &&
                     alembic current 2>&1
-                """],
+                """,
+                ],
                 capture_output=True,
-                text=True
+                text=True,
             )
             print(f"     Current: {result.stdout.strip()}")
 
             print("     Kører migrations...", end=" ")
             result = subprocess.run(
-                ["bash", "-c", f"""
+                [
+                    "bash",
+                    "-c",
+                    f"""
                     cd {PROJECTS_ROOT / 'cirkelline-system'} &&
                     source {PROJECTS_ROOT / 'cirkelline-env'}/bin/activate &&
                     alembic upgrade head 2>&1
-                """],
+                """,
+                ],
                 capture_output=True,
-                text=True
+                text=True,
             )
             if "FAILED" in result.stdout or result.returncode != 0:
                 print("FEJL")
@@ -636,13 +652,17 @@ def cmd_migrate():
         migrations_found = True
 
         result = subprocess.run(
-            ["bash", "-c", f"""
+            [
+                "bash",
+                "-c",
+                f"""
                 cd {PROJECTS_ROOT / 'lib-admin-main' / 'backend'} &&
                 source venv/bin/activate &&
                 alembic current 2>&1
-            """],
+            """,
+            ],
             capture_output=True,
-            text=True
+            text=True,
         )
         print(f"     Current: {result.stdout.strip()}")
 
@@ -666,7 +686,7 @@ def cmd_logs():
                 result = subprocess.run(
                     ["docker", "logs", "--tail", "10", service.docker_container],
                     capture_output=True,
-                    text=True
+                    text=True,
                 )
                 if result.stdout:
                     for line in result.stdout.strip().split("\n")[-10:]:
@@ -700,19 +720,24 @@ def cmd_test():
     # lib-admin tests
     print("📁 lib-admin backend tests...")
     result = subprocess.run(
-        ["bash", "-c", """
+        [
+            "bash",
+            "-c",
+            """
             cd /home/rasmus/Desktop/projects/lib-admin-main/backend &&
             source venv/bin/activate &&
             TESTING=true ENVIRONMENT=testing python -m pytest tests/ -v --tb=short -q 2>&1 | tail -30
-        """],
+        """,
+        ],
         capture_output=True,
-        text=True
+        text=True,
     )
     print(result.stdout)
 
     if "passed" in result.stdout:
         # Extract count
         import re
+
         match = re.search(r"(\d+) passed", result.stdout)
         if match:
             print(f"✅ lib-admin tests OK! ({match.group(1)} tests)\n")
@@ -724,13 +749,17 @@ def cmd_test():
     if cirkelline_tests.exists():
         print("📁 cirkelline-system tests...")
         result = subprocess.run(
-            ["bash", "-c", f"""
+            [
+                "bash",
+                "-c",
+                f"""
                 cd {PROJECTS_ROOT / 'cirkelline-system'} &&
                 source {PROJECTS_ROOT / 'cirkelline-env'}/bin/activate &&
                 python -m pytest tests/ -v --tb=short -q 2>&1 | tail -20
-            """],
+            """,
+            ],
             capture_output=True,
-            text=True
+            text=True,
         )
         print(result.stdout)
         if "passed" in result.stdout:
@@ -747,10 +776,7 @@ def cmd_doctor():
     # Check Docker
     print("Checker Docker...", end=" ")
     try:
-        result = subprocess.run(
-            ["docker", "ps"],
-            capture_output=True
-        )
+        result = subprocess.run(["docker", "ps"], capture_output=True)
         if result.returncode == 0:
             print("OK")
         else:
@@ -804,8 +830,17 @@ def cmd_doctor():
     db_status, _ = get_service_status(SERVICES["cirkelline-postgres"])
     if db_status == Status.RUNNING:
         result = subprocess.run(
-            ["docker", "exec", "cirkelline-postgres", "psql", "-U", "cirkelline", "-c", "SELECT 1;"],
-            capture_output=True
+            [
+                "docker",
+                "exec",
+                "cirkelline-postgres",
+                "psql",
+                "-U",
+                "cirkelline",
+                "-c",
+                "SELECT 1;",
+            ],
+            capture_output=True,
         )
         if result.returncode == 0:
             print("OK")
@@ -921,6 +956,7 @@ def cmd_help():
 # ============================================================================
 # MAIN
 # ============================================================================
+
 
 def main():
     """Hovedfunktion"""

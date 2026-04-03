@@ -17,10 +17,12 @@ from cirkelline.config import logger
 # Forward reference - will be set by main module
 cirkelline = None
 
+
 def set_cirkelline_team(team):
     """Set cirkelline team reference after it's created"""
     global cirkelline
     cirkelline = team
+
 
 def is_session_named(session_id: str) -> bool:
     """Check if session already has an auto-generated name"""
@@ -38,6 +40,7 @@ def is_session_named(session_id: str) -> bool:
         logger.warning(f"Error checking if session is named: {e}")
         return False
 
+
 def get_message_count(session_id: str) -> int:
     """Get number of messages in session"""
     try:
@@ -49,21 +52,24 @@ def get_message_count(session_id: str) -> int:
         logger.warning(f"Error getting message count: {e}")
         return 0
 
+
 def generate_custom_session_name(session_id: str, max_words: int = 10) -> str:
     """Generate session name with custom word limit (max 10 words per user requirement)"""
     try:
         messages = cirkelline.get_session_messages(session_id=session_id)
 
         if not messages or len(messages) < 2:
-            logger.warning(f"Not enough messages to generate name (count: {len(messages) if messages else 0})")
+            logger.warning(
+                f"Not enough messages to generate name (count: {len(messages) if messages else 0})"
+            )
             return None
 
         # Build conversation context (limit to first 3 exchanges for efficiency)
         conversation = "Conversation:\n"
         for msg in messages[:6]:  # First 3 exchanges (user + assistant)
-            role = msg.role.upper() if hasattr(msg, 'role') else 'USER'
+            role = msg.role.upper() if hasattr(msg, "role") else "USER"
             # Ensure content is always a string, explicitly check for None
-            if hasattr(msg, 'content') and msg.content is not None:
+            if hasattr(msg, "content") and msg.content is not None:
                 content = str(msg.content)  # Convert to string for safety
             else:
                 content = str(msg) if msg else ""
@@ -84,7 +90,7 @@ def generate_custom_session_name(session_id: str, max_words: int = 10) -> str:
                 f"NEVER use generic words like 'test', 'hey', 'hello', 'hi', or 'greeting'. "
                 f"Focus on the actual content and purpose of the conversation. "
                 f"Examples: 'Image Analysis Request', 'Python Data Analysis Help', 'Calendar Event Creation', 'Email Search Assistance'"
-            )
+            ),
         )
         user_msg = Message(role="user", content=conversation + "\n\nSession Name:")
 
@@ -95,7 +101,7 @@ def generate_custom_session_name(session_id: str, max_words: int = 10) -> str:
             logger.error("No response from Gemini for session name generation")
             return None
 
-        name = response.content.replace('"', '').replace("'", '').strip()
+        name = response.content.replace('"', "").replace("'", "").strip()
 
         # Validate length
         word_count = len(name.split())
@@ -110,6 +116,7 @@ def generate_custom_session_name(session_id: str, max_words: int = 10) -> str:
     except Exception as e:
         logger.error(f"Failed to generate session name: {e}")
         return None
+
 
 async def attempt_session_naming(session_id: str, attempt_number: int = None):
     """Attempt to name a session, with logging"""
@@ -129,13 +136,13 @@ async def attempt_session_naming(session_id: str, attempt_number: int = None):
         if attempt_number is None:
             attempt_number = message_count // 2  # Each exchange is 2 messages
 
-        logger.info(f"🎯 Attempt #{attempt_number} to name session {session_id[:8]}... ({message_count} messages)")
+        logger.info(
+            f"🎯 Attempt #{attempt_number} to name session {session_id[:8]}... ({message_count} messages)"
+        )
 
         # Generate name (runs in thread pool to avoid blocking)
         generated_name = await asyncio.to_thread(
-            generate_custom_session_name,
-            session_id=session_id,
-            max_words=10
+            generate_custom_session_name, session_id=session_id, max_words=10
         )
 
         if not generated_name:
@@ -144,9 +151,7 @@ async def attempt_session_naming(session_id: str, attempt_number: int = None):
 
         # Save to database
         await asyncio.to_thread(
-            cirkelline.set_session_name,
-            session_id=session_id,
-            session_name=generated_name
+            cirkelline.set_session_name, session_id=session_id, session_name=generated_name
         )
 
         logger.info(f"✅ SUCCESS! Session {session_id[:8]}... named: '{generated_name}'")
@@ -155,5 +160,6 @@ async def attempt_session_naming(session_id: str, attempt_number: int = None):
     except Exception as e:
         logger.error(f"❌ Attempt #{attempt_number} failed with error: {e}")
         return False
+
 
 logger.info("✅ Session naming helpers loaded")

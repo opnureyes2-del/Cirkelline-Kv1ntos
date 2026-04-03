@@ -41,17 +41,19 @@ import httpx
 
 class CustomerTier(str, Enum):
     """Customer tiers"""
+
     INCOGNITO = "incognito"
     NEW_USER = "new_user"
     COMPANY = "company"
     VIP = "vip"
     ENTERPRISE = "enterprise"
-    CREATOR = "creator"          # System creator / superadmin
+    CREATOR = "creator"  # System creator / superadmin
 
 
 @dataclass
 class TokenValidationResult:
     """Result of token validation"""
+
     valid: bool
     user_email: Optional[str] = None
     user_type: Optional[str] = None
@@ -65,6 +67,7 @@ class TokenValidationResult:
 @dataclass
 class TokenExchangeResult:
     """Result of token exchange"""
+
     success: bool
     exchange_token: Optional[str] = None
     expires_in_seconds: int = 300
@@ -97,7 +100,7 @@ class GatewayClient:
         gateway_url: str = "http://localhost:7779",
         platform_code: str = "kv1ntos",
         api_key: Optional[str] = None,
-        timeout: float = 5.0
+        timeout: float = 5.0,
     ):
         """
         Initialize the gateway client.
@@ -140,10 +143,7 @@ class GatewayClient:
                 response = await client.post(
                     f"{self.gateway_url}/api/gateway/token/validate",
                     headers=self._get_headers(),
-                    json={
-                        "token": token,
-                        "requesting_platform": self.platform_code
-                    }
+                    json={"token": token, "requesting_platform": self.platform_code},
                 )
 
                 if response.status_code == 200:
@@ -156,24 +156,16 @@ class GatewayClient:
                         platforms=data.get("platforms", []),
                         features=data.get("features", []),
                         session_id=data.get("session_id"),
-                        error=data.get("error")
+                        error=data.get("error"),
                     )
                 else:
                     return TokenValidationResult(
-                        valid=False,
-                        error=f"Gateway returned {response.status_code}"
+                        valid=False, error=f"Gateway returned {response.status_code}"
                     )
         except Exception as e:
-            return TokenValidationResult(
-                valid=False,
-                error=f"Gateway connection failed: {str(e)}"
-            )
+            return TokenValidationResult(valid=False, error=f"Gateway connection failed: {str(e)}")
 
-    async def exchange_token(
-        self,
-        token: str,
-        target_platform: str
-    ) -> TokenExchangeResult:
+    async def exchange_token(self, token: str, target_platform: str) -> TokenExchangeResult:
         """
         Exchange a token for a short-lived token for another platform.
 
@@ -192,8 +184,8 @@ class GatewayClient:
                     json={
                         "token": token,
                         "target_platform": target_platform,
-                        "source_platform": self.platform_code
-                    }
+                        "source_platform": self.platform_code,
+                    },
                 )
 
                 if response.status_code == 200:
@@ -202,24 +194,16 @@ class GatewayClient:
                         success=data.get("success", False),
                         exchange_token=data.get("exchange_token"),
                         expires_in_seconds=data.get("expires_in_seconds", 300),
-                        error=data.get("error")
+                        error=data.get("error"),
                     )
                 else:
                     return TokenExchangeResult(
-                        success=False,
-                        error=f"Gateway returned {response.status_code}"
+                        success=False, error=f"Gateway returned {response.status_code}"
                     )
         except Exception as e:
-            return TokenExchangeResult(
-                success=False,
-                error=f"Gateway connection failed: {str(e)}"
-            )
+            return TokenExchangeResult(success=False, error=f"Gateway connection failed: {str(e)}")
 
-    async def sso_login(
-        self,
-        email: str,
-        password: str
-    ) -> Dict[str, Any]:
+    async def sso_login(self, email: str, password: str) -> Dict[str, Any]:
         """
         SSO Login via the CKC Gateway.
 
@@ -238,27 +222,18 @@ class GatewayClient:
                     json={
                         "email": email,
                         "password": password,
-                        "source_platform": self.platform_code
-                    }
+                        "source_platform": self.platform_code,
+                    },
                 )
 
                 if response.status_code == 200:
                     return response.json()
                 else:
-                    return {
-                        "success": False,
-                        "error": f"Gateway returned {response.status_code}"
-                    }
+                    return {"success": False, "error": f"Gateway returned {response.status_code}"}
         except Exception as e:
-            return {
-                "success": False,
-                "error": f"Gateway connection failed: {str(e)}"
-            }
+            return {"success": False, "error": f"Gateway connection failed: {str(e)}"}
 
-    async def refresh_tokens(
-        self,
-        refresh_token: str
-    ) -> Dict[str, Any]:
+    async def refresh_tokens(self, refresh_token: str) -> Dict[str, Any]:
         """
         Refresh access token using refresh token.
 
@@ -273,24 +248,15 @@ class GatewayClient:
                 response = await client.post(
                     f"{self.gateway_url}/api/gateway/token/refresh",
                     headers=self._get_headers(),
-                    json={
-                        "refresh_token": refresh_token,
-                        "source_platform": self.platform_code
-                    }
+                    json={"refresh_token": refresh_token, "source_platform": self.platform_code},
                 )
 
                 if response.status_code == 200:
                     return response.json()
                 else:
-                    return {
-                        "success": False,
-                        "error": f"Gateway returned {response.status_code}"
-                    }
+                    return {"success": False, "error": f"Gateway returned {response.status_code}"}
         except Exception as e:
-            return {
-                "success": False,
-                "error": f"Gateway connection failed: {str(e)}"
-            }
+            return {"success": False, "error": f"Gateway connection failed: {str(e)}"}
 
     async def get_user_info(self, token: str) -> Dict[str, Any]:
         """
@@ -306,10 +272,7 @@ class GatewayClient:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.get(
                     f"{self.gateway_url}/api/gateway/me",
-                    headers={
-                        **self._get_headers(),
-                        "Authorization": f"Bearer {token}"
-                    }
+                    headers={**self._get_headers(), "Authorization": f"Bearer {token}"},
                 )
 
                 if response.status_code == 200:
@@ -329,8 +292,7 @@ class GatewayClient:
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.get(
-                    f"{self.gateway_url}/api/gateway/platforms",
-                    headers=self._get_headers()
+                    f"{self.gateway_url}/api/gateway/platforms", headers=self._get_headers()
                 )
 
                 if response.status_code == 200:
@@ -350,8 +312,7 @@ class GatewayClient:
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.get(
-                    f"{self.gateway_url}/api/gateway/tiers",
-                    headers=self._get_headers()
+                    f"{self.gateway_url}/api/gateway/tiers", headers=self._get_headers()
                 )
 
                 if response.status_code == 200:
@@ -421,6 +382,7 @@ class GatewayClient:
 # FASTAPI DEPENDENCY FOR OTHER PLATFORMS
 # =============================================================================
 
+
 class GatewayAuthDependency:
     """
     FastAPI dependency for validating gateway tokens.
@@ -453,10 +415,7 @@ class GatewayAuthDependency:
     def __init__(self, gateway_client: GatewayClient):
         self.gateway = gateway_client
 
-    async def __call__(
-        self,
-        authorization: str = None
-    ) -> TokenValidationResult:
+    async def __call__(self, authorization: str = None) -> TokenValidationResult:
         """
         Validate token from Authorization header.
 
@@ -475,11 +434,15 @@ class GatewayAuthDependency:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Authorization header required",
-                headers={"WWW-Authenticate": "Bearer"}
+                headers={"WWW-Authenticate": "Bearer"},
             )
 
         # Extract token from Bearer scheme
-        token = authorization.replace("Bearer ", "") if authorization.startswith("Bearer ") else authorization
+        token = (
+            authorization.replace("Bearer ", "")
+            if authorization.startswith("Bearer ")
+            else authorization
+        )
 
         result = await self.gateway.validate_token(token)
 
@@ -487,7 +450,7 @@ class GatewayAuthDependency:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=result.error or "Invalid token",
-                headers={"WWW-Authenticate": "Bearer"}
+                headers={"WWW-Authenticate": "Bearer"},
             )
 
         return result
@@ -514,7 +477,7 @@ class GatewayAuthDependency:
             if not GatewayClient.is_tier_or_higher(result, min_tier):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Requires {min_tier} tier or higher"
+                    detail=f"Requires {min_tier} tier or higher",
                 )
 
             return result
@@ -543,7 +506,7 @@ class GatewayAuthDependency:
             if not GatewayClient.has_feature(result, feature):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Feature not available: {feature}"
+                    detail=f"Feature not available: {feature}",
                 )
 
             return result
@@ -554,6 +517,7 @@ class GatewayAuthDependency:
 # =============================================================================
 # LOCAL TOKEN VALIDATION (FOR PERFORMANCE)
 # =============================================================================
+
 
 class LocalTokenValidator:
     """
@@ -601,11 +565,7 @@ class LocalTokenValidator:
         try:
             from jose import JWTError, jwt
 
-            payload = jwt.decode(
-                token,
-                self.secret_key,
-                algorithms=[self.algorithm]
-            )
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
 
             return TokenValidationResult(
                 valid=True,
@@ -614,16 +574,10 @@ class LocalTokenValidator:
                 tier=payload.get("tier"),
                 platforms=payload.get("platforms", []),
                 features=payload.get("features", []),
-                session_id=payload.get("session_id")
+                session_id=payload.get("session_id"),
             )
 
         except JWTError as e:
-            return TokenValidationResult(
-                valid=False,
-                error=str(e)
-            )
+            return TokenValidationResult(valid=False, error=str(e))
         except Exception as e:
-            return TokenValidationResult(
-                valid=False,
-                error=f"Validation error: {str(e)}"
-            )
+            return TokenValidationResult(valid=False, error=f"Validation error: {str(e)}")

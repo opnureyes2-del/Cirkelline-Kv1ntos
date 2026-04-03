@@ -41,8 +41,10 @@ logger = logging.getLogger(__name__)
 # ANOMALY TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class AnomalyType(Enum):
     """Types of detected anomalies."""
+
     LATENCY_SPIKE = "latency_spike"
     ERROR_RATE_INCREASE = "error_rate_increase"
     RESOURCE_EXHAUSTION = "resource_exhaustion"
@@ -55,6 +57,7 @@ class AnomalyType(Enum):
 
 class AnomalySeverity(Enum):
     """Severity levels for anomalies."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -64,6 +67,7 @@ class AnomalySeverity(Enum):
 @dataclass
 class Anomaly:
     """A detected anomaly."""
+
     anomaly_id: str
     anomaly_type: AnomalyType
     severity: AnomalySeverity
@@ -104,9 +108,11 @@ class Anomaly:
 # METRIC TRACKING
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class MetricWindow:
     """Rolling window of metric values."""
+
     name: str
     values: List[Tuple[datetime, float]] = field(default_factory=list)
     window_size: int = 100
@@ -119,7 +125,7 @@ class MetricWindow:
 
         # Trim by size
         if len(self.values) > self.window_size:
-            self.values = self.values[-self.window_size:]
+            self.values = self.values[-self.window_size :]
 
         # Trim by time
         cutoff = datetime.utcnow() - timedelta(minutes=self.window_minutes)
@@ -156,9 +162,11 @@ class MetricWindow:
 # DETECTION RULES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class DetectionRule:
     """Rule for anomaly detection."""
+
     rule_id: str
     name: str
     metric_name: str
@@ -207,7 +215,6 @@ DEFAULT_DETECTION_RULES: List[DetectionRule] = [
         severity=AnomalySeverity.HIGH,
         std_dev_multiplier=3.0,  # 3 standard deviations
     ),
-
     # Error rate rules
     DetectionRule(
         rule_id="error-rate-high",
@@ -225,7 +232,6 @@ DEFAULT_DETECTION_RULES: List[DetectionRule] = [
         severity=AnomalySeverity.MEDIUM,
         change_rate_threshold=50.0,  # 50% increase
     ),
-
     # Resource rules
     DetectionRule(
         rule_id="memory-high",
@@ -243,7 +249,6 @@ DEFAULT_DETECTION_RULES: List[DetectionRule] = [
         severity=AnomalySeverity.MEDIUM,
         threshold_high=85,  # 85%
     ),
-
     # Mission rules
     DetectionRule(
         rule_id="mission-stall",
@@ -253,7 +258,6 @@ DEFAULT_DETECTION_RULES: List[DetectionRule] = [
         severity=AnomalySeverity.HIGH,
         threshold_high=30,  # 30 minutes
     ),
-
     # Agent rules
     DetectionRule(
         rule_id="agent-failure-rate",
@@ -269,6 +273,7 @@ DEFAULT_DETECTION_RULES: List[DetectionRule] = [
 # ═══════════════════════════════════════════════════════════════════════════════
 # ANOMALY DETECTOR
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class AnomalyDetector:
     """
@@ -388,8 +393,8 @@ class AnomalyDetector:
                 await self._report_anomaly(anomaly)
 
                 # Set cooldown
-                self._cooldowns[rule.rule_id] = (
-                    datetime.utcnow() + timedelta(minutes=rule.cooldown_minutes)
+                self._cooldowns[rule.rule_id] = datetime.utcnow() + timedelta(
+                    minutes=rule.cooldown_minutes
                 )
 
     def _detect_anomaly(
@@ -439,7 +444,7 @@ class AnomalyDetector:
 
             if len(recent) >= 2 and len(older) >= 5:
                 recent_avg = statistics.mean(recent)
-                older_avg = statistics.mean(older[:-len(recent)])  # Exclude recent
+                older_avg = statistics.mean(older[: -len(recent)])  # Exclude recent
 
                 if older_avg > 0:
                     change_rate = ((recent_avg - older_avg) / older_avg) * 100
@@ -462,6 +467,7 @@ class AnomalyDetector:
     ) -> Anomaly:
         """Create an anomaly from a rule match."""
         import uuid
+
         return Anomaly(
             anomaly_id=f"anomaly-{uuid.uuid4().hex[:8]}",
             anomaly_type=rule.anomaly_type,
@@ -498,6 +504,7 @@ class AnomalyDetector:
             for service_name, service_health in health.get("services", {}).items():
                 if service_health.get("status") == "unhealthy":
                     import uuid
+
                     anomaly = Anomaly(
                         anomaly_id=f"anomaly-svc-{uuid.uuid4().hex[:8]}",
                         anomaly_type=AnomalyType.AGENT_FAILURE,
@@ -521,12 +528,14 @@ class AnomalyDetector:
         self._anomalies[anomaly.anomaly_id] = anomaly
 
         # Publish event
-        await self._event_bus.publish(Event(
-            event_type=EventType.SYSTEM_ALERT,
-            source="anomaly_detector",
-            payload=anomaly.to_dict(),
-            priority=self._severity_to_priority(anomaly.severity),
-        ))
+        await self._event_bus.publish(
+            Event(
+                event_type=EventType.SYSTEM_ALERT,
+                source="anomaly_detector",
+                payload=anomaly.to_dict(),
+                priority=self._severity_to_priority(anomaly.severity),
+            )
+        )
 
         logger.warning(f"Anomaly detected: [{anomaly.severity.value}] {anomaly.title}")
 
@@ -565,8 +574,7 @@ class AnomalyDetector:
     def get_anomalies_by_type(self, anomaly_type: AnomalyType) -> List[Anomaly]:
         """Get anomalies by type."""
         return [
-            a for a in self._anomalies.values()
-            if a.anomaly_type == anomaly_type and not a.resolved
+            a for a in self._anomalies.values() if a.anomaly_type == anomaly_type and not a.resolved
         ]
 
     # ═══════════════════════════════════════════════════════════════════════════
@@ -600,6 +608,7 @@ class AnomalyDetector:
                 failure_rate = 1 - statistics.mean(recent)
                 if failure_rate > 0.3:  # 30% failure rate
                     import uuid
+
                     anomaly = Anomaly(
                         anomaly_id=f"anomaly-mission-{uuid.uuid4().hex[:8]}",
                         anomaly_type=AnomalyType.MISSION_STALL,
@@ -626,6 +635,7 @@ class AnomalyDetector:
             recent = metric.get_recent(minutes=5)
             if len(recent) >= 3:
                 import uuid
+
                 anomaly = Anomaly(
                     anomaly_id=f"anomaly-agent-{uuid.uuid4().hex[:8]}",
                     anomaly_type=AnomalyType.AGENT_FAILURE,

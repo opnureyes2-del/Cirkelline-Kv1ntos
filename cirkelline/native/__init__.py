@@ -42,6 +42,7 @@ try:
     from cirkelline_native import (
         fast_hash as _rust_hash,
     )
+
     NATIVE_AVAILABLE = True
     logger.info("Native Rust extensions loaded - performance mode enabled")
 except ImportError:
@@ -122,6 +123,7 @@ def _python_batch_hash(items: List[str]) -> List[int]:
 def _python_extract_keys(json_str: str, keys: List[str]) -> Dict[str, str]:
     """Python fallback for extract_json_keys."""
     import json
+
     try:
         data = json.loads(json_str)
         return {k: str(data.get(k, "")) for k in keys if k in data}

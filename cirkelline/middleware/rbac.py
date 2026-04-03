@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 # PERMISSION DEFINITIONS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class Permission(str, Enum):
     """
     Enumeration of all system permissions.
@@ -117,20 +118,14 @@ class Permission(str, Enum):
 # TIER HIERARCHY
 # ═══════════════════════════════════════════════════════════════════════════════
 
-TIER_HIERARCHY: Dict[str, int] = {
-    "member": 1,
-    "pro": 2,
-    "business": 3,
-    "elite": 4,
-    "family": 5
-}
+TIER_HIERARCHY: Dict[str, int] = {"member": 1, "pro": 2, "business": 3, "elite": 4, "family": 5}
 
 TIER_NAMES: Dict[str, str] = {
     "member": "Member (Free)",
     "pro": "Pro",
     "business": "Business",
     "elite": "Elite",
-    "family": "Family"
+    "family": "Family",
 }
 
 
@@ -147,27 +142,21 @@ TIER_PERMISSIONS: Dict[str, Set[Permission]] = {
     "member": {
         # Chat
         Permission.CHAT_BASIC,
-
         # Core Specialists (all available)
         Permission.AGENT_AUDIO,
         Permission.AGENT_IMAGE,
         Permission.AGENT_DOCUMENT,
-
         # Basic Search
         Permission.SEARCH_DUCKDUCKGO,
-
         # Documents (limited)
         Permission.DOCUMENT_UPLOAD,
         Permission.KNOWLEDGE_UPLOAD,
         Permission.KNOWLEDGE_SEARCH,
-
         # Memory (limited)
         Permission.MEMORY_BASIC,
-
         # Google Integration
         Permission.INTEGRATION_GOOGLE,
     },
-
     # ─────────────────────────────────────────────────────────────────────────
     # PRO - Level 2
     # Power users: Advanced search, Research Team, Video
@@ -175,27 +164,20 @@ TIER_PERMISSIONS: Dict[str, Set[Permission]] = {
     "pro": {
         # Advanced Chat
         Permission.CHAT_ADVANCED,
-
         # Video Specialist
         Permission.AGENT_VIDEO,
-
         # Research Team
         Permission.TEAM_RESEARCH,
-
         # Advanced Search
         Permission.SEARCH_EXA,
         Permission.DEEP_RESEARCH,
-
         # Notion Integration
         Permission.INTEGRATION_NOTION,
-
         # Unlimited Memory
         Permission.MEMORY_UNLIMITED,
-
         # API Access
         Permission.API_ACCESS,
     },
-
     # ─────────────────────────────────────────────────────────────────────────
     # BUSINESS - Level 3
     # Enterprise: Law Team, Tavily, Priority Support
@@ -203,27 +185,20 @@ TIER_PERMISSIONS: Dict[str, Set[Permission]] = {
     "business": {
         # Law Team
         Permission.TEAM_LEGAL,
-
         # Tavily Deep Search
         Permission.SEARCH_TAVILY,
-
         # Document Export
         Permission.DOCUMENT_EXPORT,
         Permission.DOCUMENT_UNLIMITED,
-
         # Unlimited Chat
         Permission.CHAT_UNLIMITED,
-
         # API Unlimited
         Permission.API_UNLIMITED,
-
         # Priority Support
         Permission.PRIORITY_SUPPORT,
-
         # Custom Instructions
         Permission.CUSTOM_INSTRUCTIONS,
     },
-
     # ─────────────────────────────────────────────────────────────────────────
     # ELITE - Level 4
     # Premium: Custom Agents, Data Export, Full Admin
@@ -232,14 +207,11 @@ TIER_PERMISSIONS: Dict[str, Set[Permission]] = {
         # Custom Agents
         Permission.AGENT_CUSTOM,
         Permission.TEAM_CUSTOM,
-
         # Data Export (GDPR)
         Permission.DATA_EXPORT,
-
         # Document Management
         Permission.DOCUMENT_DELETE,
     },
-
     # ─────────────────────────────────────────────────────────────────────────
     # FAMILY - Level 5
     # Full Suite: All Elite features + Family sharing
@@ -278,6 +250,7 @@ TOOL_PERMISSIONS: Dict[str, Permission] = {
 # ═══════════════════════════════════════════════════════════════════════════════
 # PERMISSION RESOLUTION
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def resolve_permissions(tier_slug: str, is_admin: bool = False) -> Set[Permission]:
     """
@@ -349,6 +322,7 @@ def has_any_permission(user_permissions: Set[Permission], required: List[Permiss
 # FASTAPI DEPENDENCY INJECTION
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class PermissionChecker:
     """
     FastAPI dependency for checking user permissions.
@@ -382,17 +356,14 @@ class PermissionChecker:
             User context dict with user_id, tier_slug, is_admin, permissions
         """
         # Extract user info from request state (set by JWT middleware)
-        user_id = getattr(request.state, 'user_id', None)
+        user_id = getattr(request.state, "user_id", None)
 
         if not user_id:
-            raise HTTPException(
-                status_code=401,
-                detail="Authentication required"
-            )
+            raise HTTPException(status_code=401, detail="Authentication required")
 
         # Get tier info from request state or JWT payload
-        tier_slug = getattr(request.state, 'tier_slug', 'member')
-        is_admin = getattr(request.state, 'is_admin', False)
+        tier_slug = getattr(request.state, "tier_slug", "member")
+        is_admin = getattr(request.state, "is_admin", False)
 
         # Resolve user's permissions
         user_permissions = resolve_permissions(tier_slug, is_admin)
@@ -417,8 +388,8 @@ class PermissionChecker:
                     "missing_permissions": missing_perms,
                     "required_tier": min_tier,
                     "current_tier": tier_slug,
-                    "upgrade_url": "https://cirkelline.com/pricing"
-                }
+                    "upgrade_url": "https://cirkelline.com/pricing",
+                },
             )
 
         # Return user context for downstream use
@@ -427,7 +398,7 @@ class PermissionChecker:
             "tier_slug": tier_slug,
             "tier_level": TIER_HIERARCHY.get(tier_slug, 1),
             "is_admin": is_admin,
-            "permissions": user_permissions
+            "permissions": user_permissions,
         }
 
 
@@ -459,23 +430,19 @@ def require_tier(min_tier: str):
         async def pro_feature():
             ...
     """
+
     async def tier_checker(request: Request) -> Dict[str, Any]:
-        user_id = getattr(request.state, 'user_id', None)
+        user_id = getattr(request.state, "user_id", None)
 
         if not user_id:
             raise HTTPException(status_code=401, detail="Authentication required")
 
-        tier_slug = getattr(request.state, 'tier_slug', 'member')
-        is_admin = getattr(request.state, 'is_admin', False)
+        tier_slug = getattr(request.state, "tier_slug", "member")
+        is_admin = getattr(request.state, "is_admin", False)
 
         # Admins bypass tier checks
         if is_admin:
-            return {
-                "user_id": user_id,
-                "tier_slug": tier_slug,
-                "tier_level": 99,
-                "is_admin": True
-            }
+            return {"user_id": user_id, "tier_slug": tier_slug, "tier_level": 99, "is_admin": True}
 
         user_level = TIER_HIERARCHY.get(tier_slug, 1)
         required_level = TIER_HIERARCHY.get(min_tier, 1)
@@ -488,15 +455,15 @@ def require_tier(min_tier: str):
                     "message": f"This feature requires {TIER_NAMES.get(min_tier, min_tier)} tier or higher",
                     "required_tier": min_tier,
                     "current_tier": tier_slug,
-                    "upgrade_url": "https://cirkelline.com/pricing"
-                }
+                    "upgrade_url": "https://cirkelline.com/pricing",
+                },
             )
 
         return {
             "user_id": user_id,
             "tier_slug": tier_slug,
             "tier_level": user_level,
-            "is_admin": False
+            "is_admin": False,
         }
 
     return tier_checker
@@ -511,28 +478,22 @@ def require_admin():
         async def list_users():
             ...
     """
+
     async def admin_checker(request: Request) -> Dict[str, Any]:
-        user_id = getattr(request.state, 'user_id', None)
+        user_id = getattr(request.state, "user_id", None)
 
         if not user_id:
             raise HTTPException(status_code=401, detail="Authentication required")
 
-        is_admin = getattr(request.state, 'is_admin', False)
+        is_admin = getattr(request.state, "is_admin", False)
 
         if not is_admin:
             raise HTTPException(
                 status_code=403,
-                detail={
-                    "error": "admin_required",
-                    "message": "Admin privileges required"
-                }
+                detail={"error": "admin_required", "message": "Admin privileges required"},
             )
 
-        return {
-            "user_id": user_id,
-            "is_admin": True,
-            "permissions": ADMIN_PERMISSIONS
-        }
+        return {"user_id": user_id, "is_admin": True, "permissions": ADMIN_PERMISSIONS}
 
     return admin_checker
 
@@ -541,11 +502,9 @@ def require_admin():
 # AGENT/TEAM ACCESS CONTROL
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 async def check_agent_access(
-    user_id: str,
-    agent_id: str,
-    tier_slug: str,
-    is_admin: bool = False
+    user_id: str, agent_id: str, tier_slug: str, is_admin: bool = False
 ) -> Dict[str, Any]:
     """
     Check if user can access specific agent.
@@ -583,15 +542,12 @@ async def check_agent_access(
         "message": f"The {agent_id.replace('-', ' ').title()} requires {TIER_NAMES.get(min_tier, min_tier)} tier or higher.",
         "required_tier": min_tier,
         "current_tier": tier_slug,
-        "upgrade_url": "https://cirkelline.com/pricing"
+        "upgrade_url": "https://cirkelline.com/pricing",
     }
 
 
 async def check_team_access(
-    user_id: str,
-    team_id: str,
-    tier_slug: str,
-    is_admin: bool = False
+    user_id: str, team_id: str, tier_slug: str, is_admin: bool = False
 ) -> Dict[str, Any]:
     """
     Check if user can access specific team.
@@ -629,15 +585,11 @@ async def check_team_access(
         "message": f"The {team_id.replace('-', ' ').title()} requires {TIER_NAMES.get(min_tier, min_tier)} tier or higher.",
         "required_tier": min_tier,
         "current_tier": tier_slug,
-        "upgrade_url": "https://cirkelline.com/pricing"
+        "upgrade_url": "https://cirkelline.com/pricing",
     }
 
 
-async def check_tool_access(
-    tool_name: str,
-    tier_slug: str,
-    is_admin: bool = False
-) -> bool:
+async def check_tool_access(tool_name: str, tier_slug: str, is_admin: bool = False) -> bool:
     """
     Check if user can access specific search tool.
 
@@ -664,6 +616,7 @@ async def check_tool_access(
 # ═══════════════════════════════════════════════════════════════════════════════
 # DYNAMIC MEMBER/TOOL BUILDERS FOR CIRKELLINE TEAM
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def get_available_agents_for_tier(tier_slug: str, is_admin: bool = False) -> List[str]:
     """
@@ -741,6 +694,7 @@ def get_available_tools_for_tier(tier_slug: str, is_admin: bool = False) -> List
 # UTILITY FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def get_tier_features_summary(tier_slug: str) -> Dict[str, Any]:
     """
     Get a summary of features available for a tier.
@@ -769,7 +723,7 @@ def get_tier_features_summary(tier_slug: str) -> Dict[str, Any]:
             "api_access": Permission.API_ACCESS in permissions,
             "priority_support": Permission.PRIORITY_SUPPORT in permissions,
             "data_export": Permission.DATA_EXPORT in permissions,
-        }
+        },
     }
 
 
@@ -801,44 +755,40 @@ def format_upgrade_message(current_tier: str, required_permission: Permission) -
 
 __all__ = [
     # Enums
-    'Permission',
-
+    "Permission",
     # Constants
-    'TIER_HIERARCHY',
-    'TIER_NAMES',
-    'TIER_PERMISSIONS',
-    'ADMIN_PERMISSIONS',
-    'AGENT_PERMISSIONS',
-    'TEAM_PERMISSIONS_MAP',
-    'TOOL_PERMISSIONS',
-
+    "TIER_HIERARCHY",
+    "TIER_NAMES",
+    "TIER_PERMISSIONS",
+    "ADMIN_PERMISSIONS",
+    "AGENT_PERMISSIONS",
+    "TEAM_PERMISSIONS_MAP",
+    "TOOL_PERMISSIONS",
     # Resolution functions
-    'resolve_permissions',
-    'get_tier_for_permission',
-    'has_permission',
-    'has_all_permissions',
-    'has_any_permission',
-
+    "resolve_permissions",
+    "get_tier_for_permission",
+    "has_permission",
+    "has_all_permissions",
+    "has_any_permission",
     # FastAPI dependencies
-    'require_permissions',
-    'require_tier',
-    'require_admin',
-    'PermissionChecker',
-
+    "require_permissions",
+    "require_tier",
+    "require_admin",
+    "PermissionChecker",
     # Access checks
-    'check_agent_access',
-    'check_team_access',
-    'check_tool_access',
-
+    "check_agent_access",
+    "check_team_access",
+    "check_tool_access",
     # Builders
-    'get_available_agents_for_tier',
-    'get_available_teams_for_tier',
-    'get_available_tools_for_tier',
-
+    "get_available_agents_for_tier",
+    "get_available_teams_for_tier",
+    "get_available_tools_for_tier",
     # Utilities
-    'get_tier_features_summary',
-    'format_upgrade_message',
+    "get_tier_features_summary",
+    "format_upgrade_message",
 ]
 
 
-logger.info("RBAC module loaded with %d permissions, %d tiers", len(Permission), len(TIER_HIERARCHY))
+logger.info(
+    "RBAC module loaded with %d permissions, %d tiers", len(Permission), len(TIER_HIERARCHY)
+)

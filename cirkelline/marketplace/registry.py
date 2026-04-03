@@ -22,15 +22,17 @@ from typing import Any, Dict, List, Optional
 
 class APIStatus(Enum):
     """API livscyklus status."""
-    DRAFT = "draft"           # Under udvikling
-    BETA = "beta"             # Beta test
-    ACTIVE = "active"         # Produktions-klar
+
+    DRAFT = "draft"  # Under udvikling
+    BETA = "beta"  # Beta test
+    ACTIVE = "active"  # Produktions-klar
     DEPRECATED = "deprecated"  # Udgået men stadig tilgængelig
-    RETIRED = "retired"       # Fjernet
+    RETIRED = "retired"  # Fjernet
 
 
 class HTTPMethod(Enum):
     """HTTP metoder."""
+
     GET = "GET"
     POST = "POST"
     PUT = "PUT"
@@ -52,6 +54,7 @@ class APIEndpoint:
         response: Response schema
         rate_limit: Endpoint-specifik rate limit
     """
+
     path: str
     method: HTTPMethod
     description: str
@@ -78,6 +81,7 @@ class APIVersion:
         deprecated_at: Tidspunkt for deprecation
         sunset_at: Tidspunkt hvor API fjernes helt
     """
+
     version: str
     status: APIStatus
     endpoints: List[APIEndpoint] = field(default_factory=list)
@@ -127,6 +131,7 @@ class APIDefinition:
         default_rate_limit: Default rate limit
         base_path: Base URL sti
     """
+
     name: str
     display_name: str
     description: str
@@ -266,10 +271,7 @@ class APIRegistry:
         return list(self._by_category.keys())
 
     def search(
-        self,
-        query: str,
-        category: Optional[str] = None,
-        status: Optional[APIStatus] = None
+        self, query: str, category: Optional[str] = None, status: Optional[APIStatus] = None
     ) -> List[APIDefinition]:
         """
         Søg i API registret.
@@ -297,10 +299,12 @@ class APIRegistry:
                     continue
 
             # Søg i navn og beskrivelse
-            if (query_lower in api.name.lower() or
-                query_lower in api.display_name.lower() or
-                query_lower in api.description.lower() or
-                any(query_lower in tag.lower() for tag in api.tags)):
+            if (
+                query_lower in api.name.lower()
+                or query_lower in api.display_name.lower()
+                or query_lower in api.description.lower()
+                or any(query_lower in tag.lower() for tag in api.tags)
+            ):
                 results.append(api)
 
         return results
@@ -329,23 +333,15 @@ class APIRegistry:
                 "title": api.display_name,
                 "description": api.description,
                 "version": version.version,
-                "contact": {
-                    "email": api.support_email
-                } if api.support_email else {}
+                "contact": {"email": api.support_email} if api.support_email else {},
             },
-            "servers": [
-                {"url": f"{api.base_path}/v{version.major}"}
-            ],
+            "servers": [{"url": f"{api.base_path}/v{version.major}"}],
             "paths": {},
             "components": {
                 "securitySchemes": {
-                    "bearerAuth": {
-                        "type": "http",
-                        "scheme": "bearer",
-                        "bearerFormat": "JWT"
-                    }
+                    "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
                 }
-            }
+            },
         }
 
         # Tilføj endpoints
@@ -361,13 +357,9 @@ class APIRegistry:
                 "responses": {
                     "200": {
                         "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": endpoint.response or {}
-                            }
-                        }
+                        "content": {"application/json": {"schema": endpoint.response or {}}},
                     }
-                }
+                },
             }
 
             if endpoint.requires_auth:
@@ -375,11 +367,7 @@ class APIRegistry:
 
             if endpoint.request_body:
                 method_spec["requestBody"] = {
-                    "content": {
-                        "application/json": {
-                            "schema": endpoint.request_body
-                        }
-                    }
+                    "content": {"application/json": {"schema": endpoint.request_body}}
                 }
 
             spec["paths"][path][endpoint.method.value.lower()] = method_spec
@@ -410,7 +398,7 @@ def register_api(
     version: str = "1.0.0",
     endpoints: Optional[List[Dict[str, Any]]] = None,
     rate_limit: int = 100,
-    **kwargs
+    **kwargs,
 ) -> APIDefinition:
     """
     Convenience function til at registrere en API.
@@ -434,14 +422,12 @@ def register_api(
         description=description,
         category=category,
         default_rate_limit=rate_limit,
-        **kwargs
+        **kwargs,
     )
 
     # Tilføj initial version
     api_version = APIVersion(
-        version=version,
-        status=APIStatus.ACTIVE,
-        released_at=datetime.utcnow()
+        version=version, status=APIStatus.ACTIVE, released_at=datetime.utcnow()
     )
 
     # Konverter endpoint dicts til APIEndpoint
@@ -460,7 +446,7 @@ def register_api(
                 response=ep_dict.get("response"),
                 rate_limit=ep_dict.get("rate_limit"),
                 requires_auth=ep_dict.get("requires_auth", True),
-                tags=ep_dict.get("tags", [])
+                tags=ep_dict.get("tags", []),
             )
             api_version.endpoints.append(endpoint)
 

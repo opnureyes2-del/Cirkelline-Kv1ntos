@@ -42,8 +42,10 @@ logger = logging.getLogger(__name__)
 # COLLABORATION TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class CollaborationMode(Enum):
     """Modes of multi-agent collaboration."""
+
     SEQUENTIAL = "sequential"  # Agents work one after another
     PARALLEL = "parallel"  # Agents work simultaneously
     CONSENSUS = "consensus"  # Agents must agree
@@ -53,6 +55,7 @@ class CollaborationMode(Enum):
 
 class CollaborationStatus(Enum):
     """Status of a collaboration session."""
+
     PENDING = "pending"
     ACTIVE = "active"
     VOTING = "voting"
@@ -64,6 +67,7 @@ class CollaborationStatus(Enum):
 @dataclass
 class AgentContribution:
     """A contribution from an agent to a collaboration."""
+
     agent_id: str
     agent_name: str
     content: str
@@ -87,6 +91,7 @@ class AgentContribution:
 @dataclass
 class CollaborationSession:
     """A multi-agent collaboration session."""
+
     session_id: str
     problem: str
     mode: CollaborationMode
@@ -123,6 +128,7 @@ class CollaborationSession:
 # SYNTHESIS STRATEGIES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class SynthesisStrategy:
     """Base class for synthesis strategies."""
 
@@ -153,7 +159,9 @@ class WeightedAverageSynthesis(SynthesisStrategy):
 
         # Use highest confidence contribution as base
         primary = sorted_contrib[0]
-        result_parts = [f"Primary insight (confidence {primary.confidence:.0%}):\n{primary.content}"]
+        result_parts = [
+            f"Primary insight (confidence {primary.confidence:.0%}):\n{primary.content}"
+        ]
 
         # Add supporting perspectives
         if len(sorted_contrib) > 1:
@@ -183,15 +191,19 @@ class ConsensusSynthesis(SynthesisStrategy):
 
         if avg_confidence >= self.agreement_threshold:
             # Combine all contributions
-            combined = "\n\n".join([
-                f"**{c.agent_name}** (confidence: {c.confidence:.0%}):\n{c.content}"
-                for c in contributions
-            ])
+            combined = "\n\n".join(
+                [
+                    f"**{c.agent_name}** (confidence: {c.confidence:.0%}):\n{c.content}"
+                    for c in contributions
+                ]
+            )
             return f"CONSENSUS REACHED (avg confidence: {avg_confidence:.0%})\n\n{combined}"
         else:
             # No consensus
-            return f"NO CONSENSUS (avg confidence: {avg_confidence:.0%}). Diverse perspectives:\n\n" + \
-                   "\n".join([f"- {c.agent_name}: {c.content[:100]}..." for c in contributions])
+            return (
+                f"NO CONSENSUS (avg confidence: {avg_confidence:.0%}). Diverse perspectives:\n\n"
+                + "\n".join([f"- {c.agent_name}: {c.content[:100]}..." for c in contributions])
+            )
 
 
 class VotingSynthesis(SynthesisStrategy):
@@ -247,6 +259,7 @@ class VotingSynthesis(SynthesisStrategy):
 # ═══════════════════════════════════════════════════════════════════════════════
 # COLLABORATION ENGINE
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class CollaborationEngine:
     """
@@ -339,7 +352,9 @@ class CollaborationEngine:
         )
 
         self._sessions[session_id] = session
-        logger.info(f"Created collaboration session {session_id} with {len(participants)} participants")
+        logger.info(
+            f"Created collaboration session {session_id} with {len(participants)} participants"
+        )
 
         return session
 
@@ -382,11 +397,13 @@ class CollaborationEngine:
             },
         )
 
-        await self._event_bus.publish(Event(
-            event_type=EventType.AGENT_REQUEST,
-            source="collaboration_engine",
-            payload=message.to_dict(),
-        ))
+        await self._event_bus.publish(
+            Event(
+                event_type=EventType.AGENT_REQUEST,
+                source="collaboration_engine",
+                payload=message.to_dict(),
+            )
+        )
 
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRIBUTION HANDLING
@@ -566,7 +583,8 @@ class CollaborationEngine:
     def get_active_sessions(self) -> List[CollaborationSession]:
         """Get all active sessions."""
         return [
-            s for s in self._sessions.values()
+            s
+            for s in self._sessions.values()
             if s.status in [CollaborationStatus.PENDING, CollaborationStatus.ACTIVE]
         ]
 

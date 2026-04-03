@@ -108,18 +108,12 @@ class NotionAdapter(BibliotekAdapter):
         """
         if not self._connected or not self._notion_client:
             return SearchResult(
-                items=[],
-                total_count=0,
-                query=query.query,
-                sources_searched=[self.source]
+                items=[], total_count=0, query=query.query, sources_searched=[self.source]
             )
 
         try:
             # Brug Notion search API
-            response = await self._notion_client.search(
-                query=query.query,
-                page_size=query.limit
-            )
+            response = await self._notion_client.search(query=query.query, page_size=query.limit)
 
             items = []
             for result in response.get("results", []):
@@ -131,16 +125,13 @@ class NotionAdapter(BibliotekAdapter):
                 items=items,
                 total_count=len(items),
                 query=query.query,
-                sources_searched=[self.source]
+                sources_searched=[self.source],
             )
 
         except Exception as e:
             print(f"Notion søgefejl: {e}")
             return SearchResult(
-                items=[],
-                total_count=0,
-                query=query.query,
-                sources_searched=[self.source]
+                items=[], total_count=0, query=query.query, sources_searched=[self.source]
             )
 
     async def get_item(self, item_id: str) -> Optional[LibraryItem]:
@@ -174,7 +165,7 @@ class NotionAdapter(BibliotekAdapter):
         domain: Optional[str] = None,
         item_type: Optional[ItemType] = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[LibraryItem]:
         """List items fra Notion."""
         if not self._connected or not self._notion_client:
@@ -183,8 +174,7 @@ class NotionAdapter(BibliotekAdapter):
         try:
             # List brugerens databaser
             response = await self._notion_client.search(
-                filter={"property": "object", "value": "database"},
-                page_size=limit
+                filter={"property": "object", "value": "database"}, page_size=limit
             )
 
             items = []
@@ -222,10 +212,7 @@ class NotionAdapter(BibliotekAdapter):
 
         try:
             # Notion understøtter kun arkivering, ikke sletning
-            await self._notion_client.pages.update(
-                page_id=item_id,
-                archived=True
-            )
+            await self._notion_client.pages.update(page_id=item_id, archived=True)
             return True
 
         except Exception:
@@ -234,16 +221,12 @@ class NotionAdapter(BibliotekAdapter):
     async def sync(self) -> SyncStatus:
         """Synkroniser database liste fra Notion."""
         if not self._connected or not self._notion_client:
-            return SyncStatus(
-                source=self.source,
-                status="disconnected"
-            )
+            return SyncStatus(source=self.source, status="disconnected")
 
         try:
             # Hent alle databaser
             response = await self._notion_client.search(
-                filter={"property": "object", "value": "database"},
-                page_size=100
+                filter={"property": "object", "value": "database"}, page_size=100
             )
 
             self._databases = {}
@@ -252,7 +235,7 @@ class NotionAdapter(BibliotekAdapter):
                 self._databases[db_id] = {
                     "id": db_id,
                     "title": self._get_notion_title(db),
-                    "type": "database"
+                    "type": "database",
                 }
 
             self._last_sync = datetime.utcnow()
@@ -260,15 +243,11 @@ class NotionAdapter(BibliotekAdapter):
                 source=self.source,
                 last_sync=self._last_sync,
                 items_synced=len(self._databases),
-                status="success"
+                status="success",
             )
 
         except Exception as e:
-            return SyncStatus(
-                source=self.source,
-                status="failed",
-                error=str(e)
-            )
+            return SyncStatus(source=self.source, status="failed", error=str(e))
 
     async def get_databases(self) -> List[Dict[str, Any]]:
         """
@@ -281,10 +260,7 @@ class NotionAdapter(BibliotekAdapter):
             await self.sync()
         return list(self._databases.values())
 
-    def _convert_notion_to_library_item(
-        self,
-        notion_obj: Dict[str, Any]
-    ) -> Optional[LibraryItem]:
+    def _convert_notion_to_library_item(self, notion_obj: Dict[str, Any]) -> Optional[LibraryItem]:
         """Konverter Notion objekt til LibraryItem."""
         try:
             obj_type = notion_obj.get("object", "unknown")
@@ -320,16 +296,21 @@ class NotionAdapter(BibliotekAdapter):
                 item_type=item_type,
                 source_id=notion_obj["id"],
                 url=notion_obj.get("url"),
-                created_at=datetime.fromisoformat(
-                    notion_obj.get("created_time", "").replace("Z", "+00:00")
-                ) if notion_obj.get("created_time") else datetime.utcnow(),
-                updated_at=datetime.fromisoformat(
-                    notion_obj.get("last_edited_time", "").replace("Z", "+00:00")
-                ) if notion_obj.get("last_edited_time") else datetime.utcnow(),
-                metadata={
-                    "notion_type": obj_type,
-                    "parent": notion_obj.get("parent", {})
-                }
+                created_at=(
+                    datetime.fromisoformat(
+                        notion_obj.get("created_time", "").replace("Z", "+00:00")
+                    )
+                    if notion_obj.get("created_time")
+                    else datetime.utcnow()
+                ),
+                updated_at=(
+                    datetime.fromisoformat(
+                        notion_obj.get("last_edited_time", "").replace("Z", "+00:00")
+                    )
+                    if notion_obj.get("last_edited_time")
+                    else datetime.utcnow()
+                ),
+                metadata={"notion_type": obj_type, "parent": notion_obj.get("parent", {})},
             )
 
         except Exception as e:

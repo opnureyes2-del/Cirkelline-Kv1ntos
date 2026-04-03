@@ -31,6 +31,7 @@ try:
         ToolCallStatus,
         get_ckc_optimizer,
     )
+
     CKC_OPTIMIZER_AVAILABLE = True
 except ImportError:
     CKC_OPTIMIZER_AVAILABLE = False
@@ -45,6 +46,7 @@ try:
         get_orchestrator,
         get_orchestrator_status,
     )
+
     CKC_ORCHESTRATOR_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"CKC Orchestrator not available: {e}")
@@ -56,6 +58,7 @@ try:
         RoomStatus,
         ValidationState,
     )
+
     CKC_LEARNING_ROOMS_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"CKC Learning Rooms not available: {e}")
@@ -69,6 +72,7 @@ try:
         create_mastermind_coordinator,
         get_mastermind_coordinator,
     )
+
     CKC_MASTERMIND_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"CKC Mastermind not available: {e}")
@@ -102,17 +106,15 @@ class CKCTools:
         self.mastermind_available = CKC_MASTERMIND_AVAILABLE
         self.learning_rooms_available = CKC_LEARNING_ROOMS_AVAILABLE
 
-        logger.info(f"CKC Tools initialized - Orchestrator: {self.orchestrator_available}, "
-                   f"Mastermind: {self.mastermind_available}, "
-                   f"Learning Rooms: {self.learning_rooms_available}, "
-                   f"Optimizer: {CKC_OPTIMIZER_AVAILABLE}")
+        logger.info(
+            f"CKC Tools initialized - Orchestrator: {self.orchestrator_available}, "
+            f"Mastermind: {self.mastermind_available}, "
+            f"Learning Rooms: {self.learning_rooms_available}, "
+            f"Optimizer: {CKC_OPTIMIZER_AVAILABLE}"
+        )
 
     def _track_call(
-        self,
-        tool_name: str,
-        status: str,
-        duration_ms: float,
-        error_message: Optional[str] = None
+        self, tool_name: str, status: str, duration_ms: float, error_message: Optional[str] = None
     ) -> None:
         """Track a tool call with the optimizer."""
         if self._optimizer:
@@ -121,7 +123,7 @@ class CKCTools:
                 tool_name=tool_name,
                 status=call_status,
                 duration_ms=duration_ms,
-                error_message=error_message
+                error_message=error_message,
             )
 
     def get_optimizer_stats(self) -> Dict[str, Any]:
@@ -137,7 +139,7 @@ class CKCTools:
         return {
             "health_report": self._optimizer.get_health_report(),
             "suggestions": self._optimizer.get_improvement_suggestions(),
-            "available": True
+            "available": True,
         }
 
     @property
@@ -182,20 +184,14 @@ class CKCTools:
                 "timestamp": datetime.utcnow().isoformat(),
                 "ckc_available": True,
                 "components": {
-                    "orchestrator": {
-                        "available": self.orchestrator_available,
-                        "status": "unknown"
-                    },
-                    "mastermind": {
-                        "available": self.mastermind_available,
-                        "status": "unknown"
-                    },
+                    "orchestrator": {"available": self.orchestrator_available, "status": "unknown"},
+                    "mastermind": {"available": self.mastermind_available, "status": "unknown"},
                     "learning_rooms": {
                         "available": self.learning_rooms_available,
-                        "status": "unknown"
-                    }
+                        "status": "unknown",
+                    },
                 },
-                "capabilities": self.list_ckc_capabilities()
+                "capabilities": self.list_ckc_capabilities(),
             }
 
             # Get orchestrator status if available
@@ -203,8 +199,8 @@ class CKCTools:
                 try:
                     status["components"]["orchestrator"]["status"] = "ready"
                     status["components"]["orchestrator"]["details"] = {
-                        "agents_registered": len(getattr(self.orchestrator, '_agents', {})),
-                        "active_tasks": len(getattr(self.orchestrator, '_tasks', {})),
+                        "agents_registered": len(getattr(self.orchestrator, "_agents", {})),
+                        "active_tasks": len(getattr(self.orchestrator, "_tasks", {})),
                     }
                 except Exception as e:
                     status["components"]["orchestrator"]["status"] = f"error: {e}"
@@ -246,40 +242,46 @@ class CKCTools:
         capabilities = []
 
         if self.orchestrator_available:
-            capabilities.extend([
-                "task_management",      # Create and manage tasks
-                "agent_coordination",   # Coordinate multiple agents
-                "validation_flows",     # Input validation and verification
-                "work_loop_sequencer",  # Complex workflow orchestration
-            ])
+            capabilities.extend(
+                [
+                    "task_management",  # Create and manage tasks
+                    "agent_coordination",  # Coordinate multiple agents
+                    "validation_flows",  # Input validation and verification
+                    "work_loop_sequencer",  # Complex workflow orchestration
+                ]
+            )
 
         if self.mastermind_available:
-            capabilities.extend([
-                "mastermind_sessions",      # Collaborative AI sessions
-                "super_admin_control",      # Super admin capabilities
-                "systems_dirigent",         # System orchestration
-                "feedback_aggregation",     # Feedback collection and analysis
-                "resource_allocation",      # Resource management
-                "training_room",            # Agent training
-                "self_optimization",        # Self-improvement scheduling
-                "ethics_guardrails",        # Ethical AI controls
-                "output_integrity",         # Output validation
-                "learning_loop",            # Continuous learning
-                "autonomy_control",         # Autonomy level management
-                "insight_synthesis",        # Insight aggregation
-                "decision_engine",          # Structured decision making
-                "ritual_execution",         # Routine/ritual execution
-                "think_aloud_streaming",    # Real-time thought streaming
-                "collective_awareness",     # Shared memory/awareness
-            ])
+            capabilities.extend(
+                [
+                    "mastermind_sessions",  # Collaborative AI sessions
+                    "super_admin_control",  # Super admin capabilities
+                    "systems_dirigent",  # System orchestration
+                    "feedback_aggregation",  # Feedback collection and analysis
+                    "resource_allocation",  # Resource management
+                    "training_room",  # Agent training
+                    "self_optimization",  # Self-improvement scheduling
+                    "ethics_guardrails",  # Ethical AI controls
+                    "output_integrity",  # Output validation
+                    "learning_loop",  # Continuous learning
+                    "autonomy_control",  # Autonomy level management
+                    "insight_synthesis",  # Insight aggregation
+                    "decision_engine",  # Structured decision making
+                    "ritual_execution",  # Routine/ritual execution
+                    "think_aloud_streaming",  # Real-time thought streaming
+                    "collective_awareness",  # Shared memory/awareness
+                ]
+            )
 
         if self.learning_rooms_available:
-            capabilities.extend([
-                "learning_rooms",           # Isolated learning environments
-                "room_status_tracking",     # Visual status (blue/green/yellow/red)
-                "validation_flow_items",    # Validation pipeline
-                "integrity_verification",   # Data integrity checks
-            ])
+            capabilities.extend(
+                [
+                    "learning_rooms",  # Isolated learning environments
+                    "room_status_tracking",  # Visual status (blue/green/yellow/red)
+                    "validation_flow_items",  # Validation pipeline
+                    "integrity_verification",  # Data integrity checks
+                ]
+            )
 
         return capabilities
 
@@ -310,11 +312,7 @@ class CKCTools:
             )
         """
         if not self.orchestrator_available:
-            return {
-                "success": False,
-                "error": "CKC Orchestrator is not available",
-                "task_id": None
-            }
+            return {"success": False, "error": "CKC Orchestrator is not available", "task_id": None}
 
         try:
             # Map string priority to enum
@@ -335,20 +333,16 @@ class CKCTools:
 
             return {
                 "success": True,
-                "task_id": task.task_id if hasattr(task, 'task_id') else str(task),
+                "task_id": task.task_id if hasattr(task, "task_id") else str(task),
                 "description": description,
                 "priority": priority,
                 "status": "created",
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:
             logger.error(f"Failed to create CKC task: {e}")
-            return {
-                "success": False,
-                "error": str(e),
-                "task_id": None
-            }
+            return {"success": False, "error": str(e), "task_id": None}
 
     async def start_mastermind_session(
         self,
@@ -383,7 +377,7 @@ class CKCTools:
             return {
                 "success": False,
                 "error": "CKC Mastermind is not available",
-                "session_id": None
+                "session_id": None,
             }
 
         try:
@@ -415,16 +409,12 @@ class CKCTools:
                 "status": "started",
                 "budget_usd": budget_usd,
                 "participants": participants or [],
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:
             logger.error(f"Failed to start Mastermind session: {e}")
-            return {
-                "success": False,
-                "error": str(e),
-                "session_id": None
-            }
+            return {"success": False, "error": str(e), "session_id": None}
 
     def list_learning_rooms(self) -> List[Dict[str, Any]]:
         """
@@ -446,10 +436,7 @@ class CKCTools:
         if not self.learning_rooms_available:
             duration_ms = (time.time() - start_time) * 1000
             self._track_call("list_learning_rooms", "success", duration_ms)
-            return [{
-                "error": "Learning Rooms not available",
-                "available": False
-            }]
+            return [{"error": "Learning Rooms not available", "available": False}]
 
         # Default rooms that CKC provides
         default_rooms = [
@@ -460,7 +447,7 @@ class CKCTools:
                 "status": "blue",
                 "status_meaning": "Stable and validated",
                 "owner": "system",
-                "type": "research"
+                "type": "research",
             },
             {
                 "room_id": 2,
@@ -469,7 +456,7 @@ class CKCTools:
                 "status": "green",
                 "status_meaning": "Active and functional",
                 "owner": "system",
-                "type": "creative"
+                "type": "creative",
             },
             {
                 "room_id": 3,
@@ -478,7 +465,7 @@ class CKCTools:
                 "status": "blue",
                 "status_meaning": "Stable and validated",
                 "owner": "system",
-                "type": "analysis"
+                "type": "analysis",
             },
             {
                 "room_id": 4,
@@ -487,7 +474,7 @@ class CKCTools:
                 "status": "green",
                 "status_meaning": "Active and functional",
                 "owner": "system",
-                "type": "training"
+                "type": "training",
             },
             {
                 "room_id": 5,
@@ -496,7 +483,7 @@ class CKCTools:
                 "status": "green",
                 "status_meaning": "Active and functional",
                 "owner": "system",
-                "type": "mvp"
+                "type": "mvp",
             },
         ]
 

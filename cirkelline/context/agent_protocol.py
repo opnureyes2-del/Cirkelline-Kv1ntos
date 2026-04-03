@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 # MESSAGE TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class MessageType(str, Enum):
     """Types of messages between agents."""
 
@@ -54,6 +55,7 @@ class MessageType(str, Enum):
 
 class MessagePriority(int, Enum):
     """Priority levels for message handling."""
+
     LOW = 0
     NORMAL = 1
     HIGH = 2
@@ -63,6 +65,7 @@ class MessagePriority(int, Enum):
 # ═══════════════════════════════════════════════════════════════════════════════
 # AGENT CAPABILITIES
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class AgentCapability(str, Enum):
     """Standard capabilities an agent can declare."""
@@ -104,6 +107,7 @@ class AgentCapability(str, Enum):
 @dataclass
 class AgentDescriptor:
     """Description of an agent's identity and capabilities."""
+
     agent_id: str
     name: str
     role: str
@@ -134,6 +138,7 @@ class AgentDescriptor:
 # MESSAGE STRUCTURE
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class AgentMessage:
     """
@@ -142,6 +147,7 @@ class AgentMessage:
     All agent-to-agent communication uses this structure.
     Messages are sent through the Event Bus.
     """
+
     # Identifiers
     message_id: str = field(default_factory=lambda: str(uuid.uuid4())[:12])
     correlation_id: Optional[str] = None  # For request/response tracking
@@ -229,6 +235,7 @@ class AgentMessage:
 # ═══════════════════════════════════════════════════════════════════════════════
 # MESSAGE FACTORIES
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def create_agent_message(
     sender: str,
@@ -332,6 +339,7 @@ def create_heartbeat(agent_id: str, status: str = "healthy") -> AgentMessage:
 # CAPABILITY REGISTRY
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class CapabilityRegistry:
     """
     Registry of agent capabilities for routing.
@@ -353,7 +361,9 @@ class CapabilityRegistry:
             if descriptor.agent_id not in self._capability_index[capability]:
                 self._capability_index[capability].append(descriptor.agent_id)
 
-        logger.info(f"Registered agent {descriptor.agent_id} with {len(descriptor.capabilities)} capabilities")
+        logger.info(
+            f"Registered agent {descriptor.agent_id} with {len(descriptor.capabilities)} capabilities"
+        )
 
     def unregister(self, agent_id: str) -> None:
         """Unregister an agent."""
@@ -365,8 +375,7 @@ class CapabilityRegistry:
         for capability in descriptor.capabilities:
             if capability in self._capability_index:
                 self._capability_index[capability] = [
-                    aid for aid in self._capability_index[capability]
-                    if aid != agent_id
+                    aid for aid in self._capability_index[capability] if aid != agent_id
                 ]
 
     def find_by_capability(
@@ -379,9 +388,7 @@ class CapabilityRegistry:
         agent_ids = self._capability_index.get(capability, [])
 
         return [
-            self._agents[aid]
-            for aid in agent_ids
-            if aid not in exclude and aid in self._agents
+            self._agents[aid] for aid in agent_ids if aid not in exclude and aid in self._agents
         ]
 
     def get_agent(self, agent_id: str) -> Optional[AgentDescriptor]:

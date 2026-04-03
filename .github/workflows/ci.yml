@@ -35,7 +35,7 @@ jobs:
         run: ruff check .
 
       - name: Check formatting with Black
-        run: black --check . --exclude "(venv|\.venv|\.git)"
+        run: black --check --config pyproject.toml .
 
   test:
     name: Tests

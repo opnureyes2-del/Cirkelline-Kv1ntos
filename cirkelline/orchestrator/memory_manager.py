@@ -54,7 +54,6 @@ custom_memory_manager = MemoryManager(
     • External factors affecting decisions
     • Previous solutions that helped
     """,
-
     additional_instructions="""
     MEMORY CAPTURE PRINCIPLES:
 
@@ -66,7 +65,7 @@ custom_memory_manager = MemoryManager(
     6. CONTEXT IS KEY - Store the "why" behind facts, not just facts
     7. RESPECT PRIVACY - Don't store overly personal details unless clearly shared
     8. ORGANIC CAPTURE - Extract naturally, don't interrogate
-    """
+    """,
 )
 
 logger.info("✅ Memory manager module loaded")

@@ -24,8 +24,10 @@ logger = logging.getLogger(__name__)
 # TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class RateLimitStrategy(Enum):
     """Rate limiting strategies."""
+
     TOKEN_BUCKET = "token_bucket"  # Allows bursts
     SLIDING_WINDOW = "sliding_window"  # Smooth limiting
     FIXED_WINDOW = "fixed_window"  # Simple counting
@@ -35,6 +37,7 @@ class RateLimitStrategy(Enum):
 @dataclass
 class RateLimitConfig:
     """Configuration for rate limiting."""
+
     requests_per_minute: int = 60
     requests_per_hour: int = 1000
     burst_size: int = 10  # Max burst for token bucket
@@ -45,6 +48,7 @@ class RateLimitConfig:
 @dataclass
 class RateLimitResult:
     """Result of a rate limit check."""
+
     allowed: bool
     remaining: int
     reset_at: float  # Unix timestamp
@@ -77,6 +81,7 @@ class RateLimitResult:
 # ═══════════════════════════════════════════════════════════════════════════════
 # TOKEN BUCKET
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TokenBucket:
     """
@@ -115,10 +120,7 @@ class TokenBucket:
         """Refill tokens based on elapsed time."""
         now = time.time()
         elapsed = now - self.last_update
-        self.tokens = min(
-            self.capacity,
-            self.tokens + elapsed * self.refill_rate
-        )
+        self.tokens = min(self.capacity, self.tokens + elapsed * self.refill_rate)
         self.last_update = now
 
     def get_state(self) -> Dict[str, Any]:
@@ -135,6 +137,7 @@ class TokenBucket:
 # ═══════════════════════════════════════════════════════════════════════════════
 # SLIDING WINDOW
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class SlidingWindow:
     """
@@ -198,6 +201,7 @@ class SlidingWindow:
 # ═══════════════════════════════════════════════════════════════════════════════
 # RATE LIMITER
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class RateLimiter:
     """
@@ -497,13 +501,15 @@ def get_rate_limiter() -> RateLimiter:
     global _limiter_instance
 
     if _limiter_instance is None:
-        _limiter_instance = RateLimiter(RateLimitConfig(
-            requests_per_minute=60,
-            requests_per_hour=1000,
-            burst_size=20,
-            strategy=RateLimitStrategy.TOKEN_BUCKET,
-            block_duration_seconds=60,
-        ))
+        _limiter_instance = RateLimiter(
+            RateLimitConfig(
+                requests_per_minute=60,
+                requests_per_hour=1000,
+                burst_size=20,
+                strategy=RateLimitStrategy.TOKEN_BUCKET,
+                block_duration_seconds=60,
+            )
+        )
 
     return _limiter_instance
 

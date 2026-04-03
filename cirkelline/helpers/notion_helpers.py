@@ -25,7 +25,7 @@ def get_user_notion_credentials_sync(user_id: str):
         from utils.encryption import decrypt_token
 
         # Get database connection
-        db_url = db.db_url if hasattr(db, 'db_url') else os.getenv("DATABASE_URL")
+        db_url = db.db_url if hasattr(db, "db_url") else os.getenv("DATABASE_URL")
         engine = create_engine(db_url)
 
         with Session(engine) as session:
@@ -35,7 +35,7 @@ def get_user_notion_credentials_sync(user_id: str):
                     FROM notion_tokens
                     WHERE user_id = :user_id
                 """),
-                {"user_id": user_id}
+                {"user_id": user_id},
             )
 
             row = result.fetchone()
@@ -47,20 +47,22 @@ def get_user_notion_credentials_sync(user_id: str):
             decrypted_token = decrypt_token(row[0])
 
             return {
-                'access_token': decrypted_token,
-                'workspace_id': row[1],
-                'workspace_name': row[2]
+                "access_token": decrypted_token,
+                "workspace_id": row[1],
+                "workspace_name": row[2],
             }
 
     except Exception as e:
         logger.error(f"Error getting Notion credentials for user {user_id[:20]}...: {e}")
         return None
 
+
 logger.info("✅ Notion credentials sync helper function loaded")
 
 # ════════════════════════════════════════════════════════════════
 # NOTION DYNAMIC DATABASE DISCOVERY HELPERS
 # ════════════════════════════════════════════════════════════════
+
 
 def get_database_schema(notion_client, database_id: str) -> dict:
     """
@@ -80,11 +82,7 @@ def get_database_schema(notion_client, database_id: str) -> dict:
     try:
         db_response = notion_client.data_sources.retrieve(data_source_id=database_id)
 
-        schema = {
-            "id": db_response["id"],
-            "title": "",
-            "properties": {}
-        }
+        schema = {"id": db_response["id"], "title": "", "properties": {}}
 
         # Extract database title
         title_list = db_response.get("title", [])
@@ -94,21 +92,21 @@ def get_database_schema(notion_client, database_id: str) -> dict:
         # Extract property definitions
         for prop_name, prop_config in db_response.get("properties", {}).items():
             prop_type = prop_config.get("type")
-            property_schema = {
-                "id": prop_config.get("id"),
-                "type": prop_type,
-                "name": prop_name
-            }
+            property_schema = {"id": prop_config.get("id"), "type": prop_type, "name": prop_name}
 
             # Include type-specific configuration
             if prop_type in ["select", "multi_select"]:
                 options = prop_config.get(prop_type, {}).get("options", [])
-                property_schema["options"] = [{"name": opt.get("name"), "color": opt.get("color")} for opt in options]
+                property_schema["options"] = [
+                    {"name": opt.get("name"), "color": opt.get("color")} for opt in options
+                ]
 
             elif prop_type == "status":
                 status_config = prop_config.get("status", {})
                 options = status_config.get("options", [])
-                property_schema["options"] = [{"name": opt.get("name"), "color": opt.get("color")} for opt in options]
+                property_schema["options"] = [
+                    {"name": opt.get("name"), "color": opt.get("color")} for opt in options
+                ]
                 property_schema["groups"] = status_config.get("groups", [])
 
             schema["properties"][prop_name] = property_schema
@@ -118,6 +116,7 @@ def get_database_schema(notion_client, database_id: str) -> dict:
     except Exception as e:
         logger.error(f"Error getting database schema for {database_id}: {e}")
         raise
+
 
 def classify_database_type(schema: dict) -> str:
     """
@@ -144,18 +143,25 @@ def classify_database_type(schema: dict) -> str:
         return "tasks"
 
     # Projects database indicators
-    if any("project" in p for p in props) and any(("timeline" in p or "start" in p or "end" in p) for p in props):
+    if any("project" in p for p in props) and any(
+        ("timeline" in p or "start" in p or "end" in p) for p in props
+    ):
         return "projects"
 
     # Companies database indicators
-    if any(("company" in p or "domain" in p or "website" in p) for p in props) and any("industry" in p or "size" in p for p in props):
+    if any(("company" in p or "domain" in p or "website" in p) for p in props) and any(
+        "industry" in p or "size" in p for p in props
+    ):
         return "companies"
 
     # Documentation database indicators
-    if any(("doc" in p or "article" in p or "page" in p) for p in props) and any("category" in p or "tag" in p for p in props):
+    if any(("doc" in p or "article" in p or "page" in p) for p in props) and any(
+        "category" in p or "tag" in p for p in props
+    ):
         return "documentation"
 
     return "custom"
+
 
 def extract_property_value(prop_data: dict, prop_type: str):
     """
@@ -244,6 +250,7 @@ def extract_property_value(prop_data: dict, prop_type: str):
 
     return None
 
+
 def discover_and_store_user_databases_sync(user_id: str, access_token: str):
     """
     Discover all Notion databases for a user and store them in notion_user_databases table
@@ -272,7 +279,7 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
             try:
                 search_params = {
                     "filter": {"property": "object", "value": "data_source"},
-                    "page_size": 100
+                    "page_size": 100,
                 }
                 if start_cursor:
                     search_params["start_cursor"] = start_cursor
@@ -283,15 +290,21 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
                     if result.get("object") == "data_source":
                         db_id = result["id"]
                         title_list = result.get("title", [])
-                        db_title = title_list[0].get("text", {}).get("content", "Untitled") if title_list else "Untitled"
+                        db_title = (
+                            title_list[0].get("text", {}).get("content", "Untitled")
+                            if title_list
+                            else "Untitled"
+                        )
 
-                        databases.append({
-                            "id": db_id,
-                            "title": db_title,
-                            "url": result.get("url", ""),
-                            "created_time": result.get("created_time", ""),
-                            "last_edited_time": result.get("last_edited_time", "")
-                        })
+                        databases.append(
+                            {
+                                "id": db_id,
+                                "title": db_title,
+                                "url": result.get("url", ""),
+                                "created_time": result.get("created_time", ""),
+                                "last_edited_time": result.get("last_edited_time", ""),
+                            }
+                        )
                         discovered_count += 1
 
                 # Handle pagination
@@ -332,7 +345,9 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
 
                     # Put title first, then the rest in Notion's original order
                     if title_property and title_property in property_keys:
-                        property_order = [title_property] + [k for k in property_keys if k != title_property]
+                        property_order = [title_property] + [
+                            k for k in property_keys if k != title_property
+                        ]
                     else:
                         property_order = property_keys
 
@@ -358,8 +373,8 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
                             "database_title": db_item["title"],
                             "database_type": db_type,
                             "schema": json.dumps(schema),
-                            "property_order": json.dumps(property_order)
-                        }
+                            "property_order": json.dumps(property_order),
+                        },
                     )
                     stored_count += 1
 
@@ -375,7 +390,9 @@ def discover_and_store_user_databases_sync(user_id: str, access_token: str):
     except Exception as e:
         logger.error(f"❌ Error discovering databases for user {user_id[:8]}: {e}")
         import traceback
+
         logger.error(traceback.format_exc())
         return {"success": False, "error": str(e)}
+
 
 logger.info("✅ Notion database discovery helpers loaded")

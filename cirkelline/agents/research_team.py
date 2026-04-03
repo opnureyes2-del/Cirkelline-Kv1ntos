@@ -32,12 +32,14 @@ TAVILY_AVAILABLE = bool(os.getenv("TAVILY_API_KEY"))
 
 if EXA_AVAILABLE:
     from agno.tools.exa import ExaTools
+
     logger.info("Exa API available - semantic search enabled")
 else:
     logger.warning("EXA_API_KEY not set - Exa researcher disabled (using DuckDuckGo only)")
 
 if TAVILY_AVAILABLE:
     from agno.tools.tavily import TavilyTools
+
     logger.info("Tavily API available - comprehensive search enabled")
 else:
     logger.warning("TAVILY_API_KEY not set - Tavily researcher disabled (using DuckDuckGo only)")
@@ -195,7 +197,9 @@ if exa_researcher:
 if tavily_researcher:
     _available_researchers.append(tavily_researcher)
 
-logger.info(f"Research Team initialized with {len(_available_researchers)} researcher(s): {[r.name for r in _available_researchers]}")
+logger.info(
+    f"Research Team initialized with {len(_available_researchers)} researcher(s): {[r.name for r in _available_researchers]}"
+)
 
 research_team = Team(
     id="research-team",

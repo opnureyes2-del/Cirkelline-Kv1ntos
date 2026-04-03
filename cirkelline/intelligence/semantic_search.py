@@ -31,8 +31,10 @@ logger = logging.getLogger(__name__)
 # SEARCH TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class SearchMode(Enum):
     """Search modes available."""
+
     SEMANTIC = "semantic"  # Vector similarity
     KEYWORD = "keyword"  # Traditional text match
     HYBRID = "hybrid"  # Combination of both
@@ -41,6 +43,7 @@ class SearchMode(Enum):
 @dataclass
 class SearchResult:
     """A single search result."""
+
     doc_id: str
     content: str
     score: float  # Similarity score (0-1)
@@ -62,6 +65,7 @@ class SearchResult:
 @dataclass
 class Document:
     """A document for indexing."""
+
     doc_id: str
     content: str
     title: Optional[str] = None
@@ -85,6 +89,7 @@ class Document:
 # ═══════════════════════════════════════════════════════════════════════════════
 # EMBEDDING PROVIDER
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class EmbeddingProvider:
     """Base class for embedding providers."""
@@ -119,7 +124,7 @@ class SimpleEmbeddingProvider(EmbeddingProvider):
         features = []
 
         # Character frequencies (a-z)
-        for char in 'abcdefghijklmnopqrstuvwxyz':
+        for char in "abcdefghijklmnopqrstuvwxyz":
             freq = text_lower.count(char) / max(len(text), 1)
             features.append(freq)
 
@@ -131,7 +136,7 @@ class SimpleEmbeddingProvider(EmbeddingProvider):
         # Pad or truncate to dimensions
         while len(features) < self.dimensions:
             features.append(0.0)
-        features = features[:self.dimensions]
+        features = features[: self.dimensions]
 
         # Normalize
         magnitude = sum(f * f for f in features) ** 0.5
@@ -144,6 +149,7 @@ class SimpleEmbeddingProvider(EmbeddingProvider):
 # ═══════════════════════════════════════════════════════════════════════════════
 # SIMILARITY FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def cosine_similarity(a: List[float], b: List[float]) -> float:
     """Calculate cosine similarity between two vectors."""
@@ -177,6 +183,7 @@ def jaccard_similarity(a: str, b: str) -> float:
 # ═══════════════════════════════════════════════════════════════════════════════
 # SEMANTIC SEARCH ENGINE
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class SemanticSearch:
     """
@@ -251,15 +258,17 @@ class SemanticSearch:
 
         # Also add to knowledge graph
         if self._graph:
-            self._graph.add_node(GraphNode(
-                node_id=doc_id,
-                node_type=NodeType.DOCUMENT,
-                name=title or doc_id,
-                properties={
-                    "content_preview": content[:200],
-                    **doc.metadata,
-                },
-            ))
+            self._graph.add_node(
+                GraphNode(
+                    node_id=doc_id,
+                    node_type=NodeType.DOCUMENT,
+                    name=title or doc_id,
+                    properties={
+                        "content_preview": content[:200],
+                        **doc.metadata,
+                    },
+                )
+            )
 
         logger.debug(f"Indexed document {doc_id}")
         return doc
@@ -370,14 +379,16 @@ class SemanticSearch:
                 # Extract highlights
                 highlights = self._extract_highlights(query, doc.content)
 
-                results.append(SearchResult(
-                    doc_id=doc_id,
-                    content=doc.content[:500],  # Preview
-                    score=score,
-                    metadata=doc.metadata,
-                    highlights=highlights,
-                    source=doc.title,
-                ))
+                results.append(
+                    SearchResult(
+                        doc_id=doc_id,
+                        content=doc.content[:500],  # Preview
+                        score=score,
+                        metadata=doc.metadata,
+                        highlights=highlights,
+                        source=doc.title,
+                    )
+                )
 
         # Sort by score and limit
         results.sort(key=lambda r: r.score, reverse=True)
@@ -407,13 +418,15 @@ class SemanticSearch:
                 continue
 
             score = cosine_similarity(source_doc.embedding, other_doc.embedding)
-            results.append(SearchResult(
-                doc_id=other_id,
-                content=other_doc.content[:500],
-                score=score,
-                metadata=other_doc.metadata,
-                source=other_doc.title,
-            ))
+            results.append(
+                SearchResult(
+                    doc_id=other_id,
+                    content=other_doc.content[:500],
+                    score=score,
+                    metadata=other_doc.metadata,
+                    source=other_doc.title,
+                )
+            )
 
         results.sort(key=lambda r: r.score, reverse=True)
         return results[:top_k]
@@ -456,7 +469,7 @@ class SemanticSearch:
     ) -> List[str]:
         """Extract relevant snippets from content."""
         query_words = set(query.lower().split())
-        sentences = content.replace('\n', '. ').split('. ')
+        sentences = content.replace("\n", ". ").split(". ")
 
         # Score sentences by query word overlap
         scored = []
@@ -502,15 +515,17 @@ class SemanticSearch:
 
     def get_stats(self) -> Dict[str, Any]:
         """Get search engine statistics."""
-        docs_with_embeddings = sum(
-            1 for d in self._documents.values() if d.embedding
-        )
+        docs_with_embeddings = sum(1 for d in self._documents.values() if d.embedding)
 
         return {
             "total_documents": len(self._documents),
             "documents_with_embeddings": docs_with_embeddings,
             "embedding_cache_size": len(self._embedding_cache),
-            "embedding_dimensions": self._embedding_provider.dimensions if hasattr(self._embedding_provider, 'dimensions') else "unknown",
+            "embedding_dimensions": (
+                self._embedding_provider.dimensions
+                if hasattr(self._embedding_provider, "dimensions")
+                else "unknown"
+            ),
         }
 
     def get_document(self, doc_id: str) -> Optional[Document]:
@@ -524,7 +539,7 @@ class SemanticSearch:
     ) -> List[Document]:
         """List all documents."""
         docs = list(self._documents.values())
-        return docs[offset:offset + limit]
+        return docs[offset : offset + limit]
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -12,6 +12,7 @@ from pydantic import BaseModel
 # USER PROFILE MODELS
 # ════════════════════════════════════════════════════════════════
 
+
 class ProfileUpdateRequest(BaseModel):
     display_name: str
     bio: Optional[str] = None
@@ -19,22 +20,27 @@ class ProfileUpdateRequest(BaseModel):
     job_title: Optional[str] = None
     instructions: Optional[str] = None
 
+
 # ════════════════════════════════════════════════════════════════
 # AUTHENTICATION MODELS
 # ════════════════════════════════════════════════════════════════
+
 
 class SignupRequest(BaseModel):
     email: str
     password: str
     display_name: str
 
+
 class LoginRequest(BaseModel):
     email: str
     password: str
 
+
 # ════════════════════════════════════════════════════════════════
 # USER PREFERENCES MODELS
 # ════════════════════════════════════════════════════════════════
+
 
 class PreferencesUpdateRequest(BaseModel):
     theme: Optional[str] = None

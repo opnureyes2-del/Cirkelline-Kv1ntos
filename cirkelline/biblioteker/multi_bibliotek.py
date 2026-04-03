@@ -34,6 +34,7 @@ from .base import (
 @dataclass
 class BibliotekConfig:
     """Konfiguration for et enkelt bibliotek."""
+
     source: BibliotekSource
     adapter_class: Type[BibliotekAdapter]
     enabled: bool = True
@@ -73,7 +74,7 @@ class MultiBibliotek:
         source: BibliotekSource,
         adapter: BibliotekAdapter,
         priority: int = 1,
-        enabled: bool = True
+        enabled: bool = True,
     ) -> None:
         """
         Registrer en biblioteks-adapter.
@@ -86,10 +87,7 @@ class MultiBibliotek:
         """
         self._adapters[source] = adapter
         self._configs[source] = BibliotekConfig(
-            source=source,
-            adapter_class=type(adapter),
-            enabled=enabled,
-            priority=priority
+            source=source, adapter_class=type(adapter), enabled=enabled, priority=priority
         )
 
     def get_adapter(self, source: BibliotekSource) -> Optional[BibliotekAdapter]:
@@ -101,10 +99,7 @@ class MultiBibliotek:
 
     def list_sources(self) -> List[BibliotekSource]:
         """List alle registrerede kilder."""
-        return [
-            source for source, config in self._configs.items()
-            if config.enabled
-        ]
+        return [source for source, config in self._configs.items() if config.enabled]
 
     async def connect_all(self) -> Dict[BibliotekSource, bool]:
         """
@@ -142,7 +137,7 @@ class MultiBibliotek:
         item_types: Optional[List[ItemType]] = None,
         limit: int = 20,
         offset: int = 0,
-        parallel: bool = True
+        parallel: bool = True,
     ) -> SearchResult:
         """
         Søg på tværs af biblioteker.
@@ -168,7 +163,7 @@ class MultiBibliotek:
             domains=domains,
             item_types=item_types,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
 
         # Bestem hvilke kilder at søge i
@@ -176,7 +171,8 @@ class MultiBibliotek:
         active_adapters = [
             (source, self._adapters[source])
             for source in target_sources
-            if source in self._adapters and self._configs.get(source, BibliotekConfig(source, BibliotekAdapter)).enabled
+            if source in self._adapters
+            and self._configs.get(source, BibliotekConfig(source, BibliotekAdapter)).enabled
         ]
 
         # Sortér efter prioritet
@@ -189,10 +185,7 @@ class MultiBibliotek:
 
         if parallel and len(active_adapters) > 1:
             # Parallel søgning
-            tasks = [
-                adapter.search(search_query)
-                for _, adapter in active_adapters
-            ]
+            tasks = [adapter.search(search_query) for _, adapter in active_adapters]
             results = await asyncio.gather(*tasks, return_exceptions=True)
 
             for (source, _), result in zip(active_adapters, results):
@@ -217,7 +210,7 @@ class MultiBibliotek:
         all_items.sort(key=lambda x: x.updated_at, reverse=True)
 
         # Anvend global limit
-        paginated_items = all_items[offset:offset + limit]
+        paginated_items = all_items[offset : offset + limit]
 
         execution_time = (time.time() - start_time) * 1000
 
@@ -229,13 +222,11 @@ class MultiBibliotek:
             execution_time_ms=execution_time,
             page=(offset // limit) + 1 if limit > 0 else 1,
             page_size=limit,
-            has_more=len(all_items) > offset + limit
+            has_more=len(all_items) > offset + limit,
         )
 
     async def get_item(
-        self,
-        item_id: str,
-        source: Optional[BibliotekSource] = None
+        self, item_id: str, source: Optional[BibliotekSource] = None
     ) -> Optional[LibraryItem]:
         """
         Hent et specifikt item.
@@ -264,11 +255,7 @@ class MultiBibliotek:
                     continue
         return None
 
-    async def save_item(
-        self,
-        item: LibraryItem,
-        source: Optional[BibliotekSource] = None
-    ) -> str:
+    async def save_item(self, item: LibraryItem, source: Optional[BibliotekSource] = None) -> str:
         """
         Gem et item.
 
@@ -304,11 +291,7 @@ class MultiBibliotek:
                 try:
                     results[source] = await adapter.sync()
                 except Exception as e:
-                    results[source] = SyncStatus(
-                        source=source,
-                        status="failed",
-                        error=str(e)
-                    )
+                    results[source] = SyncStatus(source=source, status="failed", error=str(e))
         return results
 
     async def health_check(self) -> Dict[str, Any]:
@@ -330,7 +313,7 @@ class MultiBibliotek:
             "domain": self._domain,
             "adapters": adapter_health,
             "active_sources": [s.value for s in self.list_sources()],
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
 
@@ -342,10 +325,7 @@ _bibliotek_registry: Dict[str, MultiBibliotek] = {}
 _adapter_registry: Dict[BibliotekSource, Type[BibliotekAdapter]] = {}
 
 
-def register_adapter(
-    source: BibliotekSource,
-    adapter_class: Type[BibliotekAdapter]
-) -> None:
+def register_adapter(source: BibliotekSource, adapter_class: Type[BibliotekAdapter]) -> None:
     """
     Registrer en adapter-klasse globalt.
 
@@ -357,8 +337,7 @@ def register_adapter(
 
 
 def get_bibliotek(
-    domain: Optional[str] = None,
-    sources: Optional[List[BibliotekSource]] = None
+    domain: Optional[str] = None, sources: Optional[List[BibliotekSource]] = None
 ) -> MultiBibliotek:
     """
     Hent eller opret en MultiBibliotek instance.

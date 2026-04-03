@@ -53,8 +53,7 @@ class CosmicLibraryAdapter(BibliotekAdapter):
         """Opret forbindelse til Cosmic Library API."""
         try:
             self._session = aiohttp.ClientSession(
-                headers=self._get_headers(),
-                timeout=aiohttp.ClientTimeout(total=30)
+                headers=self._get_headers(), timeout=aiohttp.ClientTimeout(total=30)
             )
 
             # Verificer forbindelse med health check
@@ -96,19 +95,12 @@ class CosmicLibraryAdapter(BibliotekAdapter):
         """
         if not self._connected or not self._session:
             return SearchResult(
-                items=[],
-                total_count=0,
-                query=query.query,
-                sources_searched=[self.source]
+                items=[], total_count=0, query=query.query, sources_searched=[self.source]
             )
 
         try:
             # Byg search request
-            search_params = {
-                "query": query.query,
-                "limit": query.limit,
-                "offset": query.offset
-            }
+            search_params = {"query": query.query, "limit": query.limit, "offset": query.offset}
 
             if query.domains:
                 search_params["domains"] = query.domains
@@ -117,15 +109,11 @@ class CosmicLibraryAdapter(BibliotekAdapter):
                 search_params["types"] = [t.value for t in query.item_types]
 
             async with self._session.post(
-                f"{self.base_url}/api/knowledge/search",
-                json=search_params
+                f"{self.base_url}/api/knowledge/search", json=search_params
             ) as resp:
                 if resp.status != 200:
                     return SearchResult(
-                        items=[],
-                        total_count=0,
-                        query=query.query,
-                        sources_searched=[self.source]
+                        items=[], total_count=0, query=query.query, sources_searched=[self.source]
                     )
 
                 data = await resp.json()
@@ -139,16 +127,13 @@ class CosmicLibraryAdapter(BibliotekAdapter):
                 items=items,
                 total_count=data.get("total", len(items)),
                 query=query.query,
-                sources_searched=[self.source]
+                sources_searched=[self.source],
             )
 
         except Exception as e:
             print(f"Cosmic Library søgefejl: {e}")
             return SearchResult(
-                items=[],
-                total_count=0,
-                query=query.query,
-                sources_searched=[self.source]
+                items=[], total_count=0, query=query.query, sources_searched=[self.source]
             )
 
     async def get_item(self, item_id: str) -> Optional[LibraryItem]:
@@ -157,9 +142,7 @@ class CosmicLibraryAdapter(BibliotekAdapter):
             return None
 
         try:
-            async with self._session.get(
-                f"{self.base_url}/api/knowledge/{item_id}"
-            ) as resp:
+            async with self._session.get(f"{self.base_url}/api/knowledge/{item_id}") as resp:
                 if resp.status != 200:
                     return None
 
@@ -175,7 +158,7 @@ class CosmicLibraryAdapter(BibliotekAdapter):
         domain: Optional[str] = None,
         item_type: Optional[ItemType] = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[LibraryItem]:
         """List items fra Cosmic Library."""
         query = SearchQuery(
@@ -183,7 +166,7 @@ class CosmicLibraryAdapter(BibliotekAdapter):
             domains=[domain] if domain else None,
             item_types=[item_type] if item_type else None,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
         result = await self.search(query)
         return result.items
@@ -202,8 +185,8 @@ class CosmicLibraryAdapter(BibliotekAdapter):
                     "type": item.item_type.value,
                     "domain": item.domain,
                     "tags": item.tags,
-                    "metadata": item.metadata
-                }
+                    "metadata": item.metadata,
+                },
             ) as resp:
                 if resp.status not in (200, 201):
                     raise Exception(f"Gem fejl: {resp.status}")
@@ -220,9 +203,7 @@ class CosmicLibraryAdapter(BibliotekAdapter):
             return False
 
         try:
-            async with self._session.delete(
-                f"{self.base_url}/api/knowledge/{item_id}"
-            ) as resp:
+            async with self._session.delete(f"{self.base_url}/api/knowledge/{item_id}") as resp:
                 return resp.status in (200, 204)
 
         except Exception:
@@ -232,11 +213,7 @@ class CosmicLibraryAdapter(BibliotekAdapter):
         """Synkroniser med Cosmic Library."""
         # Cosmic Library er source-of-truth, så sync er primært pull
         self._last_sync = datetime.utcnow()
-        return SyncStatus(
-            source=self.source,
-            last_sync=self._last_sync,
-            status="success"
-        )
+        return SyncStatus(source=self.source, last_sync=self._last_sync, status="success")
 
     async def get_knowledge_domains(self) -> List[Dict[str, Any]]:
         """
@@ -249,9 +226,7 @@ class CosmicLibraryAdapter(BibliotekAdapter):
             return []
 
         try:
-            async with self._session.get(
-                f"{self.base_url}/api/domains"
-            ) as resp:
+            async with self._session.get(f"{self.base_url}/api/domains") as resp:
                 if resp.status != 200:
                     return []
                 return await resp.json()
@@ -284,10 +259,18 @@ class CosmicLibraryAdapter(BibliotekAdapter):
             tags=data.get("tags", []),
             categories=data.get("categories", []),
             domain=data.get("domain"),
-            created_at=datetime.fromisoformat(data["created_at"]) if "created_at" in data else datetime.utcnow(),
-            updated_at=datetime.fromisoformat(data["updated_at"]) if "updated_at" in data else datetime.utcnow(),
+            created_at=(
+                datetime.fromisoformat(data["created_at"])
+                if "created_at" in data
+                else datetime.utcnow()
+            ),
+            updated_at=(
+                datetime.fromisoformat(data["updated_at"])
+                if "updated_at" in data
+                else datetime.utcnow()
+            ),
             url=data.get("url"),
-            author=data.get("author")
+            author=data.get("author"),
         )
 
     async def health_check(self) -> Dict[str, Any]:

@@ -42,8 +42,10 @@ logger = logging.getLogger(__name__)
 # ADVICE TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class AdviceType(Enum):
     """Categories of advice."""
+
     GIT_WORKFLOW = "git_workflow"
     CODE_QUALITY = "code_quality"
     SECURITY = "security"
@@ -58,6 +60,7 @@ class AdviceType(Enum):
 
 class AdvicePriority(Enum):
     """Priority levels for advice."""
+
     INFO = "info"
     SUGGESTION = "suggestion"
     RECOMMENDATION = "recommendation"
@@ -68,6 +71,7 @@ class AdvicePriority(Enum):
 @dataclass
 class Advice:
     """A contextual recommendation."""
+
     advice_id: str
     advice_type: AdviceType
     priority: AdvicePriority
@@ -104,9 +108,11 @@ class Advice:
 # ADVICE RULES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class AdviceRule:
     """A rule for generating advice."""
+
     rule_id: str
     name: str
     condition: str  # Python expression to evaluate
@@ -165,7 +171,6 @@ DEFAULT_RULES: List[AdviceRule] = [
         action_template="Use git add -p for selective staging",
         tags={"git", "code-review"},
     ),
-
     # Security rules
     AdviceRule(
         rule_id="sensitive-file-staged",
@@ -189,7 +194,6 @@ DEFAULT_RULES: List[AdviceRule] = [
         action_template="Add to .gitignore: echo '.env*' >> .gitignore",
         tags={"security", "gitignore"},
     ),
-
     # Testing rules
     AdviceRule(
         rule_id="test-file-modified",
@@ -212,7 +216,6 @@ DEFAULT_RULES: List[AdviceRule] = [
         description_template="Consider adding tests for your changes.",
         tags={"testing", "quality"},
     ),
-
     # System health rules
     AdviceRule(
         rule_id="system-degraded",
@@ -236,7 +239,6 @@ DEFAULT_RULES: List[AdviceRule] = [
         action_template="Run diagnostics and check service logs",
         tags={"system", "critical"},
     ),
-
     # Documentation rules
     AdviceRule(
         rule_id="readme-missing",
@@ -254,6 +256,7 @@ DEFAULT_RULES: List[AdviceRule] = [
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONTEXTUAL ADVISOR
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class ContextualAdvisor:
     """
@@ -397,6 +400,7 @@ class ContextualAdvisor:
             action = rule.action_template.format(**format_data) if rule.action_template else None
 
             import uuid
+
             return Advice(
                 advice_id=f"adv-{rule.rule_id}-{uuid.uuid4().hex[:6]}",
                 advice_type=rule.advice_type,
@@ -427,45 +431,54 @@ class ContextualAdvisor:
             # WIP commits
             if msg.startswith("wip") or "work in progress" in msg:
                 import uuid
-                advice_list.append(Advice(
-                    advice_id=f"adv-wip-{uuid.uuid4().hex[:6]}",
-                    advice_type=AdviceType.GIT_WORKFLOW,
-                    priority=AdvicePriority.INFO,
-                    title="WIP commit detected",
-                    description="Remember to squash or amend WIP commits before pushing.",
-                    action="Run: git commit --amend",
-                    context_source="git-pattern-analysis",
-                    tags={"git", "workflow"},
-                ))
+
+                advice_list.append(
+                    Advice(
+                        advice_id=f"adv-wip-{uuid.uuid4().hex[:6]}",
+                        advice_type=AdviceType.GIT_WORKFLOW,
+                        priority=AdvicePriority.INFO,
+                        title="WIP commit detected",
+                        description="Remember to squash or amend WIP commits before pushing.",
+                        action="Run: git commit --amend",
+                        context_source="git-pattern-analysis",
+                        tags={"git", "workflow"},
+                    )
+                )
 
             # Fix commits without issue reference
-            if msg.startswith("fix") and not re.search(r'#\d+|[A-Z]+-\d+', msg):
+            if msg.startswith("fix") and not re.search(r"#\d+|[A-Z]+-\d+", msg):
                 import uuid
-                advice_list.append(Advice(
-                    advice_id=f"adv-fix-ref-{uuid.uuid4().hex[:6]}",
-                    advice_type=AdviceType.GIT_WORKFLOW,
-                    priority=AdvicePriority.SUGGESTION,
-                    title="Fix commit without issue reference",
-                    description="Consider linking fixes to issue tracker (e.g., #123 or JIRA-456).",
-                    context_source="git-pattern-analysis",
-                    tags={"git", "tracking"},
-                ))
+
+                advice_list.append(
+                    Advice(
+                        advice_id=f"adv-fix-ref-{uuid.uuid4().hex[:6]}",
+                        advice_type=AdviceType.GIT_WORKFLOW,
+                        priority=AdvicePriority.SUGGESTION,
+                        title="Fix commit without issue reference",
+                        description="Consider linking fixes to issue tracker (e.g., #123 or JIRA-456).",
+                        context_source="git-pattern-analysis",
+                        tags={"git", "tracking"},
+                    )
+                )
 
         # Check branch naming
         branch = git_context.current_branch
-        if branch and branch not in ['main', 'master', 'develop']:
+        if branch and branch not in ["main", "master", "develop"]:
             # Check for common patterns
-            if not re.match(r'^(feature|fix|hotfix|release|chore)/[a-z0-9-]+$', branch):
+            if not re.match(r"^(feature|fix|hotfix|release|chore)/[a-z0-9-]+$", branch):
                 import uuid
-                advice_list.append(Advice(
-                    advice_id=f"adv-branch-name-{uuid.uuid4().hex[:6]}",
-                    advice_type=AdviceType.BEST_PRACTICE,
-                    priority=AdvicePriority.INFO,
-                    title="Non-standard branch naming",
-                    description="Consider using conventional branch names like feature/*, fix/*, etc.",
-                    context_source="git-pattern-analysis",
-                    tags={"git", "naming"},
-                ))
+
+                advice_list.append(
+                    Advice(
+                        advice_id=f"adv-branch-name-{uuid.uuid4().hex[:6]}",
+                        advice_type=AdviceType.BEST_PRACTICE,
+                        priority=AdvicePriority.INFO,
+                        title="Non-standard branch naming",
+                        description="Consider using conventional branch names like feature/*, fix/*, etc.",
+                        context_source="git-pattern-analysis",
+                        tags={"git", "naming"},
+                    )
+                )
 
         return advice_list
 
@@ -494,15 +507,13 @@ class ContextualAdvisor:
 
     def get_active_advice(self) -> List[Advice]:
         """Get all non-dismissed advice."""
-        return [
-            a for a in self._advice_cache.values()
-            if not a.dismissed
-        ]
+        return [a for a in self._advice_cache.values() if not a.dismissed]
 
     def get_advice_by_type(self, advice_type: AdviceType) -> List[Advice]:
         """Get advice filtered by type."""
         return [
-            a for a in self._advice_cache.values()
+            a
+            for a in self._advice_cache.values()
             if a.advice_type == advice_type and not a.dismissed
         ]
 

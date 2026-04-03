@@ -53,13 +53,11 @@ __all__ = [
     "LibraryItem",
     "SearchQuery",
     "SearchResult",
-
     # Multi-Bibliotek
     "MultiBibliotek",
     "get_bibliotek",
     "list_biblioteker",
     "register_adapter",
-
     # Adapters
     "CosmicLibraryAdapter",
     "NotionAdapter",

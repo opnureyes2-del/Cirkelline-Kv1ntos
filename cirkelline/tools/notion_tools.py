@@ -31,7 +31,7 @@ class NotionTools(Toolkit):
             Use when user asks about their tasks, projects, companies, or documentation stored in Notion.
             The user must have connected their Notion workspace first.
             """,
-            add_instructions=True
+            add_instructions=True,
         )
         self.db = database
         self.register(self.get_notion_tasks)
@@ -54,9 +54,9 @@ class NotionTools(Toolkit):
             Formatted string with task list or error message.
         """
         try:
-            user_id = session_state.get('current_user_id')
+            user_id = session_state.get("current_user_id")
             # v1.3.4: Require authentication - no anonymous access
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "❌ Authentication required. Please log in to use Notion integration."
 
             # Get user's Notion credentials
@@ -81,7 +81,7 @@ class NotionTools(Toolkit):
                         ORDER BY last_synced DESC
                         LIMIT 1
                     """),
-                    {"user_id": user_id}
+                    {"user_id": user_id},
                 ).fetchone()
 
                 if not result:
@@ -92,17 +92,15 @@ class NotionTools(Toolkit):
 
             # Initialize Notion client
             from notion_client import Client
-            notion = Client(auth=creds['access_token'])
+
+            notion = Client(auth=creds["access_token"])
 
             # Query tasks database
             response = notion.data_sources.query(data_source_id=tasks_db_id, page_size=100)
             tasks = []
 
             for page in response.get("results", []):
-                task = {
-                    "id": page["id"],
-                    "url": page.get("url", "")
-                }
+                task = {"id": page["id"], "url": page.get("url", "")}
 
                 # 🎯 Extract properties dynamically using schema
                 page_props = page.get("properties", {})
@@ -166,6 +164,7 @@ class NotionTools(Toolkit):
         except Exception as e:
             logger.error(f"❌ Error fetching Notion tasks: {e}")
             import traceback
+
             logger.error(traceback.format_exc())
             return f"❌ Error accessing your Notion tasks: {str(e)}"
 
@@ -183,9 +182,9 @@ class NotionTools(Toolkit):
             Formatted string with project list or error message.
         """
         try:
-            user_id = session_state.get('current_user_id')
+            user_id = session_state.get("current_user_id")
             # v1.3.4: Require authentication - no anonymous access
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "❌ Authentication required. Please log in to use Notion integration."
 
             # Get user's Notion credentials
@@ -210,7 +209,7 @@ class NotionTools(Toolkit):
                         ORDER BY last_synced DESC
                         LIMIT 1
                     """),
-                    {"user_id": user_id}
+                    {"user_id": user_id},
                 ).fetchone()
 
                 if not result:
@@ -221,7 +220,8 @@ class NotionTools(Toolkit):
 
             # Initialize Notion client
             from notion_client import Client
-            notion = Client(auth=creds['access_token'])
+
+            notion = Client(auth=creds["access_token"])
 
             # Query database dynamically
             response = notion.data_sources.query(data_source_id=db_id, page_size=100)
@@ -233,7 +233,9 @@ class NotionTools(Toolkit):
 
                 # Extract properties dynamically using schema
                 for prop_name, prop_config in schema["properties"].items():
-                    value = extract_property_value(page_props.get(prop_name, {}), prop_config["type"])
+                    value = extract_property_value(
+                        page_props.get(prop_name, {}), prop_config["type"]
+                    )
                     if value:
                         item[prop_name.lower().replace(" ", "_")] = value
 
@@ -264,7 +266,11 @@ class NotionTools(Toolkit):
                     key = prop_name.lower().replace(" ", "_")
                     value = item.get(key)
                     if value:
-                        value_str = ", ".join(str(v) for v in value) if isinstance(value, list) else str(value)
+                        value_str = (
+                            ", ".join(str(v) for v in value)
+                            if isinstance(value, list)
+                            else str(value)
+                        )
                         result += f"   • {prop_name}: {value_str}\n"
 
                 result += f"   • Link: {item['url']}\n\n"
@@ -274,6 +280,7 @@ class NotionTools(Toolkit):
         except Exception as e:
             logger.error(f"❌ Error fetching Notion projects: {e}")
             import traceback
+
             logger.error(traceback.format_exc())
             return f"❌ Error accessing your Notion projects: {str(e)}"
 
@@ -291,9 +298,9 @@ class NotionTools(Toolkit):
             Formatted string with companies list or error message.
         """
         try:
-            user_id = session_state.get('current_user_id')
+            user_id = session_state.get("current_user_id")
             # v1.3.4: Require authentication - no anonymous access
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "❌ Authentication required. Please log in to use Notion integration."
 
             # Get user's Notion credentials
@@ -318,7 +325,7 @@ class NotionTools(Toolkit):
                         ORDER BY last_synced DESC
                         LIMIT 1
                     """),
-                    {"user_id": user_id}
+                    {"user_id": user_id},
                 ).fetchone()
 
                 if not result:
@@ -329,7 +336,8 @@ class NotionTools(Toolkit):
 
             # Initialize Notion client
             from notion_client import Client
-            notion = Client(auth=creds['access_token'])
+
+            notion = Client(auth=creds["access_token"])
 
             # Query database dynamically
             response = notion.data_sources.query(data_source_id=db_id, page_size=100)
@@ -341,7 +349,9 @@ class NotionTools(Toolkit):
 
                 # Extract properties dynamically using schema
                 for prop_name, prop_config in schema["properties"].items():
-                    value = extract_property_value(page_props.get(prop_name, {}), prop_config["type"])
+                    value = extract_property_value(
+                        page_props.get(prop_name, {}), prop_config["type"]
+                    )
                     if value:
                         item[prop_name.lower().replace(" ", "_")] = value
 
@@ -372,7 +382,11 @@ class NotionTools(Toolkit):
                     key = prop_name.lower().replace(" ", "_")
                     value = item.get(key)
                     if value:
-                        value_str = ", ".join(str(v) for v in value) if isinstance(value, list) else str(value)
+                        value_str = (
+                            ", ".join(str(v) for v in value)
+                            if isinstance(value, list)
+                            else str(value)
+                        )
                         result += f"   • {prop_name}: {value_str}\n"
 
                 result += f"   • Link: {item['url']}\n\n"
@@ -382,6 +396,7 @@ class NotionTools(Toolkit):
         except Exception as e:
             logger.error(f"❌ Error fetching Notion companies: {e}")
             import traceback
+
             logger.error(traceback.format_exc())
             return f"❌ Error accessing your Notion companies: {str(e)}"
 
@@ -399,9 +414,9 @@ class NotionTools(Toolkit):
             Formatted string with documentation list or error message.
         """
         try:
-            user_id = session_state.get('current_user_id')
+            user_id = session_state.get("current_user_id")
             # v1.3.4: Require authentication - no anonymous access
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "❌ Authentication required. Please log in to use Notion integration."
 
             # Get user's Notion credentials
@@ -426,7 +441,7 @@ class NotionTools(Toolkit):
                         ORDER BY last_synced DESC
                         LIMIT 1
                     """),
-                    {"user_id": user_id}
+                    {"user_id": user_id},
                 ).fetchone()
 
                 if not result:
@@ -437,7 +452,8 @@ class NotionTools(Toolkit):
 
             # Initialize Notion client
             from notion_client import Client
-            notion = Client(auth=creds['access_token'])
+
+            notion = Client(auth=creds["access_token"])
 
             # Query database dynamically
             response = notion.data_sources.query(data_source_id=db_id, page_size=100)
@@ -449,7 +465,9 @@ class NotionTools(Toolkit):
 
                 # Extract properties dynamically using schema
                 for prop_name, prop_config in schema["properties"].items():
-                    value = extract_property_value(page_props.get(prop_name, {}), prop_config["type"])
+                    value = extract_property_value(
+                        page_props.get(prop_name, {}), prop_config["type"]
+                    )
                     if value:
                         item[prop_name.lower().replace(" ", "_")] = value
 
@@ -480,7 +498,11 @@ class NotionTools(Toolkit):
                     key = prop_name.lower().replace(" ", "_")
                     value = item.get(key)
                     if value:
-                        value_str = ", ".join(str(v) for v in value) if isinstance(value, list) else str(value)
+                        value_str = (
+                            ", ".join(str(v) for v in value)
+                            if isinstance(value, list)
+                            else str(value)
+                        )
                         result += f"   • {prop_name}: {value_str}\n"
 
                 result += f"   • Link: {item['url']}\n\n"
@@ -490,6 +512,7 @@ class NotionTools(Toolkit):
         except Exception as e:
             logger.error(f"❌ Error fetching Notion documentation: {e}")
             import traceback
+
             logger.error(traceback.format_exc())
             return f"❌ Error accessing your Notion documentation: {str(e)}"
 
@@ -500,7 +523,7 @@ class NotionTools(Toolkit):
         status: str = None,
         priority: str = None,
         due_date: str = None,
-        description: str = None
+        description: str = None,
     ) -> str:
         """
         Create a new task in your Notion workspace.
@@ -518,9 +541,9 @@ class NotionTools(Toolkit):
             Confirmation message with link to the new task
         """
         try:
-            user_id = session_state.get('current_user_id')
+            user_id = session_state.get("current_user_id")
             # v1.3.4: Require authentication - no anonymous access
-            if not user_id or user_id == 'anonymous' or user_id.startswith('anon-'):
+            if not user_id or user_id == "anonymous" or user_id.startswith("anon-"):
                 return "❌ Authentication required. Please log in to use Notion integration."
 
             # Get user's Notion credentials
@@ -545,7 +568,7 @@ class NotionTools(Toolkit):
                         ORDER BY last_synced DESC
                         LIMIT 1
                     """),
-                    {"user_id": user_id}
+                    {"user_id": user_id},
                 ).fetchone()
 
                 if not result:
@@ -556,7 +579,8 @@ class NotionTools(Toolkit):
 
             # Initialize Notion client
             from notion_client import Client
-            notion = Client(auth=creds['access_token'])
+
+            notion = Client(auth=creds["access_token"])
 
             # 🎯 Build properties dynamically based on schema
             properties = {}
@@ -574,9 +598,7 @@ class NotionTools(Toolkit):
                 # Title property (required for all pages)
                 if prop_type == "title":
                     title_prop = prop_name
-                    properties[prop_name] = {
-                        "title": [{"text": {"content": title}}]
-                    }
+                    properties[prop_name] = {"title": [{"text": {"content": title}}]}
 
                 # Status property
                 elif prop_type == "status" and "status" in prop_lower:
@@ -602,18 +624,20 @@ class NotionTools(Toolkit):
             # Build children (description)
             children = []
             if description:
-                children.append({
-                    "object": "block",
-                    "type": "paragraph",
-                    "paragraph": {
-                        "rich_text": [{"type": "text", "text": {"content": description}}]
+                children.append(
+                    {
+                        "object": "block",
+                        "type": "paragraph",
+                        "paragraph": {
+                            "rich_text": [{"type": "text", "text": {"content": description}}]
+                        },
                     }
-                })
+                )
 
             # Create task
             create_params = {
                 "parent": {"type": "data_source_id", "data_source_id": tasks_db_id},
-                "properties": properties
+                "properties": properties,
             }
 
             # Only add children if we have content
@@ -640,6 +664,7 @@ class NotionTools(Toolkit):
         except Exception as e:
             logger.error(f"❌ Error creating Notion task: {e}")
             import traceback
+
             logger.error(traceback.format_exc())
             return f"❌ Error creating task: {str(e)}"
 

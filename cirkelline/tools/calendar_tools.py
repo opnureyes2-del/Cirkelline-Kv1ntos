@@ -44,7 +44,7 @@ class CirkellineCalendarTools(Toolkit):
             with engine.connect() as conn:
                 result = conn.execute(
                     text("SELECT preferences->>'timezone' as tz FROM users WHERE id = :user_id"),
-                    {"user_id": user_id}
+                    {"user_id": user_id},
                 )
                 row = result.fetchone()
                 if row and row.tz:
@@ -59,7 +59,7 @@ class CirkellineCalendarTools(Toolkit):
             # Check for existing default calendar
             result = conn.execute(
                 text("SELECT id FROM calendars WHERE user_id = :user_id AND is_default = true"),
-                {"user_id": user_id}
+                {"user_id": user_id},
             )
             row = result.fetchone()
 
@@ -73,7 +73,7 @@ class CirkellineCalendarTools(Toolkit):
                     VALUES (:user_id, 'My Calendar', '#8E0B83', true, 'local')
                     RETURNING id
                 """),
-                {"user_id": user_id}
+                {"user_id": user_id},
             )
             row = result.fetchone()
             conn.commit()
@@ -99,19 +99,21 @@ class CirkellineCalendarTools(Toolkit):
                         WHERE user_id = :user_id
                         ORDER BY is_default DESC, name ASC
                     """),
-                    {"user_id": user_id}
+                    {"user_id": user_id},
                 )
 
                 calendars = []
                 for row in result:
-                    calendars.append({
-                        "id": str(row.id),
-                        "name": row.name,
-                        "color": row.color,
-                        "is_default": row.is_default,
-                        "is_visible": row.is_visible,
-                        "source": row.source
-                    })
+                    calendars.append(
+                        {
+                            "id": str(row.id),
+                            "name": row.name,
+                            "color": row.color,
+                            "is_default": row.is_default,
+                            "is_visible": row.is_visible,
+                            "source": row.source,
+                        }
+                    )
 
                 if not calendars:
                     # Create default calendar if none exist
@@ -135,7 +137,7 @@ class CirkellineCalendarTools(Toolkit):
         user_id: str,
         days_ahead: int = 7,
         days_behind: int = 0,
-        calendar_id: Optional[str] = None
+        calendar_id: Optional[str] = None,
     ) -> str:
         """
         List upcoming calendar events for a user.
@@ -166,11 +168,7 @@ class CirkellineCalendarTools(Toolkit):
                     AND e.start_time <= :time_max
                     AND e.end_time >= :time_min
                 """
-                params = {
-                    "user_id": user_id,
-                    "time_min": time_min,
-                    "time_max": time_max
-                }
+                params = {"user_id": user_id, "time_min": time_min, "time_max": time_max}
 
                 if calendar_id:
                     query += " AND e.calendar_id = :calendar_id"
@@ -182,16 +180,18 @@ class CirkellineCalendarTools(Toolkit):
 
                 events = []
                 for row in result:
-                    events.append({
-                        "id": str(row.id),
-                        "title": row.title,
-                        "description": row.description,
-                        "location": row.location,
-                        "start": row.start_time,
-                        "end": row.end_time,
-                        "all_day": row.all_day,
-                        "calendar": row.calendar_name
-                    })
+                    events.append(
+                        {
+                            "id": str(row.id),
+                            "title": row.title,
+                            "description": row.description,
+                            "location": row.location,
+                            "start": row.start_time,
+                            "end": row.end_time,
+                            "all_day": row.all_day,
+                            "calendar": row.calendar_name,
+                        }
+                    )
 
                 if not events:
                     return f"No events found in the next {days_ahead} days."
@@ -201,7 +201,11 @@ class CirkellineCalendarTools(Toolkit):
                     if evt["all_day"]:
                         time_str = evt["start"].strftime("%Y-%m-%d") + " (All day)"
                     else:
-                        time_str = evt["start"].strftime("%Y-%m-%d %H:%M") + " - " + evt["end"].strftime("%H:%M")
+                        time_str = (
+                            evt["start"].strftime("%Y-%m-%d %H:%M")
+                            + " - "
+                            + evt["end"].strftime("%H:%M")
+                        )
 
                     line = f"- {evt['title']} | {time_str}"
                     if evt["location"]:
@@ -224,7 +228,7 @@ class CirkellineCalendarTools(Toolkit):
         description: Optional[str] = None,
         location: Optional[str] = None,
         all_day: bool = False,
-        calendar_id: Optional[str] = None
+        calendar_id: Optional[str] = None,
     ) -> str:
         """
         Create a new calendar event.
@@ -253,18 +257,22 @@ class CirkellineCalendarTools(Toolkit):
                 logger.warning(f"Invalid timezone '{user_tz_str}', defaulting to UTC")
 
             # Log the arguments for debugging
-            logger.info(f"📅 create_calendar_event called: title='{title}', start='{start_time}', end='{end_time}', all_day={all_day}, user_tz={user_tz_str}")
+            logger.info(
+                f"📅 create_calendar_event called: title='{title}', start='{start_time}', end='{end_time}', all_day={all_day}, user_tz={user_tz_str}"
+            )
 
             # Parse times - if no timezone in string, assume user's local timezone
             try:
                 # Parse the datetime string
-                start_dt = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
-                end_dt = datetime.fromisoformat(end_time.replace('Z', '+00:00'))
+                start_dt = datetime.fromisoformat(start_time.replace("Z", "+00:00"))
+                end_dt = datetime.fromisoformat(end_time.replace("Z", "+00:00"))
 
                 # If the datetime is naive (no timezone), assume it's in the user's local time
                 if start_dt.tzinfo is None:
                     start_dt = start_dt.replace(tzinfo=user_tz)
-                    logger.info(f"📅 Interpreted start time as {user_tz_str}: {start_dt.isoformat()}")
+                    logger.info(
+                        f"📅 Interpreted start time as {user_tz_str}: {start_dt.isoformat()}"
+                    )
                 if end_dt.tzinfo is None:
                     end_dt = end_dt.replace(tzinfo=user_tz)
                     logger.info(f"📅 Interpreted end time as {user_tz_str}: {end_dt.isoformat()}")
@@ -272,7 +280,9 @@ class CirkellineCalendarTools(Toolkit):
                 # Convert to UTC for storage
                 start_dt = start_dt.astimezone(UTC)
                 end_dt = end_dt.astimezone(UTC)
-                logger.info(f"📅 Converted to UTC: start={start_dt.isoformat()}, end={end_dt.isoformat()}")
+                logger.info(
+                    f"📅 Converted to UTC: start={start_dt.isoformat()}, end={end_dt.isoformat()}"
+                )
 
             except ValueError as e:
                 return f"Invalid date format. Use ISO format: YYYY-MM-DDTHH:MM:SS. Error: {e}"
@@ -288,7 +298,7 @@ class CirkellineCalendarTools(Toolkit):
                 # Verify calendar ownership
                 check = conn.execute(
                     text("SELECT id FROM calendars WHERE id = :id AND user_id = :user_id"),
-                    {"id": calendar_id, "user_id": user_id}
+                    {"id": calendar_id, "user_id": user_id},
                 )
                 if not check.fetchone():
                     return "Error: Calendar not found or doesn't belong to user."
@@ -309,26 +319,35 @@ class CirkellineCalendarTools(Toolkit):
                         "location": location,
                         "start_time": start_dt,
                         "end_time": end_dt,
-                        "all_day": all_day
-                    }
+                        "all_day": all_day,
+                    },
                 )
 
                 row = result.fetchone()
                 conn.commit()
 
                 # Try to sync to Google (if connected)
-                sync_msg = self._try_google_sync(user_id, str(row.id), "create", {
-                    "title": title,
-                    "description": description,
-                    "location": location,
-                    "start_time": start_dt,
-                    "end_time": end_dt,
-                    "all_day": all_day
-                })
+                sync_msg = self._try_google_sync(
+                    user_id,
+                    str(row.id),
+                    "create",
+                    {
+                        "title": title,
+                        "description": description,
+                        "location": location,
+                        "start_time": start_dt,
+                        "end_time": end_dt,
+                        "all_day": all_day,
+                    },
+                )
 
                 logger.info(f"✅ AI created calendar event '{title}' for user {user_id}")
 
-                time_str = start_dt.strftime("%Y-%m-%d %H:%M") if not all_day else start_dt.strftime("%Y-%m-%d") + " (All day)"
+                time_str = (
+                    start_dt.strftime("%Y-%m-%d %H:%M")
+                    if not all_day
+                    else start_dt.strftime("%Y-%m-%d") + " (All day)"
+                )
                 response = f"✅ Created event: {title}\n📅 {time_str}\nID: {row.id}"
                 if location:
                     response += f"\n📍 {location}"
@@ -350,7 +369,7 @@ class CirkellineCalendarTools(Toolkit):
         end_time: Optional[str] = None,
         description: Optional[str] = None,
         location: Optional[str] = None,
-        all_day: Optional[bool] = None
+        all_day: Optional[bool] = None,
     ) -> str:
         """
         Update an existing calendar event.
@@ -373,8 +392,10 @@ class CirkellineCalendarTools(Toolkit):
             with engine.connect() as conn:
                 # Verify ownership
                 check = conn.execute(
-                    text("SELECT id, external_id, start_time, end_time, all_day FROM calendar_events WHERE id = :id AND user_id = :user_id"),
-                    {"id": event_id, "user_id": user_id}
+                    text(
+                        "SELECT id, external_id, start_time, end_time, all_day FROM calendar_events WHERE id = :id AND user_id = :user_id"
+                    ),
+                    {"id": event_id, "user_id": user_id},
                 )
                 existing = check.fetchone()
                 if not existing:
@@ -395,14 +416,14 @@ class CirkellineCalendarTools(Toolkit):
                     params["location"] = location
                 if start_time is not None:
                     try:
-                        start_dt = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+                        start_dt = datetime.fromisoformat(start_time.replace("Z", "+00:00"))
                         updates.append("start_time = :start_time")
                         params["start_time"] = start_dt
                     except ValueError:
                         return "Invalid start_time format. Use ISO format."
                 if end_time is not None:
                     try:
-                        end_dt = datetime.fromisoformat(end_time.replace('Z', '+00:00'))
+                        end_dt = datetime.fromisoformat(end_time.replace("Z", "+00:00"))
                         updates.append("end_time = :end_time")
                         params["end_time"] = end_dt
                     except ValueError:
@@ -453,8 +474,10 @@ class CirkellineCalendarTools(Toolkit):
             with engine.connect() as conn:
                 # Check ownership and get external_id
                 check = conn.execute(
-                    text("SELECT id, title, external_id FROM calendar_events WHERE id = :id AND user_id = :user_id"),
-                    {"id": event_id, "user_id": user_id}
+                    text(
+                        "SELECT id, title, external_id FROM calendar_events WHERE id = :id AND user_id = :user_id"
+                    ),
+                    {"id": event_id, "user_id": user_id},
                 )
                 existing = check.fetchone()
                 if not existing:
@@ -466,14 +489,16 @@ class CirkellineCalendarTools(Toolkit):
                 # Delete event
                 conn.execute(
                     text("DELETE FROM calendar_events WHERE id = :id AND user_id = :user_id"),
-                    {"id": event_id, "user_id": user_id}
+                    {"id": event_id, "user_id": user_id},
                 )
                 conn.commit()
 
                 # Try to sync delete to Google
                 sync_msg = ""
                 if external_id:
-                    sync_msg = self._try_google_sync(user_id, event_id, "delete", {"external_id": external_id})
+                    sync_msg = self._try_google_sync(
+                        user_id, event_id, "delete", {"external_id": external_id}
+                    )
 
                 logger.info(f"✅ AI deleted calendar event '{title}' for user {user_id}")
 
@@ -505,23 +530,34 @@ class CirkellineCalendarTools(Toolkit):
                 return ""  # Not connected, no message needed
 
             from googleapiclient.discovery import build
-            service = build('calendar', 'v3', credentials=google_creds)
+
+            service = build("calendar", "v3", credentials=google_creds)
 
             if action == "create":
                 event = {
-                    'summary': data['title'],
-                    'description': data.get('description', ''),
-                    'location': data.get('location', ''),
-                    'start': {'dateTime': data['start_time'].isoformat()} if not data.get('all_day') else {'date': data['start_time'].strftime('%Y-%m-%d')},
-                    'end': {'dateTime': data['end_time'].isoformat()} if not data.get('all_day') else {'date': data['end_time'].strftime('%Y-%m-%d')}
+                    "summary": data["title"],
+                    "description": data.get("description", ""),
+                    "location": data.get("location", ""),
+                    "start": (
+                        {"dateTime": data["start_time"].isoformat()}
+                        if not data.get("all_day")
+                        else {"date": data["start_time"].strftime("%Y-%m-%d")}
+                    ),
+                    "end": (
+                        {"dateTime": data["end_time"].isoformat()}
+                        if not data.get("all_day")
+                        else {"date": data["end_time"].strftime("%Y-%m-%d")}
+                    ),
                 }
-                created = service.events().insert(calendarId='primary', body=event).execute()
+                created = service.events().insert(calendarId="primary", body=event).execute()
 
                 # Update local event with Google ID
                 with engine.connect() as conn:
                     conn.execute(
-                        text("UPDATE calendar_events SET external_id = :ext_id, sync_status = 'synced', source = 'google' WHERE id = :id"),
-                        {"ext_id": created['id'], "id": event_id}
+                        text(
+                            "UPDATE calendar_events SET external_id = :ext_id, sync_status = 'synced', source = 'google' WHERE id = :id"
+                        ),
+                        {"ext_id": created["id"], "id": event_id},
                     )
                     conn.commit()
                 return "📤 Synced to Google Calendar"
@@ -533,7 +569,7 @@ class CirkellineCalendarTools(Toolkit):
                     with engine.connect() as conn:
                         result = conn.execute(
                             text("SELECT external_id FROM calendar_events WHERE id = :id"),
-                            {"id": event_id}
+                            {"id": event_id},
                         )
                         row = result.fetchone()
                         if row:
@@ -541,25 +577,29 @@ class CirkellineCalendarTools(Toolkit):
 
                 if external_id:
                     # Get current event, update it
-                    event = service.events().get(calendarId='primary', eventId=external_id).execute()
-                    if 'title' in data:
-                        event['summary'] = data['title']
-                    if 'description' in data:
-                        event['description'] = data['description']
-                    if 'location' in data:
-                        event['location'] = data['location']
-                    if 'start_time' in data:
-                        event['start'] = {'dateTime': data['start_time'].isoformat()}
-                    if 'end_time' in data:
-                        event['end'] = {'dateTime': data['end_time'].isoformat()}
+                    event = (
+                        service.events().get(calendarId="primary", eventId=external_id).execute()
+                    )
+                    if "title" in data:
+                        event["summary"] = data["title"]
+                    if "description" in data:
+                        event["description"] = data["description"]
+                    if "location" in data:
+                        event["location"] = data["location"]
+                    if "start_time" in data:
+                        event["start"] = {"dateTime": data["start_time"].isoformat()}
+                    if "end_time" in data:
+                        event["end"] = {"dateTime": data["end_time"].isoformat()}
 
-                    service.events().update(calendarId='primary', eventId=external_id, body=event).execute()
+                    service.events().update(
+                        calendarId="primary", eventId=external_id, body=event
+                    ).execute()
                     return "📤 Synced to Google Calendar"
 
             elif action == "delete":
                 external_id = data.get("external_id")
                 if external_id:
-                    service.events().delete(calendarId='primary', eventId=external_id).execute()
+                    service.events().delete(calendarId="primary", eventId=external_id).execute()
                     return "📤 Deleted from Google Calendar"
 
             return ""

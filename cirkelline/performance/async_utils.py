@@ -20,17 +20,19 @@ from typing import Any, Awaitable, Callable, Dict, Generic, List, Optional, Tupl
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
-R = TypeVar('R')
+T = TypeVar("T")
+R = TypeVar("R")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class BatchResult(Generic[T]):
     """Result of a batch operation."""
+
     successful: List[T] = field(default_factory=list)
     failed: List[Tuple[Any, Exception]] = field(default_factory=list)
     total: int = 0
@@ -52,6 +54,7 @@ class BatchResult(Generic[T]):
 
 class RetryStrategy(Enum):
     """Retry backoff strategies."""
+
     CONSTANT = "constant"
     LINEAR = "linear"
     EXPONENTIAL = "exponential"
@@ -61,6 +64,7 @@ class RetryStrategy(Enum):
 # ═══════════════════════════════════════════════════════════════════════════════
 # ASYNC TIMEOUT
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class AsyncTimeout:
     """Async operation timeout wrapper."""
@@ -103,6 +107,7 @@ async def run_with_timeout(
 # ═══════════════════════════════════════════════════════════════════════════════
 # ASYNC RETRY
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class AsyncRetry:
     """Async operation retry with backoff."""
@@ -170,9 +175,7 @@ class AsyncRetry:
                     )
                     await asyncio.sleep(delay)
                 else:
-                    logger.error(
-                        f"All {self.max_attempts} attempts failed: {e}"
-                    )
+                    logger.error(f"All {self.max_attempts} attempts failed: {e}")
 
         raise last_exception or Exception("Retry failed")
 
@@ -208,6 +211,7 @@ def retry(
         async def flaky_operation():
             ...
     """
+
     def decorator(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
         @functools.wraps(func)
         async def wrapper(*args, **kwargs) -> T:
@@ -218,13 +222,16 @@ def retry(
                 strategy=strategy,
                 exceptions=exceptions,
             )
+
         return wrapper
+
     return decorator
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # ASYNC BATCHER
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class AsyncBatcher(Generic[T, R]):
     """
@@ -358,6 +365,7 @@ class AsyncBatcher(Generic[T, R]):
 # BATCH PROCESSING
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 async def batch_process(
     items: List[T],
     processor: Callable[[T], Awaitable[R]],
@@ -390,7 +398,7 @@ async def batch_process(
 
     # Process in batches
     for i in range(0, len(items), batch_size):
-        batch = items[i:i + batch_size]
+        batch = items[i : i + batch_size]
         tasks = [process_item(item) for item in batch]
         batch_results = await asyncio.gather(*tasks)
 
@@ -407,6 +415,7 @@ async def batch_process(
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONCURRENT EXECUTION
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 async def gather_with_concurrency(
     coros: List[Awaitable[T]],

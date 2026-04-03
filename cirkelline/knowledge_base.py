@@ -19,6 +19,7 @@ knowledge = Knowledge(
     max_results=5,  # ✅ v1.2.33: Default limit (custom tool can override to 20)
 )
 
+
 # Async knowledge loading function (for future use)
 async def load_knowledge_async():
     """
@@ -48,6 +49,7 @@ async def load_knowledge_async():
         logger.info("Knowledge base loaded successfully")
     except Exception as e:
         logger.error(f"Error loading knowledge: {e}")
+
 
 # Uncomment to load knowledge at startup:
 # import asyncio

@@ -50,9 +50,11 @@ logger = logging.getLogger(__name__)
 # TASK BREAKDOWN
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class SubTask:
     """A sub-task within a mission."""
+
     task_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     title: str = ""
     description: str = ""
@@ -68,7 +70,9 @@ class SubTask:
             "task_id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "required_capability": self.required_capability.value if self.required_capability else None,
+            "required_capability": (
+                self.required_capability.value if self.required_capability else None
+            ),
             "assigned_agent": self.assigned_agent,
             "status": self.status,
             "dependencies": self.dependencies,
@@ -80,6 +84,7 @@ class SubTask:
 @dataclass
 class MissionPlan:
     """Execution plan for a mission."""
+
     mission_id: str
     tasks: List[SubTask] = field(default_factory=list)
     execution_order: List[str] = field(default_factory=list)
@@ -97,6 +102,7 @@ class MissionPlan:
 # ═══════════════════════════════════════════════════════════════════════════════
 # COORDINATOR AGENT
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class CoordinatorAgent:
     """
@@ -126,13 +132,15 @@ class CoordinatorAgent:
 
             # Register self in capability registry
             registry = get_capability_registry()
-            registry.register(AgentDescriptor(
-                agent_id=self.AGENT_ID,
-                name=self.AGENT_NAME,
-                role="Mission coordination and task breakdown",
-                capabilities=[AgentCapability.CONVERSATION],
-                max_concurrent_tasks=10,
-            ))
+            registry.register(
+                AgentDescriptor(
+                    agent_id=self.AGENT_ID,
+                    name=self.AGENT_NAME,
+                    role="Mission coordination and task breakdown",
+                    capabilities=[AgentCapability.CONVERSATION],
+                    max_concurrent_tasks=10,
+                )
+            )
 
             # Subscribe to relevant events
             self._event_bus.subscribe(EventType.MISSION_CREATED, self._handle_new_mission)
@@ -140,12 +148,15 @@ class CoordinatorAgent:
 
             # Register in knowledge graph
             from cirkelline.headquarters.knowledge_graph import GraphNode
-            self._graph.add_node(GraphNode(
-                node_id=self.AGENT_ID,
-                node_type=NodeType.AGENT,
-                name=self.AGENT_NAME,
-                properties={"role": "coordinator", "status": "active"},
-            ))
+
+            self._graph.add_node(
+                GraphNode(
+                    node_id=self.AGENT_ID,
+                    node_type=NodeType.AGENT,
+                    name=self.AGENT_NAME,
+                    properties={"role": "coordinator", "status": "active"},
+                )
+            )
 
             logger.info(f"CoordinatorAgent initialized: {self.AGENT_ID}")
             return True
@@ -218,11 +229,13 @@ class CoordinatorAgent:
         await self._memory.create_mission(mission)
 
         # Publish creation event
-        await self._event_bus.publish(Event(
-            event_type=EventType.MISSION_CREATED,
-            source=self.AGENT_ID,
-            payload=mission.to_dict(),
-        ))
+        await self._event_bus.publish(
+            Event(
+                event_type=EventType.MISSION_CREATED,
+                source=self.AGENT_ID,
+                payload=mission.to_dict(),
+            )
+        )
 
         logger.info(f"Created mission: {mission.mission_id} - {title}")
         return mission
@@ -257,9 +270,12 @@ class CoordinatorAgent:
         self._active_missions[mission_id] = plan
 
         # Update mission with checkpoints
-        await self._memory.update_mission(mission_id, {
-            "checkpoints": [t.to_dict() for t in tasks],
-        })
+        await self._memory.update_mission(
+            mission_id,
+            {
+                "checkpoints": [t.to_dict() for t in tasks],
+            },
+        )
 
         logger.info(f"Planned mission {mission_id}: {len(tasks)} tasks")
         return plan
@@ -275,59 +291,73 @@ class CoordinatorAgent:
 
         # Research tasks
         if any(kw in desc_lower for kw in ["research", "find", "search", "lookup"]):
-            tasks.append(SubTask(
-                title="Research",
-                description=f"Research: {description}",
-                required_capability=AgentCapability.WEB_SEARCH,
-            ))
+            tasks.append(
+                SubTask(
+                    title="Research",
+                    description=f"Research: {description}",
+                    required_capability=AgentCapability.WEB_SEARCH,
+                )
+            )
 
         # Document processing
         if any(kw in desc_lower for kw in ["document", "pdf", "file", "read"]):
-            tasks.append(SubTask(
-                title="Document Processing",
-                description=f"Process document: {description}",
-                required_capability=AgentCapability.DOCUMENT_PROCESSING,
-            ))
+            tasks.append(
+                SubTask(
+                    title="Document Processing",
+                    description=f"Process document: {description}",
+                    required_capability=AgentCapability.DOCUMENT_PROCESSING,
+                )
+            )
 
         # Image analysis
         if any(kw in desc_lower for kw in ["image", "photo", "picture", "screenshot"]):
-            tasks.append(SubTask(
-                title="Image Analysis",
-                description=f"Analyze image: {description}",
-                required_capability=AgentCapability.IMAGE_ANALYSIS,
-            ))
+            tasks.append(
+                SubTask(
+                    title="Image Analysis",
+                    description=f"Analyze image: {description}",
+                    required_capability=AgentCapability.IMAGE_ANALYSIS,
+                )
+            )
 
         # Audio processing
         if any(kw in desc_lower for kw in ["audio", "voice", "sound", "transcribe"]):
-            tasks.append(SubTask(
-                title="Audio Processing",
-                description=f"Process audio: {description}",
-                required_capability=AgentCapability.AUDIO_TRANSCRIPTION,
-            ))
+            tasks.append(
+                SubTask(
+                    title="Audio Processing",
+                    description=f"Process audio: {description}",
+                    required_capability=AgentCapability.AUDIO_TRANSCRIPTION,
+                )
+            )
 
         # Legal analysis
         if any(kw in desc_lower for kw in ["legal", "law", "contract", "compliance"]):
-            tasks.append(SubTask(
-                title="Legal Analysis",
-                description=f"Legal analysis: {description}",
-                required_capability=AgentCapability.LEGAL_ANALYSIS,
-            ))
+            tasks.append(
+                SubTask(
+                    title="Legal Analysis",
+                    description=f"Legal analysis: {description}",
+                    required_capability=AgentCapability.LEGAL_ANALYSIS,
+                )
+            )
 
         # Code tasks
         if any(kw in desc_lower for kw in ["code", "programming", "debug", "implement"]):
-            tasks.append(SubTask(
-                title="Code Task",
-                description=f"Code task: {description}",
-                required_capability=AgentCapability.CODE_GENERATION,
-            ))
+            tasks.append(
+                SubTask(
+                    title="Code Task",
+                    description=f"Code task: {description}",
+                    required_capability=AgentCapability.CODE_GENERATION,
+                )
+            )
 
         # Default: general conversation
         if not tasks:
-            tasks.append(SubTask(
-                title="General Task",
-                description=description,
-                required_capability=AgentCapability.CONVERSATION,
-            ))
+            tasks.append(
+                SubTask(
+                    title="General Task",
+                    description=description,
+                    required_capability=AgentCapability.CONVERSATION,
+                )
+            )
 
         return tasks
 
@@ -340,7 +370,8 @@ class CoordinatorAgent:
         while remaining:
             # Find tasks with no unmet dependencies
             ready = [
-                tid for tid, task in remaining.items()
+                tid
+                for tid, task in remaining.items()
                 if all(dep in order for dep in task.dependencies)
             ]
 
@@ -429,11 +460,13 @@ class CoordinatorAgent:
                 mission_id=mission_id,
             )
 
-            await self._event_bus.publish(Event(
-                event_type=EventType.MISSION_ASSIGNED,
-                source=self.AGENT_ID,
-                payload=msg.to_dict(),
-            ))
+            await self._event_bus.publish(
+                Event(
+                    event_type=EventType.MISSION_ASSIGNED,
+                    source=self.AGENT_ID,
+                    payload=msg.to_dict(),
+                )
+            )
 
             assigned_count += 1
             logger.info(f"Assigned task {task.task_id} to {agent.agent_id}")
@@ -491,11 +524,13 @@ class CoordinatorAgent:
         # Check completion
         if completed == total:
             await self._memory.transition_mission(mission_id, MissionStatus.COMPLETED)
-            await self._event_bus.publish(Event(
-                event_type=EventType.MISSION_COMPLETED,
-                source=self.AGENT_ID,
-                payload={"mission_id": mission_id},
-            ))
+            await self._event_bus.publish(
+                Event(
+                    event_type=EventType.MISSION_COMPLETED,
+                    source=self.AGENT_ID,
+                    payload={"mission_id": mission_id},
+                )
+            )
             del self._active_missions[mission_id]
             logger.info(f"Mission completed: {mission_id}")
 
@@ -505,11 +540,13 @@ class CoordinatorAgent:
                 MissionStatus.FAILED,
                 error=f"{failed}/{total} tasks failed",
             )
-            await self._event_bus.publish(Event(
-                event_type=EventType.MISSION_FAILED,
-                source=self.AGENT_ID,
-                payload={"mission_id": mission_id, "failed_tasks": failed},
-            ))
+            await self._event_bus.publish(
+                Event(
+                    event_type=EventType.MISSION_FAILED,
+                    source=self.AGENT_ID,
+                    payload={"mission_id": mission_id, "failed_tasks": failed},
+                )
+            )
             del self._active_missions[mission_id]
             logger.warning(f"Mission failed: {mission_id}")
 

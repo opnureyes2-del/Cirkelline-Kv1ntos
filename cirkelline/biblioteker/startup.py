@@ -54,9 +54,7 @@ def register_default_adapters() -> None:
     print("✅ Multi-Bibliotek adapters registered")
 
 
-async def initialize_biblioteker(
-    domains: Optional[list] = None
-) -> MultiBibliotek:
+async def initialize_biblioteker(domains: Optional[list] = None) -> MultiBibliotek:
     """
     Initialiser Multi-Bibliotek systemet.
 
@@ -82,16 +80,13 @@ async def initialize_biblioteker(
         BibliotekSource.COSMIC_LIBRARY,
         cosmic,
         priority=1,
-        enabled=bool(os.getenv("COSMIC_LIBRARY_URL", ""))
+        enabled=bool(os.getenv("COSMIC_LIBRARY_URL", "")),
     )
 
     # Agent Learning (altid aktiveret)
     agent_learning = AgentLearningAdapter()
     bibliotek.register_adapter(
-        BibliotekSource.AGENT_LEARNING,
-        agent_learning,
-        priority=2,
-        enabled=True
+        BibliotekSource.AGENT_LEARNING, agent_learning, priority=2, enabled=True
     )
 
     # Notion (aktiveres hvis OAuth token findes)
@@ -100,7 +95,7 @@ async def initialize_biblioteker(
         BibliotekSource.NOTION,
         notion,
         priority=3,
-        enabled=bool(os.getenv("NOTION_INTEGRATION_TOKEN", ""))
+        enabled=bool(os.getenv("NOTION_INTEGRATION_TOKEN", "")),
     )
 
     # Forbind alle

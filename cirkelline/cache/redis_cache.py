@@ -65,6 +65,7 @@ class InMemoryCache:
 
             # Check TTL
             import time
+
             if key in self._ttls and time.time() > self._ttls[key]:
                 del self._cache[key]
                 del self._ttls[key]
@@ -192,11 +193,7 @@ class RedisCache:
             return await self._memory_cache.get(full_key)
 
     async def set(
-        self,
-        key: str,
-        value: str | dict | list,
-        ttl: int = None,
-        prefix: str = ""
+        self, key: str, value: str | dict | list, ttl: int = None, prefix: str = ""
     ) -> bool:
         """Set value in cache."""
         full_key = self._make_key(key, prefix)
@@ -262,9 +259,7 @@ class RedisCache:
     async def set_session(self, session_id: str, data: dict) -> bool:
         """Set session data."""
         return await self.set(
-            session_id, data,
-            ttl=self.config.session_ttl,
-            prefix=self.config.session_prefix
+            session_id, data, ttl=self.config.session_ttl, prefix=self.config.session_prefix
         )
 
     async def get_user(self, user_id: str) -> Optional[dict]:
@@ -274,9 +269,7 @@ class RedisCache:
     async def set_user(self, user_id: str, data: dict) -> bool:
         """Set user data."""
         return await self.set(
-            user_id, data,
-            ttl=self.config.user_data_ttl,
-            prefix=self.config.user_prefix
+            user_id, data, ttl=self.config.user_data_ttl, prefix=self.config.user_prefix
         )
 
     async def invalidate_user(self, user_id: str) -> bool:
@@ -338,9 +331,7 @@ async def get_cache() -> RedisCache:
 
 
 def cache_response(
-    ttl: int = 300,
-    key_prefix: str = "response:",
-    key_builder: Optional[Callable] = None
+    ttl: int = 300, key_prefix: str = "response:", key_builder: Optional[Callable] = None
 ):
     """
     Decorator to cache function responses.
@@ -350,6 +341,7 @@ def cache_response(
         async def get_data(user_id: str):
             ...
     """
+
     def decorator(func: Callable):
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -380,6 +372,7 @@ def cache_response(
             return result
 
         return wrapper
+
     return decorator
 
 

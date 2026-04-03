@@ -30,8 +30,10 @@ router = APIRouter(prefix="/api/terminal", tags=["Terminal"])
 # REQUEST/RESPONSE MODELS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class GitContext(BaseModel):
     """Git repository context from CLI."""
+
     is_git_repo: bool = False
     repo_name: Optional[str] = None
     current_branch: Optional[str] = None
@@ -49,6 +51,7 @@ class GitContext(BaseModel):
 
 class TerminalAskRequest(BaseModel):
     """Request to ask Kommandanten from terminal."""
+
     message: str = Field(..., min_length=1, max_length=10000)
     context: Optional[Dict[str, Any]] = None
     session_id: Optional[str] = None
@@ -57,6 +60,7 @@ class TerminalAskRequest(BaseModel):
 
 class TerminalAskResponse(BaseModel):
     """Response from Kommandanten."""
+
     success: bool
     answer: Optional[str] = None
     message_id: Optional[str] = None
@@ -68,6 +72,7 @@ class TerminalAskResponse(BaseModel):
 
 class SystemStatusResponse(BaseModel):
     """Comprehensive system status."""
+
     timestamp: str
     api_status: str
     api_version: str
@@ -89,6 +94,7 @@ class SystemStatusResponse(BaseModel):
 # ENDPOINTS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @router.post("/ask", response_model=TerminalAskResponse)
 async def terminal_ask(
     request: Request,
@@ -105,9 +111,9 @@ async def terminal_ask(
     start_time = time.time()
 
     # Get user context
-    user_id = getattr(request.state, 'user_id', None)
-    tier_slug = getattr(request.state, 'tier_slug', 'member')
-    is_admin = getattr(request.state, 'is_admin', False)
+    user_id = getattr(request.state, "user_id", None)
+    tier_slug = getattr(request.state, "tier_slug", "member")
+    is_admin = getattr(request.state, "is_admin", False)
 
     if not user_id:
         raise HTTPException(status_code=401, detail="Authentication required")
@@ -128,6 +134,7 @@ async def terminal_ask(
 
         # Generate message ID
         import uuid
+
         message_id = str(uuid.uuid4())[:12]
         session_id = payload.session_id or str(uuid.uuid4())[:16]
 
@@ -135,11 +142,11 @@ async def terminal_ask(
         enhanced_prompt = payload.message
 
         if git_context and git_context.is_git_repo:
-            git_info = (
-                f"\n\n[Git Context: {git_context.repo_name} @ {git_context.current_branch}"
-            )
+            git_info = f"\n\n[Git Context: {git_context.repo_name} @ {git_context.current_branch}"
             if git_context.has_changes:
-                git_info += f" | +{git_context.staged_count} staged, ~{git_context.modified_count} modified"
+                git_info += (
+                    f" | +{git_context.staged_count} staged, ~{git_context.modified_count} modified"
+                )
             git_info += "]"
             enhanced_prompt = f"{payload.message}{git_info}"
 
@@ -159,6 +166,7 @@ async def terminal_ask(
             try:
                 from agno.agent import Agent
                 from agno.models.google import Gemini
+
                 agent = Agent(
                     model=Gemini(id="gemini-2.5-flash"),
                     description="Du er Kommandanten, Cirkelline AI-assistent. Svar på dansk.",
@@ -203,8 +211,8 @@ async def terminal_status(request: Request):
     - CI/CD pipeline status
     - User-specific feature availability
     """
-    user_id = getattr(request.state, 'user_id', None)
-    tier_slug = getattr(request.state, 'tier_slug', 'member')
+    user_id = getattr(request.state, "user_id", None)
+    tier_slug = getattr(request.state, "tier_slug", "member")
 
     # Check service statuses
     db_status = "healthy"
@@ -249,8 +257,8 @@ async def terminal_features(request: Request):
     Used by CLI to show what features are available
     and suggest upgrades for premium features.
     """
-    tier_slug = getattr(request.state, 'tier_slug', 'member')
-    is_admin = getattr(request.state, 'is_admin', False)
+    tier_slug = getattr(request.state, "tier_slug", "member")
+    is_admin = getattr(request.state, "is_admin", False)
 
     features = get_tier_features_summary(tier_slug)
 

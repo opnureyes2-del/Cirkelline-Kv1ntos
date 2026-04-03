@@ -23,15 +23,17 @@ class BibliotekSource(Enum):
     Systemet er designet til at kunne udvides med nye kilder
     uden at ændre eksisterende kode.
     """
-    COSMIC_LIBRARY = "cosmic"       # Cosmic Library AI training system
-    NOTION = "notion"               # Notion databases
-    AGENT_LEARNING = "agent"        # Internal agent learning DB
-    LOCAL_FILES = "local"           # Local file system (via CLA)
-    CUSTOM = "custom"               # User-defined sources
+
+    COSMIC_LIBRARY = "cosmic"  # Cosmic Library AI training system
+    NOTION = "notion"  # Notion databases
+    AGENT_LEARNING = "agent"  # Internal agent learning DB
+    LOCAL_FILES = "local"  # Local file system (via CLA)
+    CUSTOM = "custom"  # User-defined sources
 
 
 class ItemType(Enum):
     """Typer af biblioteks-items."""
+
     DOCUMENT = "document"
     KNOWLEDGE = "knowledge"
     TRAINING_DATA = "training_data"
@@ -60,6 +62,7 @@ class LibraryItem:
         created_at: Oprettelsestidspunkt
         updated_at: Sidst opdateret
     """
+
     title: str
     content: str
     source: BibliotekSource
@@ -109,6 +112,7 @@ class SearchQuery:
         limit: Max antal resultater
         offset: Start offset for pagination
     """
+
     query: str
     sources: Optional[List[BibliotekSource]] = None
     domains: Optional[List[str]] = None
@@ -134,6 +138,7 @@ class SearchResult:
         sources_searched: Kilder der blev søgt i
         execution_time_ms: Søgetid i millisekunder
     """
+
     items: List[LibraryItem]
     total_count: int
     query: str
@@ -161,6 +166,7 @@ class SyncStatus:
         status: Status (success, failed, in_progress)
         error: Fejlbesked hvis relevant
     """
+
     source: BibliotekSource
     last_sync: Optional[datetime] = None
     items_synced: int = 0
@@ -245,7 +251,7 @@ class BibliotekAdapter(ABC):
         domain: Optional[str] = None,
         item_type: Optional[ItemType] = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[LibraryItem]:
         """
         List items fra biblioteket.
@@ -296,11 +302,7 @@ class BibliotekAdapter(ABC):
         Returns:
             SyncStatus med synkroniseringsresultat
         """
-        return SyncStatus(
-            source=self.source,
-            last_sync=datetime.utcnow(),
-            status="not_implemented"
-        )
+        return SyncStatus(source=self.source, last_sync=datetime.utcnow(), status="not_implemented")
 
     async def get_sync_status(self) -> SyncStatus:
         """
@@ -312,7 +314,7 @@ class BibliotekAdapter(ABC):
         return SyncStatus(
             source=self.source,
             last_sync=self._last_sync,
-            status="connected" if self._connected else "disconnected"
+            status="connected" if self._connected else "disconnected",
         )
 
     async def health_check(self) -> Dict[str, Any]:

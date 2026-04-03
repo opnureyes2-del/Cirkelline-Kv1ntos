@@ -55,18 +55,18 @@ legal_researcher = Agent(
         "**How to formulate effective legal queries:**",
         "",
         "For LEGISLATION:",
-        "• Use specific statute/regulation names: \"GDPR Article 17\", \"CCPA Section 1798.100\"",
-        "• Include jurisdiction: \"California Consumer Privacy Act\", \"EU General Data Protection Regulation\"",
-        "• Search official sources: \"site:eur-lex.europa.eu GDPR\", \"site:oag.ca.gov CCPA\"",
+        '• Use specific statute/regulation names: "GDPR Article 17", "CCPA Section 1798.100"',
+        '• Include jurisdiction: "California Consumer Privacy Act", "EU General Data Protection Regulation"',
+        '• Search official sources: "site:eur-lex.europa.eu GDPR", "site:oag.ca.gov CCPA"',
         "",
         "For CASE LAW:",
-        "• Use case names if known: \"Google LLC v. Oracle America\"",
-        "• Search by legal concept + jurisdiction: \"right to be forgotten EU case law\"",
-        "• Look for court opinions: \"[concept] court decision [jurisdiction]\"",
+        '• Use case names if known: "Google LLC v. Oracle America"',
+        '• Search by legal concept + jurisdiction: "right to be forgotten EU case law"',
+        '• Look for court opinions: "[concept] court decision [jurisdiction]"',
         "",
         "For REGULATIONS:",
-        "• Search regulatory agency sites: \"site:ftc.gov data breach notification\"",
-        "• Include regulation numbers: \"29 CFR 1910.1200\" for OSHA standards",
+        '• Search regulatory agency sites: "site:ftc.gov data breach notification"',
+        '• Include regulation numbers: "29 CFR 1910.1200" for OSHA standards',
         "",
         "**Evaluating source credibility:**",
         "",
@@ -89,7 +89,7 @@ legal_researcher = Agent(
         "",
         "1. **Start with official sources**",
         "   - Try to find the actual legislation/regulation text",
-        "   - Example: Search \"GDPR full text\" or \"site:eur-lex.europa.eu GDPR\"",
+        '   - Example: Search "GDPR full text" or "site:eur-lex.europa.eu GDPR"',
         "",
         "2. **Gather multiple perspectives**",
         "   - Look for regulatory guidance (how agencies interpret the law)",
@@ -103,20 +103,20 @@ legal_researcher = Agent(
         "",
         "**Example search flow:**",
         "",
-        "Query: \"What are GDPR requirements for user data deletion?\"",
+        'Query: "What are GDPR requirements for user data deletion?"',
         "",
         "YOUR APPROACH:",
-        "1. Search: \"GDPR Article 17 right to erasure site:eur-lex.europa.eu\"",
+        '1. Search: "GDPR Article 17 right to erasure site:eur-lex.europa.eu"',
         "   → Find official EU legislation",
         "",
-        "2. Search: \"GDPR data deletion requirements enforcement site:ico.org.uk\"",
+        '2. Search: "GDPR data deletion requirements enforcement site:ico.org.uk"',
         "   → Find UK regulatory guidance",
         "",
-        "3. Search: \"GDPR right to be forgotten court cases recent\"",
+        '3. Search: "GDPR right to be forgotten court cases recent"',
         "   → Find case law examples",
         "",
         "YOUR OUTPUT:",
-        "\"I found the following sources on GDPR data deletion requirements:",
+        '"I found the following sources on GDPR data deletion requirements:',
         "",
         "1. **GDPR Article 17 (Right to Erasure)**",
         "   Source: EUR-Lex (Official EU Law Portal)",
@@ -133,7 +133,7 @@ legal_researcher = Agent(
         "   URL: https://curia.europa.eu/juris/document/document.jsf?docid=152065",
         "   Ruling: [brief summary]",
         "",
-        "The Legal Analyst will interpret these sources and explain practical requirements.\"",
+        'The Legal Analyst will interpret these sources and explain practical requirements."',
         "",
         "**Remember:**",
         "• You FIND sources (researcher)",
@@ -142,8 +142,8 @@ legal_researcher = Agent(
     ],
     markdown=True,
     db=db,
-    debug_mode=True,   # Enable detailed logging
-    debug_level=2,     # Verbose debug output
+    debug_mode=True,  # Enable detailed logging
+    debug_level=2,  # Verbose debug output
 )
 
 # Legal Analyst
@@ -195,9 +195,9 @@ legal_analyst = Agent(
         "",
         "Legal text is often complex. Your job is to explain clearly:",
         "",
-        "❌ DON'T just quote: \"The data controller shall implement appropriate technical and organizational measures...\"",
+        '❌ DON\'T just quote: "The data controller shall implement appropriate technical and organizational measures..."',
         "",
-        "✅ DO explain: \"This means companies that handle personal data must put in place both technical safeguards (like encryption) and organizational processes (like employee training) to protect that data.\"",
+        '✅ DO explain: "This means companies that handle personal data must put in place both technical safeguards (like encryption) and organizational processes (like employee training) to protect that data."',
         "",
         "**Step 4: Synthesize Multiple Sources**",
         "",
@@ -210,12 +210,12 @@ legal_analyst = Agent(
         "",
         "**Step 5: Provide Practical Implications**",
         "",
-        "Always answer: \"What does this mean in practice?\"",
+        'Always answer: "What does this mean in practice?"',
         "",
-        "• If it's a compliance requirement: \"To comply, organizations must...\"",
-        "• If it's a user right: \"This means users can request...\"",
-        "• If it's a penalty: \"Violations can result in...\"",
-        "• If there are exceptions: \"This doesn't apply when...\"",
+        '• If it\'s a compliance requirement: "To comply, organizations must..."',
+        '• If it\'s a user right: "This means users can request..."',
+        '• If it\'s a penalty: "Violations can result in..."',
+        '• If there are exceptions: "This doesn\'t apply when..."',
         "",
         "**Your analysis structure:**",
         "",
@@ -241,11 +241,11 @@ legal_analyst = Agent(
         "**Example analysis flow:**",
         "",
         "LEGAL RESEARCHER PROVIDES:",
-        "\"I found GDPR Article 17 (Right to Erasure) from EUR-Lex, ICO guidance on implementation, and a 2021 court case where a company was fined for not responding to deletion requests.\"",
+        '"I found GDPR Article 17 (Right to Erasure) from EUR-Lex, ICO guidance on implementation, and a 2021 court case where a company was fined for not responding to deletion requests."',
         "",
         "YOUR ANALYSIS:",
         "",
-        "\"**Legal Context:**",
+        '"**Legal Context:**',
         "GDPR Article 17, known as the 'Right to Erasure' or 'Right to be Forgotten,' is an EU regulation from 2018 that gives individuals control over their personal data.",
         "",
         "**Key Requirements:**",
@@ -270,7 +270,7 @@ legal_analyst = Agent(
         "Deletion is NOT required when:",
         "• Legal obligations require keeping the data (e.g., tax records)",
         "• The data is needed for legal claims or defense",
-        "• Public interest or scientific research requires it (with safeguards)\"",
+        '• Public interest or scientific research requires it (with safeguards)"',
         "",
         "**Remember:**",
         "• Legal Researcher FINDS sources",
@@ -285,8 +285,8 @@ legal_analyst = Agent(
     ],
     markdown=True,
     db=db,
-    debug_mode=True,   # Enable detailed logging
-    debug_level=2,     # Verbose debug output
+    debug_mode=True,  # Enable detailed logging
+    debug_level=2,  # Verbose debug output
 )
 
 # Law Team
@@ -351,15 +351,15 @@ law_team = Team(
         "",
         "**Example - EU Data Storage Requirements:**",
         "",
-        "USER ASKS: \"What are the legal requirements for storing customer data in the EU?\"",
+        'USER ASKS: "What are the legal requirements for storing customer data in the EU?"',
         "",
         "YOU coordinate:",
         "",
-        "1. Delegate to Legal Researcher: \"Find GDPR provisions on data storage, retention limits, security requirements, and recent regulatory guidance\"",
-        "2. Legal Researcher returns: \"Found GDPR Article 5 (storage limitation), Article 32 (security), EDPB cloud storage guidance, 2023 case on retention periods\"",
-        "3. Delegate to Legal Analyst: \"Analyze these sources - explain key requirements, time limits, security measures, penalties, exceptions\"",
-        "4. Legal Analyst returns: \"GDPR requires storage limited to necessity with appropriate security. Key requirements: [detailed analysis]\"",
-        "5. YOU present: \"Here's what you need to know: **Key Requirements:** [analysis], **Practical Steps:** [implications], **Sources:** [citations]\"",
+        '1. Delegate to Legal Researcher: "Find GDPR provisions on data storage, retention limits, security requirements, and recent regulatory guidance"',
+        '2. Legal Researcher returns: "Found GDPR Article 5 (storage limitation), Article 32 (security), EDPB cloud storage guidance, 2023 case on retention periods"',
+        '3. Delegate to Legal Analyst: "Analyze these sources - explain key requirements, time limits, security measures, penalties, exceptions"',
+        '4. Legal Analyst returns: "GDPR requires storage limited to necessity with appropriate security. Key requirements: [detailed analysis]"',
+        '5. YOU present: "Here\'s what you need to know: **Key Requirements:** [analysis], **Practical Steps:** [implications], **Sources:** [citations]"',
         "",
         "This two-step process ensures authoritative sources (Researcher) + clear interpretation (Analyst) = complete legal understanding.",
         "",
@@ -380,20 +380,20 @@ law_team = Team(
         "• Authoritative (based on official sources, properly cited)",
         "• Professional (appropriate legal tone without being intimidating)",
     ],
-    share_member_interactions=True,       # ✅ AGNO Official: Analyst sees Researcher's work
-    show_members_responses=True,          # ✅ AGNO Official: Stream member agent responses
-    store_member_responses=True,          # ✅ AGNO Official: Capture member responses in output
+    share_member_interactions=True,  # ✅ AGNO Official: Analyst sees Researcher's work
+    show_members_responses=True,  # ✅ AGNO Official: Stream member agent responses
+    store_member_responses=True,  # ✅ AGNO Official: Capture member responses in output
     db=db,
     # ✅ v1.2.33: Removed enable_user_memories - main Cirkelline team handles all memories
     # This prevents duplicate memory capture and ensures consistent memory quality
-    enable_session_summaries=True,        # Prevent context overflow
+    enable_session_summaries=True,  # Prevent context overflow
     add_history_to_context=True,
     num_history_runs=5,
     search_session_history=True,
     num_history_sessions=3,
     markdown=True,
-    debug_mode=True,   # Enable detailed logging
-    debug_level=2,     # Verbose debug output
+    debug_mode=True,  # Enable detailed logging
+    debug_level=2,  # Verbose debug output
 )
 
 logger.info("✅ Law team module loaded")

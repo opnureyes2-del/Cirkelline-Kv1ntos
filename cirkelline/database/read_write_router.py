@@ -48,8 +48,10 @@ logger = logging.getLogger(__name__)
 # CONFIGURATION
 # =============================================================================
 
+
 class RouteMode(Enum):
     """Query routing mode."""
+
     READ = "read"
     WRITE = "write"
     AUTO = "auto"  # For future smart routing
@@ -58,6 +60,7 @@ class RouteMode(Enum):
 @dataclass
 class DatabaseNode:
     """Configuration for a database node."""
+
     name: str
     host: str
     port: int
@@ -82,6 +85,7 @@ class DatabaseNode:
 @dataclass
 class RouterConfig:
     """Database router configuration."""
+
     primary: DatabaseNode
     replicas: List[DatabaseNode] = field(default_factory=list)
 
@@ -117,15 +121,17 @@ class RouterConfig:
         for i, host in enumerate(replica_hosts):
             host = host.strip()
             if host:
-                replicas.append(DatabaseNode(
-                    name=f"replica-{i+1}",
-                    host=host,
-                    port=replica_port,
-                    database=primary.database,
-                    user=primary.user,
-                    password=primary.password,
-                    is_replica=True,
-                ))
+                replicas.append(
+                    DatabaseNode(
+                        name=f"replica-{i+1}",
+                        host=host,
+                        port=replica_port,
+                        database=primary.database,
+                        user=primary.user,
+                        password=primary.password,
+                        is_replica=True,
+                    )
+                )
 
         return cls(primary=primary, replicas=replicas)
 
@@ -150,9 +156,11 @@ class RouterConfig:
 # METRICS
 # =============================================================================
 
+
 @dataclass
 class RouterMetrics:
     """Router performance metrics."""
+
     read_queries: int = 0
     write_queries: int = 0
     primary_reads: int = 0  # Reads that went to primary (no replicas)
@@ -180,6 +188,7 @@ class RouterMetrics:
 # =============================================================================
 # DATABASE ROUTER
 # =============================================================================
+
 
 class DatabaseRouter:
     """
@@ -242,9 +251,7 @@ class DatabaseRouter:
             self._initialized = True
 
             replica_count = len(self._replica_engines)
-            logger.info(
-                f"DatabaseRouter initialized: 1 primary, {replica_count} replicas"
-            )
+            logger.info(f"DatabaseRouter initialized: 1 primary, {replica_count} replicas")
 
     def _create_engine(self, node: DatabaseNode) -> Engine:
         """Create SQLAlchemy engine for a node."""
@@ -290,11 +297,7 @@ class DatabaseRouter:
             raise RuntimeError("No replicas available")
 
         # Weighted random selection
-        engine = random.choices(
-            self._replica_engines,
-            weights=self._replica_weights,
-            k=1
-        )[0]
+        engine = random.choices(self._replica_engines, weights=self._replica_weights, k=1)[0]
 
         self._metrics.replica_reads += 1
         SessionLocal = sessionmaker(bind=engine)
@@ -444,17 +447,13 @@ async def close_database_router() -> None:
 __all__ = [
     # Enums
     "RouteMode",
-
     # Config
     "DatabaseNode",
     "RouterConfig",
-
     # Metrics
     "RouterMetrics",
-
     # Main class
     "DatabaseRouter",
-
     # Global access
     "get_database_router",
     "init_database_router",

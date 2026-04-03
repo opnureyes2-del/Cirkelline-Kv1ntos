@@ -48,8 +48,10 @@ logger = logging.getLogger(__name__)
 # NODE & EDGE TYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class NodeType(str, Enum):
     """Types of nodes in the knowledge graph."""
+
     AGENT = "agent"
     TOOL = "tool"
     KNOWLEDGE = "knowledge"
@@ -62,6 +64,7 @@ class NodeType(str, Enum):
 
 class EdgeType(str, Enum):
     """Types of relationships between nodes."""
+
     # Agent relationships
     HAS_TOOL = "has_tool"
     KNOWS = "knows"
@@ -91,6 +94,7 @@ class EdgeType(str, Enum):
 # NODE DATA CLASS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class GraphNode:
     """
@@ -104,6 +108,7 @@ class GraphNode:
         created_at: Creation timestamp
         updated_at: Last update timestamp
     """
+
     node_id: str
     node_type: NodeType
     name: str
@@ -115,7 +120,9 @@ class GraphNode:
         """Convert to dictionary."""
         return {
             "node_id": self.node_id,
-            "node_type": self.node_type.value if isinstance(self.node_type, NodeType) else self.node_type,
+            "node_type": (
+                self.node_type.value if isinstance(self.node_type, NodeType) else self.node_type
+            ),
             "name": self.name,
             "properties": self.properties,
             "created_at": self.created_at,
@@ -127,7 +134,11 @@ class GraphNode:
         """Reconstruct from dictionary."""
         return cls(
             node_id=data["node_id"],
-            node_type=NodeType(data["node_type"]) if data["node_type"] in [n.value for n in NodeType] else data["node_type"],
+            node_type=(
+                NodeType(data["node_type"])
+                if data["node_type"] in [n.value for n in NodeType]
+                else data["node_type"]
+            ),
             name=data["name"],
             properties=data.get("properties", {}),
             created_at=data.get("created_at", datetime.utcnow().isoformat()),
@@ -147,6 +158,7 @@ class GraphEdge:
         weight: Strength/confidence of relationship
         properties: Additional metadata
     """
+
     source_id: str
     target_id: str
     edge_type: EdgeType
@@ -158,7 +170,9 @@ class GraphEdge:
         return {
             "source_id": self.source_id,
             "target_id": self.target_id,
-            "edge_type": self.edge_type.value if isinstance(self.edge_type, EdgeType) else self.edge_type,
+            "edge_type": (
+                self.edge_type.value if isinstance(self.edge_type, EdgeType) else self.edge_type
+            ),
             "weight": self.weight,
             "properties": self.properties,
         }
@@ -167,6 +181,7 @@ class GraphEdge:
 # ═══════════════════════════════════════════════════════════════════════════════
 # KNOWLEDGE GRAPH
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class KnowledgeGraph:
     """
@@ -230,7 +245,9 @@ class KnowledgeGraph:
         """
         self._graph.add_node(
             node.node_id,
-            node_type=node.node_type.value if isinstance(node.node_type, NodeType) else node.node_type,
+            node_type=(
+                node.node_type.value if isinstance(node.node_type, NodeType) else node.node_type
+            ),
             name=node.name,
             properties=node.properties,
             created_at=node.created_at,
@@ -284,12 +301,14 @@ class KnowledgeGraph:
 
         for node_id, data in self._graph.nodes(data=True):
             if data.get("node_type") == type_value:
-                nodes.append(GraphNode(
-                    node_id=node_id,
-                    node_type=data.get("node_type"),
-                    name=data.get("name", ""),
-                    properties=data.get("properties", {}),
-                ))
+                nodes.append(
+                    GraphNode(
+                        node_id=node_id,
+                        node_type=data.get("node_type"),
+                        name=data.get("name", ""),
+                        properties=data.get("properties", {}),
+                    )
+                )
 
         return nodes
 
@@ -317,7 +336,9 @@ class KnowledgeGraph:
         self._graph.add_edge(
             edge.source_id,
             edge.target_id,
-            edge_type=edge.edge_type.value if isinstance(edge.edge_type, EdgeType) else edge.edge_type,
+            edge_type=(
+                edge.edge_type.value if isinstance(edge.edge_type, EdgeType) else edge.edge_type
+            ),
             weight=edge.weight,
             properties=edge.properties,
         )
@@ -341,13 +362,15 @@ class KnowledgeGraph:
             if type_value and data.get("edge_type") != type_value:
                 continue
 
-            edges.append(GraphEdge(
-                source_id=src,
-                target_id=tgt,
-                edge_type=data.get("edge_type"),
-                weight=data.get("weight", 1.0),
-                properties=data.get("properties", {}),
-            ))
+            edges.append(
+                GraphEdge(
+                    source_id=src,
+                    target_id=tgt,
+                    edge_type=data.get("edge_type"),
+                    weight=data.get("weight", 1.0),
+                    properties=data.get("properties", {}),
+                )
+            )
 
         return edges
 
@@ -491,24 +514,28 @@ class KnowledgeGraph:
             # Search in name
             name = data.get("name", "")
             if query_lower in name.lower():
-                results.append(GraphNode(
-                    node_id=node_id,
-                    node_type=data.get("node_type"),
-                    name=name,
-                    properties=data.get("properties", {}),
-                ))
+                results.append(
+                    GraphNode(
+                        node_id=node_id,
+                        node_type=data.get("node_type"),
+                        name=name,
+                        properties=data.get("properties", {}),
+                    )
+                )
                 continue
 
             # Search in properties
             props = data.get("properties", {})
             for value in props.values():
                 if isinstance(value, str) and query_lower in value.lower():
-                    results.append(GraphNode(
-                        node_id=node_id,
-                        node_type=data.get("node_type"),
-                        name=name,
-                        properties=props,
-                    ))
+                    results.append(
+                        GraphNode(
+                            node_id=node_id,
+                            node_type=data.get("node_type"),
+                            name=name,
+                            properties=props,
+                        )
+                    )
                     break
 
             if len(results) >= limit:
@@ -567,11 +594,13 @@ class KnowledgeGraph:
                     self.add_node(tool_node)
 
                 # Connect agent to tool
-                self.add_edge(GraphEdge(
-                    source_id=agent_id,
-                    target_id=tool_id,
-                    edge_type=EdgeType.HAS_TOOL,
-                ))
+                self.add_edge(
+                    GraphEdge(
+                        source_id=agent_id,
+                        target_id=tool_id,
+                        edge_type=EdgeType.HAS_TOOL,
+                    )
+                )
 
         return agent_id
 
@@ -589,12 +618,14 @@ class KnowledgeGraph:
 
             caps = data.get("properties", {}).get("capabilities", [])
             if capability in caps:
-                agents.append(GraphNode(
-                    node_id=node_id,
-                    node_type=data.get("node_type"),
-                    name=data.get("name", ""),
-                    properties=data.get("properties", {}),
-                ))
+                agents.append(
+                    GraphNode(
+                        node_id=node_id,
+                        node_type=data.get("node_type"),
+                        name=data.get("name", ""),
+                        properties=data.get("properties", {}),
+                    )
+                )
 
         return agents
 
@@ -616,17 +647,21 @@ class KnowledgeGraph:
             }
 
             for node_id, attrs in self._graph.nodes(data=True):
-                data["nodes"].append({
-                    "node_id": node_id,
-                    **attrs,
-                })
+                data["nodes"].append(
+                    {
+                        "node_id": node_id,
+                        **attrs,
+                    }
+                )
 
             for src, tgt, attrs in self._graph.edges(data=True):
-                data["edges"].append({
-                    "source_id": src,
-                    "target_id": tgt,
-                    **attrs,
-                })
+                data["edges"].append(
+                    {
+                        "source_id": src,
+                        "target_id": tgt,
+                        **attrs,
+                    }
+                )
 
             await self._redis.set(
                 self.REDIS_KEY,
@@ -667,7 +702,9 @@ class KnowledgeGraph:
                 tgt = edge_data.pop("target_id")
                 self._graph.add_edge(src, tgt, **edge_data)
 
-            logger.info(f"Loaded graph: {self._graph.number_of_nodes()} nodes, {self._graph.number_of_edges()} edges")
+            logger.info(
+                f"Loaded graph: {self._graph.number_of_nodes()} nodes, {self._graph.number_of_edges()} edges"
+            )
             return True
 
         except Exception as e:
@@ -677,10 +714,7 @@ class KnowledgeGraph:
     def to_dict(self) -> Dict[str, Any]:
         """Export graph as dictionary."""
         return {
-            "nodes": [
-                {"node_id": nid, **data}
-                for nid, data in self._graph.nodes(data=True)
-            ],
+            "nodes": [{"node_id": nid, **data} for nid, data in self._graph.nodes(data=True)],
             "edges": [
                 {"source_id": src, "target_id": tgt, **data}
                 for src, tgt, data in self._graph.edges(data=True)

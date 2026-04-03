@@ -66,8 +66,10 @@ logger = logging.getLogger(__name__)
 # CONFIGURATION
 # =============================================================================
 
+
 class BookingStatus(Enum):
     """Booking status values."""
+
     PENDING = "pending"
     CONFIRMED = "confirmed"
     CANCELLED = "cancelled"
@@ -78,6 +80,7 @@ class BookingStatus(Enum):
 @dataclass
 class QueueConfig:
     """Queue worker configuration."""
+
     # SQS settings
     queue_url: str = ""
     region: str = "eu-north-1"
@@ -109,6 +112,7 @@ class QueueConfig:
 @dataclass
 class BookingMessage:
     """A booking message from the queue."""
+
     message_id: str
     receipt_handle: str
     booking_id: str
@@ -138,6 +142,7 @@ class BookingMessage:
 @dataclass
 class WorkerStats:
     """Worker statistics."""
+
     messages_received: int = 0
     messages_processed: int = 0
     messages_failed: int = 0
@@ -165,6 +170,7 @@ class WorkerStats:
 # =============================================================================
 # QUEUE CLIENT
 # =============================================================================
+
 
 class QueueClient(ABC):
     """Abstract queue client interface."""
@@ -249,10 +255,10 @@ class SQSQueueClient(QueueClient):
         if self._client is None:
             try:
                 from aiobotocore.session import get_session
+
                 session = get_session()
                 self._client = await session.create_client(
-                    'sqs',
-                    region_name=self.config.region
+                    "sqs", region_name=self.config.region
                 ).__aenter__()
             except ImportError:
                 raise RuntimeError("aiobotocore required for SQS")
@@ -283,8 +289,7 @@ class SQSQueueClient(QueueClient):
     async def delete_messages_batch(self, receipt_handles: List[str]) -> int:
         client = await self._get_client()
         entries = [
-            {"Id": str(i), "ReceiptHandle": handle}
-            for i, handle in enumerate(receipt_handles)
+            {"Id": str(i), "ReceiptHandle": handle} for i, handle in enumerate(receipt_handles)
         ]
 
         try:
@@ -310,6 +315,7 @@ class SQSQueueClient(QueueClient):
 # BOOKING PROCESSOR
 # =============================================================================
 
+
 class BookingProcessor(ABC):
     """Abstract booking processor."""
 
@@ -325,7 +331,7 @@ class DatabaseBookingProcessor(BookingProcessor):
     def __init__(self, db_url: str = ""):
         self.db_url = db_url or os.getenv(
             "DATABASE_URL",
-            "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline"
+            "postgresql+psycopg://cirkelline:cirkelline123@localhost:5532/cirkelline",
         )
         self._pool = None
 
@@ -338,6 +344,7 @@ class DatabaseBookingProcessor(BookingProcessor):
 
             try:
                 import asyncpg
+
                 self._pool = await asyncpg.create_pool(
                     self.db_url.replace("+psycopg", "").replace("postgresql", "postgres"),
                     min_size=5,
@@ -388,6 +395,7 @@ class DatabaseBookingProcessor(BookingProcessor):
 # =============================================================================
 # BOOKING WORKER
 # =============================================================================
+
 
 class BookingWorker:
     """
@@ -449,9 +457,7 @@ class BookingWorker:
 
         while self._running:
             try:
-                messages = await self._queue.receive_messages(
-                    self.config.max_messages
-                )
+                messages = await self._queue.receive_messages(self.config.max_messages)
 
                 if not messages:
                     await asyncio.sleep(0.1)
@@ -470,6 +476,7 @@ class BookingWorker:
     async def _process_messages(self, messages: List[Dict[str, Any]]) -> None:
         """Process a batch of messages."""
         import time
+
         start_time = time.time()
 
         # Parse messages
@@ -563,24 +570,19 @@ async def stop_booking_worker() -> None:
 __all__ = [
     # Enums
     "BookingStatus",
-
     # Config
     "QueueConfig",
     "BookingMessage",
     "WorkerStats",
-
     # Clients
     "QueueClient",
     "LocalQueueClient",
     "SQSQueueClient",
-
     # Processors
     "BookingProcessor",
     "DatabaseBookingProcessor",
-
     # Worker
     "BookingWorker",
-
     # Factory
     "get_booking_worker",
     "start_booking_worker",
