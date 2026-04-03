@@ -64,6 +64,7 @@ PUBLIC_ENDPOINTS = [
     "/api/admiral/",
     "/api/kv1nt/",
     "/api/support/",
+    "/api/landing/",
 ]
 
 

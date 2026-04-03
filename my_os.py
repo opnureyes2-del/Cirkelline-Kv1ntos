@@ -286,6 +286,14 @@ try:
 except ImportError as e:
     logger.warning(f"⚠️ Agent Graduation not available: {e}")
 
+# Landing Stats (Public — myaddspace.com)
+try:
+    from cirkelline.api.landing_stats import router as landing_stats_router
+    app.include_router(landing_stats_router, tags=["Landing Stats"])
+    logger.info("✅ Landing Stats API loaded (/api/landing/stats)")
+except ImportError as e:
+    logger.warning(f"⚠️ Landing Stats not available: {e}")
+
 # Admiral Integration (ELLE.md ↔ Cirkelline)
 try:
     from cirkelline.endpoints.admiral_integration import router as admiral_router
@@ -493,6 +501,7 @@ app.add_middleware(
         "/api/admiral/*",
         "/api/kv1nt/*",
         "/api/support/*",
+        "/api/landing/*",
         "/api/oauth/google/start",
         "/api/oauth/google/callback",
         "/api/oauth/notion/start",
