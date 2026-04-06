@@ -290,6 +290,33 @@ export default function LearnMoreModal({ isOpen, onClose }: LearnMoreModalProps)
                     </div>
 
                     <div className="mt-6 p-4 rounded-lg bg-accent/10 border border-accent/20">
+                      <h4 className="font-semibold text-accent mb-2">Our Platforms</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+                        <a href="https://myaddspace.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded border border-accent/20 hover:bg-accent/5 transition-colors">
+                          <span className="text-lg">📰</span>
+                          <div>
+                            <p className="text-sm font-medium text-light-text dark:text-dark-text">MyAddSpace</p>
+                            <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">Content & Ads</p>
+                          </div>
+                        </a>
+                        <a href="https://myaddspace.com/cosmic" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded border border-accent/20 hover:bg-accent/5 transition-colors">
+                          <span className="text-lg">🌌</span>
+                          <div>
+                            <p className="text-sm font-medium text-light-text dark:text-dark-text">Cosmic Library</p>
+                            <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">AI Training</p>
+                          </div>
+                        </a>
+                        <a href="https://cirkelline-consulting.dk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded border border-accent/20 hover:bg-accent/5 transition-colors">
+                          <span className="text-lg">💼</span>
+                          <div>
+                            <p className="text-sm font-medium text-light-text dark:text-dark-text">Consulting</p>
+                            <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">IT Services</p>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 p-4 rounded-lg bg-accent/10 border border-accent/20">
                       <h4 className="font-semibold text-accent mb-2">Response Time</h4>
                       <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                         We typically respond to all inquiries within 24 hours during business days.
