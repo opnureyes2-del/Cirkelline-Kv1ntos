@@ -36,7 +36,7 @@ ndarray = "0.16"
 ort = { version = "2.0.0-rc.10", features = ["load-dynamic"] }
 
 # Tokenizer for text processing
-tokenizers = { version = "0.21", default-features = false, features = ["onig"] }
+tokenizers = { version = "0.22", default-features = false, features = ["onig"] }
 
 # Audio processing for Whisper
 hound = "3.5"
